@@ -1,0 +1,12 @@
+plugins {
+    id 'application'
+}
+
+group 'by.gradomski.multi'
+version '1.0-SNAPSHOT'
+
+mainClassName = "by.gradomski.runner.App"
+
+dependencies {
+    compile project(':core')
+}
