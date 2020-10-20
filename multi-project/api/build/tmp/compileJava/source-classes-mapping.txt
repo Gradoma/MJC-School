@@ -1,2 +1,0 @@
-by/gradomski/runner/App.java
- by.gradomski.runner.App
