@@ -39,11 +39,6 @@ public class SpringConfig {
     }
 
     @Bean
-    DbConfig getDbConfig(){
-        return new DbConfig();
-    }
-
-    @Bean
     public TagDaoImpl getTagDaoImpl(){
         return new TagDaoImpl(getJdbcTemplate());
     }
