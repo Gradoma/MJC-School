@@ -17,4 +17,6 @@ public class TagMapper implements RowMapper<Tag> {
         tag.setName(resultSet.getString(NAME));
         return tag;
     }
+
+
 }
