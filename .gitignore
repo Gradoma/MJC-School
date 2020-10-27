@@ -6,3 +6,4 @@ target/
 out/
 lib/
 *.iml
+Main.java
