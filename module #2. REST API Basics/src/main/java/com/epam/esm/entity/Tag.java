@@ -1,10 +1,14 @@
 package com.epam.esm.entity;
 
-public class Tag {
+public class Tag{
     private long id;
     private String name;
 
     public Tag(){}
+    public Tag(Tag originTag){
+        this.id = originTag.getId();
+        this.name = originTag.getName();
+    }
 
     public long getId() {
         return id;
@@ -21,6 +25,7 @@ public class Tag {
     public void setName(String name) {
         this.name = name;
     }
+
 
     @Override
     public boolean equals(Object o) {

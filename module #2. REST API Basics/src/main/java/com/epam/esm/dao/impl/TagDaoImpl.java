@@ -1,8 +1,9 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.TagDao;
+import static com.epam.esm.dao.column.TagConst.*;
+import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.mapper.TagMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -14,10 +15,7 @@ import java.util.Map;
 public class TagDaoImpl implements TagDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
-    private static final String TABLE_TAG = "tag";
-    private static final String ID = "Id";  //todo fix, same as tagMapper
-    private static final String NAME = "Name";  //todo fix, same as tagMapper
-    private static final String INSERT = "INSERT INTO tag(Name) values(?)";
+    private static final TagMapper tagMapper = new TagMapper();
     private static final String SELECT_ALL = "SELECT Id, Name FROM tag";
     private static final String SELECT_BY_ID = "SELECT Id, Name FROM tag WHERE Id=?";
     private static final String SELECT_BY_NAME = "SELECT Id, Name FROM tag WHERE Name=?";
@@ -42,7 +40,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public List<Tag> findAll() {
-        return jdbcTemplate.query(SELECT_ALL, new TagMapper());
+        return jdbcTemplate.query(SELECT_ALL, tagMapper);
     }
 
     @Override
@@ -62,8 +60,8 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public boolean delete(Tag tag) {
-        int rows = jdbcTemplate.update(DELETE_BY_ID, tag.getId());
+    public boolean deleteById(long id) {
+        int rows = jdbcTemplate.update(DELETE_BY_ID, id);
         return rows > 0;
     }
 }

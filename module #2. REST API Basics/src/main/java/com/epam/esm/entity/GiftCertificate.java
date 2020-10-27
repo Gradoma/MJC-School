@@ -1,23 +1,50 @@
 package com.epam.esm.entity;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GiftCertificate {
-    private Tag name;
+    private long id;
+    private String name;
+    private List<Tag> tagList = new ArrayList<>();
     private String description;
-    private double price;
-    private ZonedDateTime createTime;
+    private Double price;
+    private ZonedDateTime createDate;
     private ZonedDateTime LastUpdateDate;
-    private int duration;
+    private Duration duration;
 
     public GiftCertificate(){}
 
-    public Tag getName() {
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
         return name;
     }
 
-    public void setName(Tag name) {
+    public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Tag> getTagList() {
+        List<Tag> listReturn = new ArrayList<>();
+        for(Tag currentTag : tagList){
+            listReturn.add(new Tag(currentTag));
+        }
+        return listReturn;
+    }
+
+    public void setTagList(List<Tag> list) {
+        for(Tag currentTag : list){
+            tagList.add(new Tag(currentTag));
+        }
     }
 
     public String getDescription() {
@@ -36,12 +63,12 @@ public class GiftCertificate {
         this.price = price;
     }
 
-    public ZonedDateTime getCreateTime() {
-        return createTime;
+    public ZonedDateTime getCreateDate() {
+        return createDate;
     }
 
-    public void setCreateTime(ZonedDateTime createTime) {
-        this.createTime = createTime;
+    public void setCreateDate(ZonedDateTime createDate) {
+        this.createDate = createDate;
     }
 
     public ZonedDateTime getLastUpdateDate() {
@@ -52,11 +79,11 @@ public class GiftCertificate {
         LastUpdateDate = lastUpdateDate;
     }
 
-    public int getDuration() {
+    public Duration getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
@@ -67,35 +94,38 @@ public class GiftCertificate {
 
         GiftCertificate that = (GiftCertificate) o;
 
-        if (Double.compare(that.price, price) != 0) return false;
-        if (duration != that.duration) return false;
+        if (id != that.id) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (tagList != null ? !tagList.equals(that.tagList) : that.tagList != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
-        return LastUpdateDate != null ? LastUpdateDate.equals(that.LastUpdateDate) : that.LastUpdateDate == null;
+        if (price != null ? !price.equals(that.price) : that.price != null) return false;
+        if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null) return false;
+        if (LastUpdateDate != null ? !LastUpdateDate.equals(that.LastUpdateDate) : that.LastUpdateDate != null)
+            return false;
+        return duration != null ? duration.equals(that.duration) : that.duration == null;
     }
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = name != null ? name.hashCode() : 0;
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (tagList != null ? tagList.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
-        temp = Double.doubleToLongBits(price);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (price != null ? price.hashCode() : 0);
+        result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
         result = 31 * result + (LastUpdateDate != null ? LastUpdateDate.hashCode() : 0);
-        result = 31 * result + duration;
+        result = 31 * result + (duration != null ? duration.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return getClass().getName() + "{" +
+                "id=" + id +
                 "name=" + name +
                 ", description='" + description + '\'' +
                 ", price=" + price +
-                ", createTime=" + createTime +
+                ", createTime=" + createDate +
                 ", LastUpdateDate=" + LastUpdateDate +
                 ", duration=" + duration +
                 '}';
