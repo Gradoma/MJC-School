@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private final JdbcTemplate jdbcTemplate;
@@ -56,18 +57,34 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public GiftCertificate findById(long id) {
-        return jdbcTemplate.queryForObject(SELECT_BY_ID, GiftCertificate.class, id);
+    public Optional<GiftCertificate> findById(long id) {
+        Optional<GiftCertificate> certificateOptional = Optional.empty();
+        GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_ID, GiftCertificate.class, id);
+        if(certificate != null){
+            certificateOptional = Optional.of(certificate);
+        }
+        return certificateOptional;
     }
 
     @Override
-    public GiftCertificate findByName(String name) {     //TODO (DB function call) + return list
-        return jdbcTemplate.queryForObject(SELECT_BY_NAME, GiftCertificate.class, name);
+    public Optional<GiftCertificate> findByName(String name) {     //TODO (DB function call) + return list
+        Optional<GiftCertificate> certificateOptional = Optional.empty();
+        GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_NAME, GiftCertificate.class, name);
+        if(certificate != null){
+            certificateOptional = Optional.of(certificate);
+        }
+        return certificateOptional;
     }
 
     @Override
-    public GiftCertificate findByDescription(String description) {  //TODO (DB function call) + return list
-        return jdbcTemplate.queryForObject(SELECT_BY_DESCRIPTION, GiftCertificate.class, description);
+    public Optional<GiftCertificate> findByDescription(String description) {  //TODO (DB function call) + return list
+        Optional<GiftCertificate> certificateOptional = Optional.empty();
+        GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_DESCRIPTION, GiftCertificate.class,
+                description);
+        if(certificate != null){
+            certificateOptional = Optional.of(certificate);
+        }
+        return certificateOptional;
     }
 
     @Override

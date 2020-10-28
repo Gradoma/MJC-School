@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class TagDaoImpl implements TagDao {
     private final JdbcTemplate jdbcTemplate;
@@ -44,13 +45,23 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public Tag findByName(String name) {
-        return jdbcTemplate.queryForObject(SELECT_BY_NAME, Tag.class, name);
+    public Optional<Tag> findByName(String name) {
+        Optional<Tag> optionalTag = Optional.empty();
+        Tag tag = jdbcTemplate.queryForObject(SELECT_BY_NAME, Tag.class, name);
+        if(tag != null){
+            optionalTag = Optional.of(tag);
+        }
+        return optionalTag;
     }
 
     @Override
-    public Tag findById(long id) {
-        return jdbcTemplate.queryForObject(SELECT_BY_ID, Tag.class, id);
+    public Optional<Tag> findById(long id) {
+        Optional<Tag> optionalTag = Optional.empty();
+        Tag tag = jdbcTemplate.queryForObject(SELECT_BY_ID, Tag.class, id);
+        if(tag != null){
+            optionalTag = Optional.of(tag);
+        }
+        return optionalTag;
     }
 
     @Override
