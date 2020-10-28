@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface GiftCertificateDao {
     long add(GiftCertificate certificate);
     List<GiftCertificate> findAll();
+    List<GiftCertificate> findByTag(long tagId);
     Optional<GiftCertificate> findById(long id);
     Optional<GiftCertificate> findByName(String name);
     Optional<GiftCertificate> findByDescription(String description);

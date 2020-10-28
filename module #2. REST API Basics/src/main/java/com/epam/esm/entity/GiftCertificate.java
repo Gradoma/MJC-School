@@ -47,6 +47,10 @@ public class GiftCertificate {
         }
     }
 
+    public void addTagToList(Tag tag){
+        tagList.add(new Tag(tag));
+    }
+
     public String getDescription() {
         return description;
     }
