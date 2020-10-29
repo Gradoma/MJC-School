@@ -33,6 +33,10 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public long add(Tag tag) {
+        Optional<Tag> optionalTag = findByName(tag.getName());
+        if(optionalTag.isPresent()){
+            return optionalTag.get().getId();
+        }
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(NAME, tag.getName());
         Number generatedId = simpleJdbcInsert.executeAndReturnKey(parameters);
@@ -62,12 +66,6 @@ public class TagDaoImpl implements TagDao {
             optionalTag = Optional.of(tag);
         }
         return optionalTag;
-    }
-
-    @Override
-    public boolean update(Tag tag) {
-        int rows = jdbcTemplate.update(UPDATE, tag.getName(), tag.getId());
-        return rows > 0;
     }
 
     @Override

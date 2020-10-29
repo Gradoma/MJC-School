@@ -221,11 +221,6 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         }, certificateId);
     }
 
-//    private boolean updateByCertificateId(long tagId, long certificateId, long newTagId) {
-//        int rows = jdbcTemplate.update(UPDATE, newTagId, tagId, certificateId);
-//        return rows == 1;
-//    }
-
     private boolean deleteTagByTagIdCertId(long certificateId, long tagId) {
         int rows = jdbcTemplate.update(TAG_CERT_DELETE_BY_TAG_AND_CERT_ID, tagId, certificateId);
         return rows == 1;

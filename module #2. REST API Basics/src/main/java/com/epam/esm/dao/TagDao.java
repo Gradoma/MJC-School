@@ -10,6 +10,5 @@ public interface TagDao {
     List<Tag> findAll();
     Optional<Tag> findByName(String name);
     Optional<Tag> findById(long id);
-    boolean update(Tag tag);
     boolean deleteById(long id);
 }
