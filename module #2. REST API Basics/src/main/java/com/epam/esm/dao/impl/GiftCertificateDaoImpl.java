@@ -2,6 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.config.SpringConfig;
 import com.epam.esm.dao.GiftCertificateDao;
+import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import static com.epam.esm.dao.column.GiftCertificateConst.*;
@@ -9,11 +10,13 @@ import static com.epam.esm.dao.column.TagCertificateConst.CERTIFICATE_ID;
 import static com.epam.esm.dao.column.TagCertificateConst.TAG_ID;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.DaoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,11 +24,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+@Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);//todo fix!
-    TagDaoImpl tagDao = context.getBean(TagDaoImpl.class);
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
+    private final TagDao tagDao;
     private static final GiftCertificateMapper giftMapper = new GiftCertificateMapper();
     private static final String SELECT_ALL = "SELECT Id, Name, Description, Price, CreateDate, LastUpdateDate, " +
             "Duration FROM giftcertificate";
@@ -47,7 +50,8 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             "TagId = ? AND CertificateId = ?";
 
     @Autowired
-    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate){
+    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, TagDao tagDao){
+        this.tagDao = tagDao;
         this.jdbcTemplate = jdbcTemplate;
         simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName(TABLE_CERTIFICATE)
@@ -64,22 +68,15 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         parameters.put(DURATION, certificate.getDuration().getSeconds());
         long certificateId = simpleJdbcInsert.executeAndReturnKey(parameters).longValue();
 
-        long tagId;
         for(Tag tag : certificate.getTagList()){
-            Optional<Tag> optionalTag = tagDao.findByName(tag.getName());
-            if(!optionalTag.isPresent()){
-                tagId = tagDao.add(tag);
-            } else {
-                tagId = optionalTag.get().getId();
-            }
-            addTagIdCertId(tagId, certificateId);
+            addTagIdCertId(tag.getId(), certificateId);
         }
 
         return certificateId;
     }
 
     @Override
-    public List<GiftCertificate> findAll() {
+    public List<GiftCertificate> findAll() throws DaoException {
         List<GiftCertificate> certificateList = jdbcTemplate.query(SELECT_ALL, giftMapper);
         for(GiftCertificate certificate : certificateList){
             List<Long> listTagId = findByCertificateId(certificate.getId());
@@ -94,7 +91,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findByTag(long tagId) {
+    public List<GiftCertificate> findByTag(long tagId) throws DaoException{
         List<GiftCertificate> certificates = new ArrayList<>();
         List<Long> certificatesId = findByTagId(tagId);
         for(Long certId : certificatesId){
@@ -104,87 +101,98 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public Optional<GiftCertificate> findById(long id) {
-        Optional<GiftCertificate> certificateOptional = Optional.empty();
-        GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_ID, GiftCertificate.class, id);
-        if(certificate != null){
-            List<Long> listTagId = findByCertificateId(certificate.getId());
-            for(Long tagId : listTagId){
-                Optional<Tag> optionalTag = tagDao.findById(tagId);
-                if(optionalTag.isPresent()){
-                    certificate.addTagToList(optionalTag.get());
-                }
-            }
-            certificateOptional = Optional.of(certificate);
-        }
-        return certificateOptional;
+    public Optional<GiftCertificate> findById(long id) throws DaoException{
+        return selectByParameter(SELECT_BY_ID, id);
+//        List<GiftCertificate> certificates = jdbcTemplate.query(SELECT_BY_ID, giftMapper, id);
+//        if(certificates.size() == 0){
+//            return Optional.empty();
+//        } else if (certificates.size() > 1){
+//            throw new DaoException("Incorrect result count: expected 1, actual " + certificates.size());
+//        } else {
+//            GiftCertificate certificate = certificates.get(0);
+//            List<Long> listTagId = findByCertificateId(certificate.getId());
+//            for(Long tagId : listTagId){
+//                Optional<Tag> optionalTag = tagDao.findById(tagId);
+//                if(optionalTag.isPresent()){
+//                    certificate.addTagToList(optionalTag.get());
+//                }
+//            }
+//            return Optional.of(certificate);
+//        }
     }
 
     @Override
-    public Optional<GiftCertificate> findByName(String name) {     //TODO (DB function call) + return list
-        Optional<GiftCertificate> certificateOptional = Optional.empty();
-        GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_NAME, GiftCertificate.class, name);
-        if(certificate != null){
-            List<Long> listTagId = findByCertificateId(certificate.getId());
-            for(Long tagId : listTagId){
-                Optional<Tag> optionalTag = tagDao.findById(tagId);
-                if(optionalTag.isPresent()){
-                    certificate.addTagToList(optionalTag.get());
-                }
-            }
-            certificateOptional = Optional.of(certificate);
-        }
-        return certificateOptional;
+    public Optional<GiftCertificate> findByName(String name) throws DaoException{     //TODO (DB function call) + return list
+        return selectByParameter(SELECT_BY_NAME, name);
+//        List<GiftCertificate> certificates = jdbcTemplate.query(SELECT_BY_NAME, giftMapper, name);
+//        if(certificates.size() == 0){
+//            return Optional.empty();
+//        } else if (certificates.size() > 1){
+//            throw new DaoException("Incorrect result count: expected 1, actual " + certificates.size());
+//        } else {
+//            GiftCertificate certificate = certificates.get(0);
+//            List<Long> listTagId = findByCertificateId(certificate.getId());
+//            for(Long tagId : listTagId){
+//                Optional<Tag> optionalTag = tagDao.findById(tagId);
+//                if(optionalTag.isPresent()){
+//                    certificate.addTagToList(optionalTag.get());
+//                }
+//            }
+//            return Optional.of(certificate);
+//        }
     }
 
     @Override
-    public Optional<GiftCertificate> findByDescription(String description) {  //TODO (DB function call) + return list
-        Optional<GiftCertificate> certificateOptional = Optional.empty();
-        GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_DESCRIPTION, GiftCertificate.class,
-                description);
-        if(certificate != null){
-            List<Long> listTagId = findByCertificateId(certificate.getId());
-            for(Long tagId : listTagId){
-                Optional<Tag> optionalTag = tagDao.findById(tagId);
-                if(optionalTag.isPresent()){
-                    certificate.addTagToList(optionalTag.get());
-                }
-            }
-            certificateOptional = Optional.of(certificate);
-        }
-        return certificateOptional;
+    public Optional<GiftCertificate> findByDescription(String description) throws DaoException{  //TODO (DB function call) + return list
+        return selectByParameter(SELECT_BY_DESCRIPTION, description);
+//        List<GiftCertificate> certificates = jdbcTemplate.query(SELECT_BY_DESCRIPTION, giftMapper, description);
+//        if(certificates.size() == 0){
+//            return Optional.empty();
+//        } else if (certificates.size() > 1){
+//            throw new DaoException("Incorrect result count: expected 1, actual " + certificates.size());
+//        } else {
+//            GiftCertificate certificate = certificates.get(0);
+//            List<Long> listTagId = findByCertificateId(certificate.getId());
+//            for(Long tagId : listTagId){
+//                Optional<Tag> optionalTag = tagDao.findById(tagId);
+//                if(optionalTag.isPresent()){
+//                    certificate.addTagToList(optionalTag.get());
+//                }
+//            }
+//            return Optional.of(certificate);
+//        }
     }
 
     @Override
     public boolean update(GiftCertificate certificate) {
-        List<Tag> updatedTagList = certificate.getTagList();
-        List<Tag> originalTagList = certificate.getTagList();
-        for(Long id : findByCertificateId(certificate.getId())){
-            Optional<Tag> optionalTag = tagDao.findById(id);
-            if(optionalTag.isPresent()){
-                originalTagList.add(optionalTag.get());
-            }
-        }
-
-        if(!updatedTagList.containsAll(originalTagList)){
-            for(Tag tag : originalTagList){
-                if(!updatedTagList.contains(tag)){
-                    deleteTagByTagIdCertId(certificate.getId(), tag.getId());
-                }
-            }
-        }
-
-        if(!originalTagList.containsAll(updatedTagList)){
-            for(Tag tag: updatedTagList){
-                if(!originalTagList.contains(tag)){
-                    long tagId = tag.getId();
-                    if(!tagDao.findById(tag.getId()).isPresent()){
-                        tagId = tagDao.add(tag);
-                    }
-                    addTagIdCertId(tagId, certificate.getId());
-                }
-            }
-        }
+//        List<Tag> updatedTagList = certificate.getTagList();
+//        List<Tag> originalTagList = new ArrayList<>();
+//        for(Long id : findByCertificateId(certificate.getId())){
+//            Optional<Tag> optionalTag = tagDao.findById(id);
+//            if(optionalTag.isPresent()){
+//                originalTagList.add(optionalTag.get());
+//            }
+//        }
+//
+//        if(!updatedTagList.containsAll(originalTagList)){
+//            for(Tag tag : originalTagList){
+//                if(!updatedTagList.contains(tag)){
+//                    deleteTagByTagIdCertId(certificate.getId(), tag.getId());
+//                }
+//            }
+//        }
+//
+//        if(!originalTagList.containsAll(updatedTagList)){
+//            for(Tag tag: updatedTagList){
+//                if(!originalTagList.contains(tag)){
+//                    long tagId = tag.getId();
+//                    if(!tagDao.findById(tag.getId()).isPresent()){
+//                        tagId = tagDao.add(tag);
+//                    }
+//                    addTagIdCertId(tagId, certificate.getId());
+//                }
+//            }
+//        }
 
         int rows = jdbcTemplate.update(UPDATE, certificate.getName(), certificate.getDescription(),
                 certificate.getPrice(), convertToUtcEpochMillis(certificate.getLastUpdateDate()),
@@ -194,9 +202,27 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public boolean delete(long id) {
-        deleteAllTagsByCertificateId(id);
         int rows = jdbcTemplate.update(DELETE_BY_ID, id);
         return rows > 0;
+    }
+
+    private Optional<GiftCertificate> selectByParameter(String sql, Object param) throws DaoException{
+        List<GiftCertificate> certificates = jdbcTemplate.query(sql, giftMapper, param);
+        if(certificates.size() == 0){
+            return Optional.empty();
+        } else if (certificates.size() > 1){
+            throw new DaoException("Incorrect result count: expected 1, actual " + certificates.size());
+        } else {
+            GiftCertificate certificate = certificates.get(0);
+            List<Long> listTagId = findByCertificateId(certificate.getId());
+            for(Long tagId : listTagId){
+                Optional<Tag> optionalTag = tagDao.findById(tagId);
+                if(optionalTag.isPresent()){
+                    certificate.addTagToList(optionalTag.get());
+                }
+            }
+            return Optional.of(certificate);
+        }
     }
 
     private void addTagIdCertId(long tagId, long certificateId){
