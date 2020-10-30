@@ -188,7 +188,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
         int rows = jdbcTemplate.update(UPDATE, certificate.getName(), certificate.getDescription(),
                 certificate.getPrice(), convertToUtcEpochMillis(certificate.getLastUpdateDate()),
-                certificate.getDuration().getSeconds());       //TODO (simplify)
+                certificate.getDuration().getSeconds());    //todo named param?
         return rows > 0;
     }
 

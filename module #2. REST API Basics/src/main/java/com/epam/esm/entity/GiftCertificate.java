@@ -12,7 +12,7 @@ public class GiftCertificate {
     private String description;
     private Double price;
     private ZonedDateTime createDate;
-    private ZonedDateTime LastUpdateDate;
+    private ZonedDateTime lastUpdateDate;
     private Duration duration;
 
     public GiftCertificate(){}
@@ -76,11 +76,11 @@ public class GiftCertificate {
     }
 
     public ZonedDateTime getLastUpdateDate() {
-        return LastUpdateDate;
+        return lastUpdateDate;
     }
 
     public void setLastUpdateDate(ZonedDateTime lastUpdateDate) {
-        LastUpdateDate = lastUpdateDate;
+        this.lastUpdateDate = lastUpdateDate;
     }
 
     public Duration getDuration() {
@@ -104,7 +104,7 @@ public class GiftCertificate {
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (price != null ? !price.equals(that.price) : that.price != null) return false;
         if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null) return false;
-        if (LastUpdateDate != null ? !LastUpdateDate.equals(that.LastUpdateDate) : that.LastUpdateDate != null)
+        if (lastUpdateDate != null ? !lastUpdateDate.equals(that.lastUpdateDate) : that.lastUpdateDate != null)
             return false;
         return duration != null ? duration.equals(that.duration) : that.duration == null;
     }
@@ -117,7 +117,7 @@ public class GiftCertificate {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (price != null ? price.hashCode() : 0);
         result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
-        result = 31 * result + (LastUpdateDate != null ? LastUpdateDate.hashCode() : 0);
+        result = 31 * result + (lastUpdateDate != null ? lastUpdateDate.hashCode() : 0);
         result = 31 * result + (duration != null ? duration.hashCode() : 0);
         return result;
     }
@@ -130,7 +130,7 @@ public class GiftCertificate {
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", createTime=" + createDate +
-                ", LastUpdateDate=" + LastUpdateDate +
+                ", LastUpdateDate=" + lastUpdateDate +
                 ", duration=" + duration +
                 '}';
     }
