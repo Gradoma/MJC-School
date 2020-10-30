@@ -47,7 +47,7 @@ public class GiftCertificate {
         }
     }
 
-    public void addTagToList(Tag tag){
+    public void addTag(Tag tag){
         tagList.add(new Tag(tag));
     }
 

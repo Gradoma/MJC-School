@@ -4,9 +4,9 @@ import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
-import static com.epam.esm.dao.column.GiftCertificateConst.*;
-import static com.epam.esm.dao.column.TagCertificateConst.CERTIFICATE_ID;
-import static com.epam.esm.dao.column.TagCertificateConst.TAG_ID;
+import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
+import static com.epam.esm.dao.column.TagToCertificateTableConst.CERTIFICATE_ID;
+import static com.epam.esm.dao.column.TagToCertificateTableConst.TAG_ID;
 
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DaoException;
@@ -81,7 +81,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             for(Long id : listTagId){
                 Optional<Tag> optionalTag = tagDao.findById(id);
                 if(optionalTag.isPresent()){
-                    certificate.addTagToList(optionalTag.get());
+                    certificate.addTag(optionalTag.get());
                 }
             }
         }
@@ -169,7 +169,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             for(Long tagId : listTagId){
                 Optional<Tag> optionalTag = tagDao.findById(tagId);
                 if(optionalTag.isPresent()){
-                    certificate.addTagToList(optionalTag.get());
+                    certificate.addTag(optionalTag.get());
                 }
             }
             return Optional.of(certificate);

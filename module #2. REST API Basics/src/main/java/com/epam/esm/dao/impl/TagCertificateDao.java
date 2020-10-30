@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.epam.esm.dao.column.TagCertificateConst.*;
+import static com.epam.esm.dao.column.TagToCertificateTableConst.*;
 
 public class TagCertificateDao {       //TODO (rename)
     private final JdbcTemplate jdbcTemplate;

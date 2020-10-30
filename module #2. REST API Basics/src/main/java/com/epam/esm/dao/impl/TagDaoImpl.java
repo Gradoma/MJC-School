@@ -1,7 +1,7 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.TagDao;
-import static com.epam.esm.dao.column.TagConst.*;
+import static com.epam.esm.dao.column.TagTableConst.*;
 import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DaoException;

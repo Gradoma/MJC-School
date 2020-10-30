@@ -1,6 +1,6 @@
 package com.epam.esm.dao.column;
 
-public class TagCertificateConst {
+public class TagToCertificateTableConst {
     public static final String TABLE_TAG_CERT = "tag_certificate";
     public static final String ID = "Id";
     public static final String TAG_ID = "TagId";

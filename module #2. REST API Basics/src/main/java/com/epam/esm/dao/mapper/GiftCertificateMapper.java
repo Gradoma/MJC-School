@@ -1,6 +1,6 @@
 package com.epam.esm.dao.mapper;
 
-import static com.epam.esm.dao.column.GiftCertificateConst.*;
+import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 import com.epam.esm.entity.GiftCertificate;
 import org.springframework.jdbc.core.RowMapper;
 
