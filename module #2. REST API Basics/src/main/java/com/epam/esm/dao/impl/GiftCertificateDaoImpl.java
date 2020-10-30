@@ -1,6 +1,5 @@
 package com.epam.esm.dao.impl;
 
-import com.epam.esm.config.SpringConfig;
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.GiftCertificate;
@@ -12,7 +11,6 @@ import static com.epam.esm.dao.column.TagCertificateConst.TAG_ID;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DaoException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -26,9 +24,6 @@ import java.util.*;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
-    private final JdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert simpleJdbcInsert;
-    private final TagDao tagDao;
     private static final GiftCertificateMapper giftMapper = new GiftCertificateMapper();
     private static final String SELECT_ALL = "SELECT Id, Name, Description, Price, CreateDate, LastUpdateDate, " +
             "Duration FROM giftcertificate";
@@ -48,6 +43,9 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String TAG_CERT_DELETE = "DELETE FROM tag_certificate WHERE CertificateId = ?";
     private static final String TAG_CERT_DELETE_BY_TAG_AND_CERT_ID = "DELETE FROM tag_certificate WHERE " +
             "TagId = ? AND CertificateId = ?";
+    private final JdbcTemplate jdbcTemplate;
+    private final SimpleJdbcInsert simpleJdbcInsert;
+    private final TagDao tagDao;
 
     @Autowired
     public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, TagDao tagDao){
@@ -103,68 +101,21 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public Optional<GiftCertificate> findById(long id) throws DaoException{
         return selectByParameter(SELECT_BY_ID, id);
-//        List<GiftCertificate> certificates = jdbcTemplate.query(SELECT_BY_ID, giftMapper, id);
-//        if(certificates.size() == 0){
-//            return Optional.empty();
-//        } else if (certificates.size() > 1){
-//            throw new DaoException("Incorrect result count: expected 1, actual " + certificates.size());
-//        } else {
-//            GiftCertificate certificate = certificates.get(0);
-//            List<Long> listTagId = findByCertificateId(certificate.getId());
-//            for(Long tagId : listTagId){
-//                Optional<Tag> optionalTag = tagDao.findById(tagId);
-//                if(optionalTag.isPresent()){
-//                    certificate.addTagToList(optionalTag.get());
-//                }
-//            }
-//            return Optional.of(certificate);
-//        }
     }
 
     @Override
     public Optional<GiftCertificate> findByName(String name) throws DaoException{     //TODO (DB function call) + return list
         return selectByParameter(SELECT_BY_NAME, name);
-//        List<GiftCertificate> certificates = jdbcTemplate.query(SELECT_BY_NAME, giftMapper, name);
-//        if(certificates.size() == 0){
-//            return Optional.empty();
-//        } else if (certificates.size() > 1){
-//            throw new DaoException("Incorrect result count: expected 1, actual " + certificates.size());
-//        } else {
-//            GiftCertificate certificate = certificates.get(0);
-//            List<Long> listTagId = findByCertificateId(certificate.getId());
-//            for(Long tagId : listTagId){
-//                Optional<Tag> optionalTag = tagDao.findById(tagId);
-//                if(optionalTag.isPresent()){
-//                    certificate.addTagToList(optionalTag.get());
-//                }
-//            }
-//            return Optional.of(certificate);
-//        }
     }
 
     @Override
     public Optional<GiftCertificate> findByDescription(String description) throws DaoException{  //TODO (DB function call) + return list
         return selectByParameter(SELECT_BY_DESCRIPTION, description);
-//        List<GiftCertificate> certificates = jdbcTemplate.query(SELECT_BY_DESCRIPTION, giftMapper, description);
-//        if(certificates.size() == 0){
-//            return Optional.empty();
-//        } else if (certificates.size() > 1){
-//            throw new DaoException("Incorrect result count: expected 1, actual " + certificates.size());
-//        } else {
-//            GiftCertificate certificate = certificates.get(0);
-//            List<Long> listTagId = findByCertificateId(certificate.getId());
-//            for(Long tagId : listTagId){
-//                Optional<Tag> optionalTag = tagDao.findById(tagId);
-//                if(optionalTag.isPresent()){
-//                    certificate.addTagToList(optionalTag.get());
-//                }
-//            }
-//            return Optional.of(certificate);
-//        }
     }
 
     @Override
     public boolean update(GiftCertificate certificate) {
+        // check in service
 //        List<Tag> updatedTagList = certificate.getTagList();
 //        List<Tag> originalTagList = new ArrayList<>();
 //        for(Long id : findByCertificateId(certificate.getId())){

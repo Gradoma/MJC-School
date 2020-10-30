@@ -17,14 +17,13 @@ import java.util.Optional;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private final JdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert simpleJdbcInsert;
     private static final TagMapper tagMapper = new TagMapper();
     private static final String SELECT_ALL = "SELECT Id, Name FROM tag";
     private static final String SELECT_BY_ID = "SELECT Id, Name FROM tag WHERE Id=?";
     private static final String SELECT_BY_NAME = "SELECT Id, Name FROM tag WHERE Name=?";
     private static final String DELETE_BY_ID = "DELETE FROM tag WHERE Id=?";
-    private static final String UPDATE = "UPDATE tag SET Name = ? WHERE Id = ?";
+    private final JdbcTemplate jdbcTemplate;
+    private final SimpleJdbcInsert simpleJdbcInsert;
 
     @Autowired
     public TagDaoImpl(JdbcTemplate jdbcTemplate){
