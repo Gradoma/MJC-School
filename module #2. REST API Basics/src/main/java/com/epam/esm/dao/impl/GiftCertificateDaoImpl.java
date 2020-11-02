@@ -7,6 +7,7 @@ import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 
 import com.epam.esm.entity.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -17,7 +18,6 @@ import java.util.*;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
-    private static final GiftCertificateMapper giftMapper = new GiftCertificateMapper();    //in springConfig
     private static final String SELECT_ALL = "SELECT id, name, description, price, create_date, last_update_date, " +
             "duration_days FROM giftcertificate";
     private static final String SELECT_BY_ID = "SELECT id, name, description, price, create_date, last_update_date, " +
@@ -39,8 +39,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
     private final TagDao tagDao;
+    private final GiftCertificateMapper giftMapper = new GiftCertificateMapper();
 
     public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, TagDao tagDao){
+//        this.giftMapper = giftMapper;
         this.tagDao = tagDao;
         this.jdbcTemplate = jdbcTemplate;
         simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())

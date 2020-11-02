@@ -1,5 +1,6 @@
 package com.epam.esm.config;
 
+import com.epam.esm.dao.mapper.TagMapper;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,11 @@ public class SpringConfig {
         ds.setPassword(dbPassword);
         return ds;
     }
+//
+//    @Bean
+//    public TagMapper getTagMapper(){
+//        return new TagMapper();
+//    }
 
     @Bean
     private static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {

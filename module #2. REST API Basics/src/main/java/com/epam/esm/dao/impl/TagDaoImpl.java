@@ -4,7 +4,6 @@ import com.epam.esm.dao.TagDao;
 import static com.epam.esm.dao.column.TagTableConst.*;
 import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.DaoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -16,7 +15,6 @@ import java.util.Map;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private static final TagMapper tagMapper = new TagMapper();
     private static final String SELECT_ALL = "SELECT id, Name FROM tag";
     private static final String SELECT_BY_ID = "SELECT id, name FROM tag WHERE id=?";
     private static final String SELECT_BY_NAME = "SELECT id, name FROM tag WHERE name=?";
@@ -24,7 +22,10 @@ public class TagDaoImpl implements TagDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
+    private final TagMapper tagMapper = new TagMapper();
+
     public TagDaoImpl(JdbcTemplate jdbcTemplate){
+//        this.tagMapper = tagMapper;
         this.jdbcTemplate = jdbcTemplate;
         simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName(TABLE_TAG)

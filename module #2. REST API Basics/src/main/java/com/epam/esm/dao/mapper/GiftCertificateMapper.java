@@ -3,11 +3,13 @@ package com.epam.esm.dao.mapper;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 import com.epam.esm.entity.GiftCertificate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.*;
 
+//@Component
 public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
 
     @Override
