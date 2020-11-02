@@ -17,17 +17,12 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         certificate.setName(resultSet.getString(NAME));
         certificate.setDescription(resultSet.getString(DESCRIPTION));
         certificate.setPrice(resultSet.getDouble(PRICE));
-        long createDateMillisUTC = resultSet.getLong(CREATE_DATE);
-        certificate.setCreateDate(convertToCurrentZonedDateTime(createDateMillisUTC));
-        long lastUpdateMillisUTC = resultSet.getLong(LAST_UPDATE_DATE);
-        certificate.setLastUpdateDate(convertToCurrentZonedDateTime(lastUpdateMillisUTC));
-        long durationInSeconds = resultSet.getLong(DURATION);
-        certificate.setDuration(Duration.ofSeconds(durationInSeconds));
+        ZonedDateTime createDate = resultSet.getObject(CREATE_DATE, ZonedDateTime.class);
+        certificate.setCreateDate(createDate.withZoneSameInstant(ZoneOffset.UTC));
+        ZonedDateTime lastUpdateDate = resultSet.getObject(LAST_UPDATE_DATE, ZonedDateTime.class);
+        certificate.setLastUpdateDate(lastUpdateDate.withZoneSameInstant(ZoneOffset.UTC));
+        long durationInDays = resultSet.getLong(DURATION);
+        certificate.setDuration(Duration.ofDays(durationInDays));
         return certificate;
-    }
-
-    private ZonedDateTime convertToCurrentZonedDateTime(long epochMillisUTC){
-        Instant instant = Instant.ofEpochMilli(epochMillisUTC);
-        return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 }

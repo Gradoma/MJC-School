@@ -1,4 +1,4 @@
-INSERT INTO tag (Name) VALUES ('sport');
-INSERT INTO tag (Name) VALUES ('relax');
-INSERT INTO tag (Name) VALUES ('cafe');
-INSERT INTO tag (Name) VALUES ('shops');
+INSERT INTO tag (name) VALUES ('sport');
+INSERT INTO tag (name) VALUES ('relax');
+INSERT INTO tag (name) VALUES ('cafe');
+INSERT INTO tag (name) VALUES ('shops');

@@ -5,49 +5,41 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
-import static com.epam.esm.dao.column.TagToCertificateTableConst.CERTIFICATE_ID;
-import static com.epam.esm.dao.column.TagToCertificateTableConst.TAG_ID;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.DaoException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
-    private static final GiftCertificateMapper giftMapper = new GiftCertificateMapper();
-    private static final String SELECT_ALL = "SELECT Id, Name, Description, Price, CreateDate, LastUpdateDate, " +
-            "Duration FROM giftcertificate";
-    private static final String SELECT_BY_ID = "SELECT Id, Name, Description, Price, CreateDate, LastUpdateDate, " +
-            "Duration FROM giftcertificate WHERE Id=?";
-    private static final String SELECT_BY_NAME = "SELECT Id, Name, Description, Price, CreateDate, LastUpdateDate, " +
-            "Duration FROM giftcertificate WHERE Name=?";
-    private static final String SELECT_BY_DESCRIPTION = "SELECT Id, Name, Description, Price, CreateDate, " +
-            "LastUpdateDate, Duration FROM giftcertificate WHERE Description=?";
-    private static final String UPDATE = "UPDATE giftcertificate SET Name = ?, Description = ?, Price = ?, " +
-            "LastUpdateDate = ?, Duration = ? WHERE Id = ?";
-    private static final String DELETE_BY_ID = "DELETE FROM giftcertificate WHERE Id = ?";
-    private static final String TAG_CERT_INSERT = "INSERT INTO tag_certificate (TagId, CertificateId) VALUES (?, ?)";
-    private static final String TAG_CERT_SELECT_BY_TAG_ID = "SELECT CertificateId FROM tag_certificate WHERE TagId = ?";
-    private static final String TAG_CERT_SELECT_BY_CERTIFICATE_ID = "SELECT TagId FROM tag_certificate " +
-            "WHERE CertificateId = ?";
-    private static final String TAG_CERT_DELETE = "DELETE FROM tag_certificate WHERE CertificateId = ?";
+    private static final GiftCertificateMapper giftMapper = new GiftCertificateMapper();    //in springConfig
+    private static final String SELECT_ALL = "SELECT id, name, description, price, create_date, last_update_date, " +
+            "duration_days FROM giftcertificate";
+    private static final String SELECT_BY_ID = "SELECT id, name, description, price, create_date, last_update_date, " +
+            "duration_days FROM giftcertificate WHERE id=?";
+    private static final String SELECT_BY_NAME = "SELECT id, name, description, price, create_date, last_update_date, " +
+            "duration_days FROM giftcertificate WHERE name=?";
+    private static final String SELECT_BY_DESCRIPTION = "SELECT id, name, description, price, create_date, " +
+            "last_update_date, duration_days FROM giftcertificate WHERE description=?";
+    private static final String UPDATE = "UPDATE giftcertificate SET name = ?, description = ?, price = ?, " +
+            "last_update_date = ?, duration_days = ? WHERE id = ?";
+    private static final String DELETE_BY_ID = "DELETE FROM giftcertificate WHERE id = ?";
+    private static final String TAG_CERT_INSERT = "INSERT INTO tag_certificate (tag_id, certificate_id) VALUES (?, ?)";
+    private static final String TAG_CERT_SELECT_BY_TAG_ID = "SELECT certificate_id FROM tag_certificate WHERE tag_id = ?";
+    private static final String TAG_CERT_SELECT_BY_CERTIFICATE_ID = "SELECT tag_id FROM tag_certificate " +
+            "WHERE certificate_id = ?";
+    private static final String TAG_CERT_DELETE = "DELETE FROM tag_certificate WHERE certificate_id = ?";
     private static final String TAG_CERT_DELETE_BY_TAG_AND_CERT_ID = "DELETE FROM tag_certificate WHERE " +
-            "TagId = ? AND CertificateId = ?";
+            "tag_id = ? AND certificate_id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
     private final TagDao tagDao;
 
-    @Autowired
     public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, TagDao tagDao){
         this.tagDao = tagDao;
         this.jdbcTemplate = jdbcTemplate;
@@ -61,9 +53,9 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         parameters.put(NAME, certificate.getName());
         parameters.put(DESCRIPTION, certificate.getDescription());
         parameters.put(PRICE, certificate.getPrice());
-        parameters.put(CREATE_DATE, convertToUtcEpochMillis(certificate.getCreateDate()));
-        parameters.put(LAST_UPDATE_DATE, convertToUtcEpochMillis(certificate.getLastUpdateDate()));
-        parameters.put(DURATION, certificate.getDuration().getSeconds());
+        parameters.put(CREATE_DATE, convertToUtc(certificate.getCreateDate()));
+        parameters.put(LAST_UPDATE_DATE, convertToUtc(certificate.getLastUpdateDate()));
+        parameters.put(DURATION, certificate.getDuration().toDays());
         long certificateId = simpleJdbcInsert.executeAndReturnKey(parameters).longValue();
 
         for(Tag tag : certificate.getTagList()){
@@ -74,43 +66,46 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findAll() throws DaoException {
+    public List<GiftCertificate> findAllWithTags(){
         List<GiftCertificate> certificateList = jdbcTemplate.query(SELECT_ALL, giftMapper);
         for(GiftCertificate certificate : certificateList){
             List<Long> listTagId = findByCertificateId(certificate.getId());
             for(Long id : listTagId){
-                Optional<Tag> optionalTag = tagDao.findById(id);
-                if(optionalTag.isPresent()){
-                    certificate.addTag(optionalTag.get());
-                }
+                Tag tag = tagDao.findById(id);
+                certificate.addTag(tag);
             }
         }
         return certificateList;
     }
 
     @Override
-    public List<GiftCertificate> findByTag(long tagId) throws DaoException{
+    public List<GiftCertificate> findAll(){
+        return jdbcTemplate.query(SELECT_ALL, giftMapper);
+    }
+
+    @Override
+    public List<GiftCertificate> findByTag(long tagId){
         List<GiftCertificate> certificates = new ArrayList<>();
         List<Long> certificatesId = findByTagId(tagId);
         for(Long certId : certificatesId){
-            certificates.add(findById(certId).get());
+            certificates.add(findById(certId));
         }
         return certificates;
     }
 
     @Override
-    public Optional<GiftCertificate> findById(long id) throws DaoException{
+    public GiftCertificate findById(long id) {
         return selectByParameter(SELECT_BY_ID, id);
     }
 
     @Override
-    public Optional<GiftCertificate> findByName(String name) throws DaoException{     //TODO (DB function call) + return list
+    public GiftCertificate findByName(String name) {     //TODO (DB function call) + return list
         return selectByParameter(SELECT_BY_NAME, name);
     }
 
     @Override
-    public Optional<GiftCertificate> findByDescription(String description) throws DaoException{  //TODO (DB function call) + return list
-        return selectByParameter(SELECT_BY_DESCRIPTION, description);
+    public List<GiftCertificate> findByDescription(String description) {  //TODO (DB function call) + return list
+        return jdbcTemplate.query(SELECT_BY_DESCRIPTION, giftMapper, description);
     }
 
     @Override
@@ -146,7 +141,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 //        }
 
         int rows = jdbcTemplate.update(UPDATE, certificate.getName(), certificate.getDescription(),
-                certificate.getPrice(), convertToUtcEpochMillis(certificate.getLastUpdateDate()),
+                certificate.getPrice(), convertToUtc(certificate.getLastUpdateDate()),
                 certificate.getDuration().getSeconds());    //todo named param?
         return rows > 0;
     }
@@ -157,23 +152,14 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         return rows > 0;
     }
 
-    private Optional<GiftCertificate> selectByParameter(String sql, Object param) throws DaoException{
-        List<GiftCertificate> certificates = jdbcTemplate.query(sql, giftMapper, param);
-        if(certificates.size() == 0){
-            return Optional.empty();
-        } else if (certificates.size() > 1){
-            throw new DaoException("Incorrect result count: expected 1, actual " + certificates.size());
-        } else {
-            GiftCertificate certificate = certificates.get(0);
-            List<Long> listTagId = findByCertificateId(certificate.getId());
-            for(Long tagId : listTagId){
-                Optional<Tag> optionalTag = tagDao.findById(tagId);
-                if(optionalTag.isPresent()){
-                    certificate.addTag(optionalTag.get());
-                }
-            }
-            return Optional.of(certificate);
+    private <T> GiftCertificate selectByParameter(String sql, T param){
+        GiftCertificate certificate = jdbcTemplate.queryForObject(sql, giftMapper, param);
+        List<Long> listTagId = findByCertificateId(certificate.getId());
+        for(Long tagId : listTagId){
+            Tag tag = tagDao.findById(tagId);
+            certificate.addTag(tag);
         }
+        return certificate;
     }
 
     private void addTagIdCertId(long tagId, long certificateId){
@@ -181,21 +167,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     private List<Long> findByTagId(long tagId) {
-        return jdbcTemplate.query(TAG_CERT_SELECT_BY_TAG_ID, new RowMapper<Long>() {
-            @Override
-            public Long mapRow(ResultSet resultSet, int i) throws SQLException {
-                return resultSet.getLong(CERTIFICATE_ID);
-            }
-        }, tagId);
+        return jdbcTemplate.queryForList(TAG_CERT_SELECT_BY_TAG_ID, Long.class, tagId);
     }
 
-    private List<Long> findByCertificateId(long certificateId) {     //todo private
-        return jdbcTemplate.query(TAG_CERT_SELECT_BY_CERTIFICATE_ID, new RowMapper<Long>() {
-            @Override
-            public Long mapRow(ResultSet resultSet, int i) throws SQLException {
-                return resultSet.getLong(TAG_ID);
-            }
-        }, certificateId);
+    private List<Long> findByCertificateId(long certificateId) {
+        return jdbcTemplate.queryForList(TAG_CERT_SELECT_BY_CERTIFICATE_ID, Long.class, certificateId);
     }
 
     private boolean deleteTagByTagIdCertId(long certificateId, long tagId) {
@@ -208,8 +184,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         return rows == 1;
     }
 
-    private long convertToUtcEpochMillis(ZonedDateTime zonedDateTime){
-        ZonedDateTime createDateUtc = zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
-        return createDateUtc.toInstant().toEpochMilli();
+    private ZonedDateTime convertToUtc(ZonedDateTime zonedDateTime){
+        return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
     }
 }

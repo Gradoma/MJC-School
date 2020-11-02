@@ -1,5 +1,6 @@
 package com.epam.esm.config;
 
+import com.epam.esm.dao.impl.GiftCertificateDaoImpl;
 import com.epam.esm.dao.impl.TagDaoImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import javax.sql.DataSource;
 
 @Configuration
-@Import(TagDaoImpl.class)
+@Import({TagDaoImpl.class, GiftCertificateDaoImpl.class})
 public class SpringTestConfig {
 
     @Bean

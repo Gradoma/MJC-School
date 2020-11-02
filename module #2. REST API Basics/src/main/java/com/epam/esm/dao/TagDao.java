@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface TagDao {
     long add(Tag tag);
     List<Tag> findAll();
-    Optional<Tag> findByName(String name) throws DaoException;
-    Optional<Tag> findById(long id) throws DaoException;
+    Tag findByName(String name);
+    Tag findById(long id);
     boolean deleteById(long id);
 }

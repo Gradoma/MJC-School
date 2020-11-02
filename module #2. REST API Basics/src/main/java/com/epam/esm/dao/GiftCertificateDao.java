@@ -8,11 +8,12 @@ import java.util.Optional;
 
 public interface GiftCertificateDao {
     long add(GiftCertificate certificate);
-    List<GiftCertificate> findAll() throws DaoException;
-    List<GiftCertificate> findByTag(long tagId) throws DaoException;
-    Optional<GiftCertificate> findById(long id) throws DaoException;
-    Optional<GiftCertificate> findByName(String name) throws DaoException;
-    Optional<GiftCertificate> findByDescription(String description) throws DaoException;
+    List<GiftCertificate> findAllWithTags();
+    List<GiftCertificate> findAll();
+    List<GiftCertificate> findByTag(long tagId);
+    GiftCertificate findById(long id);
+    GiftCertificate findByName(String name);
+    List<GiftCertificate> findByDescription(String description);
     boolean update(GiftCertificate certificate);
     boolean delete(long id);
 }
