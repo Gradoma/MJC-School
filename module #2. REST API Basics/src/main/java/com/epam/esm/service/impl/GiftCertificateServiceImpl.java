@@ -12,10 +12,18 @@ import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    private static final int NAME_LENGTH = 40;
+    private static final int DESCRIPTION_LENGTH = 255;
+    private static final String PRICE_PATTERN = "^((\\p{Digit}){1,5}([.]\\d{1,2})?)$";
+    private static final String DURATION_DAYS = "\\d+";
     private final GiftCertificateDao certificateDao;
     private final GiftCertificateDtoMapper dtoMapper;
     private final TagService tagService;
@@ -29,7 +37,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public long add(GiftCertificateDto certificateDto) throws InvalidParameterException{
-        //validation
+        if(!isValid(certificateDto)){
+            throw new InvalidParameterException();
+        }
         GiftCertificate certificate = dtoMapper.toEntity(certificateDto);
         String[] tagNames = certificateDto.getTags();
         for(String name : tagNames){
@@ -72,7 +82,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public boolean update(GiftCertificateDto certificateDto, long certificateId)
             throws InvalidParameterException{
-        //validation
+        if(!isValid(certificateDto)){
+            throw new InvalidParameterException();
+        }
         GiftCertificate originalCertificate = certificateDao.findById(certificateId);
         List<Tag> originalTagList = originalCertificate.getTagList();
         String[] updatedTagNames = certificateDto.getTags();
@@ -148,5 +160,34 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             originalCertificate.setLastUpdateDate(updatedCertificate.getLastUpdateDate());
         }
         return originalCertificate;
+    }
+
+    private boolean isValid(GiftCertificateDto certificateDto){
+        if(certificateDto.getName() == null || certificateDto.getName().isEmpty() ||
+                certificateDto.getName().trim().isEmpty() || certificateDto.getName().length() > NAME_LENGTH){
+            return false;
+        }
+        if(certificateDto.getDescription() == null || certificateDto.getDescription().isEmpty() ||
+                certificateDto.getDescription().trim().isEmpty() ||
+                certificateDto.getDescription().length() > DESCRIPTION_LENGTH){
+            return false;
+        }
+        Pattern pricePattern = Pattern.compile(PRICE_PATTERN);
+        Matcher priceMatcher = pricePattern.matcher(certificateDto.getPrice());
+        if(!priceMatcher.matches()){
+            return false;
+        }
+        Pattern patternDuration = Pattern.compile(DURATION_DAYS);
+        Matcher matcherDuration = patternDuration.matcher(certificateDto.getDuration());
+        if(!matcherDuration.matches()){
+            return false;
+        }
+        try{
+            ZonedDateTime.parse(certificateDto.getCreateDate());
+            ZonedDateTime.parse(certificateDto.getLastUpdateDate());
+        } catch (DateTimeParseException e){
+            return false;
+        }
+        return true;
     }
 }
