@@ -13,6 +13,6 @@ public interface GiftCertificateDao {
     GiftCertificate findById(long id);
     GiftCertificate findByName(String name);
     List<GiftCertificate> findByDescription(String description);
-    boolean update(GiftCertificate certificate);
+    boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId);
     boolean delete(long id);
 }

@@ -7,7 +7,6 @@ import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 
 import com.epam.esm.entity.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -61,7 +60,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         long certificateId = simpleJdbcInsert.executeAndReturnKey(parameters).longValue();
 
         for(Tag tag : certificate.getTagList()){
-            addTagIdCertId(tag.getId(), certificateId);
+            addTagToCertId(tag.getId(), certificateId);
         }
 
         return certificateId;
@@ -111,36 +110,14 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public boolean update(GiftCertificate certificate) {
-        // check in service
-//        List<Tag> updatedTagList = certificate.getTagList();
-//        List<Tag> originalTagList = new ArrayList<>();
-//        for(Long id : findByCertificateId(certificate.getId())){
-//            Optional<Tag> optionalTag = tagDao.findById(id);
-//            if(optionalTag.isPresent()){
-//                originalTagList.add(optionalTag.get());
-//            }
-//        }
-//
-//        if(!updatedTagList.containsAll(originalTagList)){
-//            for(Tag tag : originalTagList){
-//                if(!updatedTagList.contains(tag)){
-//                    deleteTagByTagIdCertId(certificate.getId(), tag.getId());
-//                }
-//            }
-//        }
-//
-//        if(!originalTagList.containsAll(updatedTagList)){
-//            for(Tag tag: updatedTagList){
-//                if(!originalTagList.contains(tag)){
-//                    long tagId = tag.getId();
-//                    if(!tagDao.findById(tag.getId()).isPresent()){
-//                        tagId = tagDao.add(tag);
-//                    }
-//                    addTagIdCertId(tagId, certificate.getId());
-//                }
-//            }
-//        }
+    public boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId) {
+        for(long id : addedTagsId){
+            addTagToCertId(id, certificate.getId());
+        }
+
+        for(long id : deletedTagsId){
+            deleteTagToCert(certificate.getId(), id);
+        }
 
         int rows = jdbcTemplate.update(UPDATE, certificate.getName(), certificate.getDescription(),
                 certificate.getPrice(), convertToUtc(certificate.getLastUpdateDate()),
@@ -164,7 +141,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         return certificate;
     }
 
-    private void addTagIdCertId(long tagId, long certificateId){
+    private void addTagToCertId(long tagId, long certificateId){
         jdbcTemplate.update(TAG_CERT_INSERT, tagId, certificateId);
     }
 
@@ -176,7 +153,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         return jdbcTemplate.queryForList(TAG_CERT_SELECT_BY_CERTIFICATE_ID, Long.class, certificateId);
     }
 
-    private boolean deleteTagByTagIdCertId(long certificateId, long tagId) {
+    private boolean deleteTagToCert(long certificateId, long tagId) {
         int rows = jdbcTemplate.update(TAG_CERT_DELETE_BY_TAG_AND_CERT_ID, tagId, certificateId);
         return rows == 1;
     }

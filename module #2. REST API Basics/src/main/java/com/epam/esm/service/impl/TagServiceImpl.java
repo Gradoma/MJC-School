@@ -24,7 +24,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void save(TagDto tagDto) throws InvalidParameterException{
+    public long save(TagDto tagDto) throws InvalidParameterException{
         if(!validateSaving(tagDto)){
             throw new InvalidParameterException("Invalid for saving");
         }
@@ -33,7 +33,7 @@ public class TagServiceImpl implements TagService {
             tagDao.findByName(tag.getName());
             throw new InvalidParameterException("Already exist");
         } catch (EmptyResultDataAccessException e){
-            tagDao.add(tag);
+            return tagDao.add(tag);
         }
     }
 
