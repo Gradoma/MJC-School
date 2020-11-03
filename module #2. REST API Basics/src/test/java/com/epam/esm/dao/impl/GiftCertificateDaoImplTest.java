@@ -70,7 +70,7 @@ class GiftCertificateDaoImplTest {      //todo (independent tests)
     @Test
     @Order(3)
     void findByName() {
-        GiftCertificate fromDb = giftCertificateDao.findByName(certificate.getName());
+        GiftCertificate fromDb = giftCertificateDao.findByName("incorrect name");
         ZonedDateTime createDate = fromDb.getCreateDate();
         fromDb.setCreateDate(createDate.withZoneSameInstant(ZoneId.systemDefault()));
         ZonedDateTime lastUpdDate = fromDb.getLastUpdateDate();

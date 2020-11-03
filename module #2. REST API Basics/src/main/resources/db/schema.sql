@@ -13,7 +13,7 @@ create table if not exists tag
 (
     id   bigint auto_increment
         primary key,
-    name varchar(255) not null,
+    name varchar(20) not null,
     constraint tag_name_uindex
         unique (Name)
 );

@@ -34,11 +34,6 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public long add(Tag tag) {
-        // check in service
-//        Optional<Tag> optionalTag = findByName(tag.getName());
-//        if(optionalTag.isPresent()){
-//            return optionalTag.get().getId();
-//        }
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(NAME, tag.getName());
         Number generatedId = simpleJdbcInsert.executeAndReturnKey(parameters);
