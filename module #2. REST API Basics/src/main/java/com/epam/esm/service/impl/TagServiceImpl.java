@@ -25,7 +25,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public long save(TagDto tagDto) throws InvalidParameterException{
-        if(!validateSaving(tagDto)){
+        if(!isValid(tagDto)){
             throw new InvalidParameterException("Invalid for saving");
         }
         Tag tag = dtoMapper.toEntity(tagDto);
@@ -65,7 +65,7 @@ public class TagServiceImpl implements TagService {
         return tagDao.deleteById(id);
     }
 
-    private boolean validateSaving (TagDto tagDto){
+    private boolean isValid(TagDto tagDto){
         if(tagDto.getId() != null ){
             return false;
         }
