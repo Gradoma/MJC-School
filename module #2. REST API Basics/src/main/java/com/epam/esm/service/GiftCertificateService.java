@@ -9,9 +9,9 @@ public interface GiftCertificateService {
     long add(GiftCertificateDto certificateDto) throws InvalidParameterException;
     List<GiftCertificateDto> getAll();
     GiftCertificateDto getById(long id);
-    GiftCertificateDto getByName(String name);
-    GiftCertificateDto getByDescription(String name);
-    List<GiftCertificateDto> findByTag(String tagName) throws InvalidParameterException;
+    List<GiftCertificateDto> getByName(String name);
+    List<GiftCertificateDto> getByDescription(String name);
+    List<GiftCertificateDto> getByTag(String tagName) throws InvalidParameterException;
     boolean update(GiftCertificateDto certificateDto, long certificateId) throws InvalidParameterException;
     boolean delete(long id);
 }

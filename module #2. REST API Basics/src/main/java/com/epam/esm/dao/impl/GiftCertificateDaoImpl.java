@@ -102,13 +102,21 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public List<GiftCertificate> findByName(String name) {
         name = "%" + name.trim() + "%";
-        return jdbcTemplate.query(SELECT_BY_NAME, giftMapper, name);
+        List<GiftCertificate> certificateList = jdbcTemplate.query(SELECT_BY_NAME, giftMapper, name);
+        for(GiftCertificate certificate : certificateList){
+            certificate.setTagList(collectTagList(certificate.getId()));
+        }
+        return certificateList;
     }
 
     @Override
     public List<GiftCertificate> findByDescription(String description) {
         description = "%" + description.trim() + "%";
-        return jdbcTemplate.query(SELECT_BY_DESCRIPTION, giftMapper, description);
+        List<GiftCertificate> certificateList = jdbcTemplate.query(SELECT_BY_DESCRIPTION, giftMapper, description);
+        for(GiftCertificate certificate : certificateList){
+            certificate.setTagList(collectTagList(certificate.getId()));
+        }
+        return certificateList;
     }
 
     @Override

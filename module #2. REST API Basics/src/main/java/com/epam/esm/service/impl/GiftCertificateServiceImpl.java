@@ -62,17 +62,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public GiftCertificateDto getByName(String name) {
-        return null;
+    public List<GiftCertificateDto> getByName(String name) {
+        return dtoMapper.toDto(certificateDao.findByName(name));
     }
 
     @Override
-    public GiftCertificateDto getByDescription(String name) {
-        return null;
+    public List<GiftCertificateDto> getByDescription(String description) {
+        return dtoMapper.toDto(certificateDao.findByDescription(description));
     }
 
     @Override
-    public List<GiftCertificateDto> findByTag(String tagName) throws InvalidParameterException {
+    public List<GiftCertificateDto> getByTag(String tagName) throws InvalidParameterException {
         TagDto tagDto = tagService.getByName(tagName);
         long tagId = Long.parseLong(tagDto.getId());
         List<GiftCertificate> certificateList = certificateDao.findByTag(tagId);
