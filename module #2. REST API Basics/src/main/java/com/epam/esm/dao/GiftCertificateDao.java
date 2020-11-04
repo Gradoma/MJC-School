@@ -11,7 +11,7 @@ public interface GiftCertificateDao {
     List<GiftCertificate> findAll();
     List<GiftCertificate> findByTag(long tagId);
     GiftCertificate findById(long id);
-    GiftCertificate findByName(String name);
+    List<GiftCertificate> findByName(String name);
     List<GiftCertificate> findByDescription(String description);
     boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId);
     boolean delete(long id);

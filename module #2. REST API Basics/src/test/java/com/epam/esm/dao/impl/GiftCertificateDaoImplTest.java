@@ -10,8 +10,11 @@ import com.epam.esm.entity.Tag;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -27,12 +30,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SpringTestConfig.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Sql("/db/certificate-data.sql")
 class GiftCertificateDaoImplTest {      //todo (independent tests)
+    private static final String DESCRIPTION_KEYWORD_DESCRIPTION = "description";
+    private static final int DESCRIPTION_COUNT = 3;
+    private static final String NAME_KEYWORD_TEXT = "name";
+    private static final int TEXT_COUNT = 3;
+    private static GiftCertificate certificate;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private GiftCertificateDao giftCertificateDao;
-    private static GiftCertificate certificate;
 
     @BeforeAll
     static void beforeAll() {
@@ -44,6 +52,11 @@ class GiftCertificateDaoImplTest {      //todo (independent tests)
         certificate.setCreateDate(creationDate);
         certificate.setLastUpdateDate(certificate.getCreateDate());
         certificate.setDuration(Duration.ofDays(17));
+    }
+
+    @AfterEach
+    void cleanUp(){
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, GiftCertificateTableConst.TABLE_CERTIFICATE);
     }
 
     @Test
@@ -68,13 +81,23 @@ class GiftCertificateDaoImplTest {      //todo (independent tests)
     }
 
     @Test
-    @Order(3)
+    void findAll(){
+        List<GiftCertificate> certificateList = giftCertificateDao.findAll();
+        for(GiftCertificate certificate : certificateList){
+            System.out.println(certificate);
+        }
+        assertNotEquals(null, certificateList);
+    }
+
+    @Test
     void findByName() {
-        GiftCertificate fromDb = giftCertificateDao.findByName("incorrect name");
-        ZonedDateTime createDate = fromDb.getCreateDate();
-        fromDb.setCreateDate(createDate.withZoneSameInstant(ZoneId.systemDefault()));
-        ZonedDateTime lastUpdDate = fromDb.getLastUpdateDate();
-        fromDb.setLastUpdateDate(lastUpdDate.withZoneSameInstant(ZoneId.systemDefault()));
-        assertEquals(certificate, fromDb);
+        List<GiftCertificate> certificateList = giftCertificateDao.findByName(NAME_KEYWORD_TEXT);
+        assertEquals(TEXT_COUNT, certificateList.size());
+    }
+
+    @Test
+    void findByDescription(){
+        List<GiftCertificate> certificateList = giftCertificateDao.findByDescription(DESCRIPTION_KEYWORD_DESCRIPTION);
+        assertEquals(DESCRIPTION_COUNT, certificateList.size());
     }
 }
