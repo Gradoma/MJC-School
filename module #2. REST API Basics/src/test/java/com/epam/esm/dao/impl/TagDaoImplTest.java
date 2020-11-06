@@ -4,6 +4,7 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.column.TagTableConst;
 import com.epam.esm.config.SpringTestConfig;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.DuplicateException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +27,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = {SpringTestConfig.class})
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TagDaoImplTest {
+    private static final String EXIST_NAME = "sport";
     private static int startRows;
     private static long firstId = 1;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private TagDao tagDao;
-    private static final String testName = "sport";
-
 
     @BeforeEach
     void before() {
@@ -47,12 +47,22 @@ class TagDaoImplTest {
     }
 
     @Test
-    void add() {
+    void addPositive() {
         Tag testTag = new Tag();
         testTag.setName("name");
-        long generatedId = tagDao.add(testTag);
-        testTag.setId(generatedId);
+        try{
+            tagDao.add(testTag);
+        } catch (Exception e){
+            fail(e);
+        }
         assertEquals(startRows + 1, JdbcTestUtils.countRowsInTable(jdbcTemplate, TagTableConst.TABLE_TAG));
+    }
+
+    @Test
+    void addNegative_Exist() {
+        Tag testTag = new Tag();
+        testTag.setName(EXIST_NAME);
+        assertThrows(DuplicateException.class, () -> tagDao.add(testTag));
     }
 
     @Test

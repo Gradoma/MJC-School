@@ -2,16 +2,21 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.entity.TagDto;
-import com.epam.esm.exception.InvalidParameterException;
+import com.epam.esm.dto.TagDto;
+import com.epam.esm.exception.DuplicateException;
+import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.TagDtoMapper;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+@Validated
 @Service
 public class TagServiceImpl implements TagService {
     private static final int NAME_LENGTH = 20;
@@ -24,17 +29,18 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public long save(TagDto tagDto) throws InvalidParameterException{
-        if(!isValid(tagDto)){
-            throw new InvalidParameterException("Invalid for saving");
-        }
+    public long save(@Valid TagDto tagDto) throws DuplicateException {
+//        if(!isValid(tagDto)){
+//            throw new InvalidEntityException("Invalid for saving");
+//        }
         Tag tag = dtoMapper.toEntity(tagDto);
-        try{
-            tagDao.findByName(tag.getName());
-            throw new InvalidParameterException("Already exist");
-        } catch (EmptyResultDataAccessException e){
-            return tagDao.add(tag);
-        }
+        return tagDao.add(tag);
+//        try{
+//            tagDao.findByName(tag.getName());
+//            throw new InvalidEntityException("Already exist");
+//        } catch (EmptyResultDataAccessException e){
+//            return tagDao.add(tag);
+//        }
     }
 
     @Override
@@ -53,9 +59,9 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagDto getByName(String name) throws InvalidParameterException{
+    public TagDto getByName(String name) throws InvalidEntityException {
         if(name == null){
-            throw new InvalidParameterException("Name can't be null");
+            throw new InvalidEntityException("Name can't be null");
         }
         return dtoMapper.toDto(tagDao.findByName(name));
     }
