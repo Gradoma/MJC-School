@@ -17,16 +17,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 
 @Configuration
 @ComponentScan("com.epam.esm")
-@PropertySource("classpath:db/database.properties")
 public class SpringConfig {
-    @Value("${db.driver}")
-    private String dbDriver;
-    @Value("${db.url}")
-    private String dbUrl;
-    @Value("${db.user}")
-    private String dbUser;
-    @Value("${db.password}")
-    private String dbPassword;
 
     @Bean
     public JdbcTemplate getJdbcTemplate(BasicDataSource dataSource){
@@ -34,12 +25,12 @@ public class SpringConfig {
     }
 
     @Bean
-    public BasicDataSource getDataSource() {
+    public BasicDataSource getDataSource(DbConfig dbConfig) {
         BasicDataSource ds = new BasicDataSource();
-        ds.setDriverClassName(dbDriver);
-        ds.setUrl(dbUrl);
-        ds.setUsername(dbUser);
-        ds.setPassword(dbPassword);
+        ds.setDriverClassName(dbConfig.getDriver());
+        ds.setUrl(dbConfig.getUrl());
+        ds.setUsername(dbConfig.getUser());
+        ds.setPassword(dbConfig.getPassword());
         return ds;
     }
 
