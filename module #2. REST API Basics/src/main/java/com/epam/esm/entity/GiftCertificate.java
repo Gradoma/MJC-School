@@ -8,7 +8,7 @@ import java.util.List;
 public class GiftCertificate {
     private long id;
     private String name;
-    private List<Tag> tagList = new ArrayList<>();
+    private List<Tag> tagList = new ArrayList<>();     //todo (Set)
     private String description;
     private Double price;
     private ZonedDateTime createDate;

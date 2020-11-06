@@ -1,7 +1,7 @@
 package com.epam.esm.service.mapper;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.entity.TagDto;
+import com.epam.esm.dto.TagDto;
 import org.springframework.stereotype.Component;
 
 @Component

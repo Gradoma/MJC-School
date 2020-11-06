@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-//@Component
+@Component
 public class TagMapper implements RowMapper<Tag> {
 
     @Override

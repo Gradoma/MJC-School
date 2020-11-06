@@ -38,10 +38,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
     private final TagDao tagDao;
-    private final GiftCertificateMapper giftMapper = new GiftCertificateMapper();
+    private final GiftCertificateMapper giftMapper;
 
-    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, TagDao tagDao){
-//        this.giftMapper = giftMapper;
+    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, TagDao tagDao, GiftCertificateMapper giftMapper){
+        this.giftMapper = giftMapper;
         this.tagDao = tagDao;
         this.jdbcTemplate = jdbcTemplate;
         simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())

@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.*;
 
-//@Component
+@Component
 public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
 
     @Override
