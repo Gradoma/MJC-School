@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Validated
 @Service
@@ -30,17 +32,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public long save(@Valid TagDto tagDto) throws DuplicateException {
-//        if(!isValid(tagDto)){
-//            throw new InvalidEntityException("Invalid for saving");
-//        }
         Tag tag = dtoMapper.toEntity(tagDto);
         return tagDao.add(tag);
-//        try{
-//            tagDao.findByName(tag.getName());
-//            throw new InvalidEntityException("Already exist");
-//        } catch (EmptyResultDataAccessException e){
-//            return tagDao.add(tag);
-//        }
     }
 
     @Override
@@ -59,11 +52,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagDto getByName(String name) throws InvalidEntityException {
-        if(name == null){
-            throw new InvalidEntityException("Name can't be null");
+    public Optional<TagDto> getByName(@NotNull String name) {
+        Optional<Tag> optionalTag = tagDao.findByName(name);
+        if(optionalTag.isPresent()){
+            Tag tag = optionalTag.get();
+            return Optional.of(dtoMapper.toDto(tag));
+        } else {
+            return Optional.empty();
         }
-        return dtoMapper.toDto(tagDao.findByName(name));
     }
 
     @Override

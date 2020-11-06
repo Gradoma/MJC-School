@@ -72,18 +72,22 @@ class TagDaoImplTest {
     }
 
     @Test
-    @Disabled
-    void findByName() {
-//        Optional<Tag> optionalTag = null;
-//        try{
-//            optionalTag = tagDao.findByName(testName);
-//        } catch (Exception e){
-//            fail(e);
-//        }
-//        if(!optionalTag.isPresent()){
-//            fail("Tag with name=" + testName + " wasn't found in DB");
-//        }
-//        assertEquals(testName, optionalTag.get().getName());
+    void findByNamePositive() {
+        Tag testTag = new Tag();
+        testTag.setName("Test name");
+        try {
+            tagDao.add(testTag);
+        } catch (DuplicateException e) {
+            fail(e);
+        }
+        Optional<Tag> tagFromDao = tagDao.findByName(testTag.getName());
+        assertEquals(testTag.getName(), tagFromDao.get().getName());
+    }
+
+    @Test
+    void findByNameNegative() {
+        Optional<Tag> tagFromDao = tagDao.findByName("not present name");
+        assertEquals(Optional.empty(), tagFromDao);
     }
 
     @Test

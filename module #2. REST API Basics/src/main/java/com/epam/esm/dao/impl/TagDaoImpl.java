@@ -6,6 +6,7 @@ import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class TagDaoImpl implements TagDao {
@@ -52,8 +54,13 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public Tag findByName(String name){
-        return jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
+    public Optional<Tag> findByName(String name){
+        try {
+            Tag tag = jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
+            return Optional.of(tag);
+        } catch (EmptyResultDataAccessException e){
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -76,10 +76,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public List<GiftCertificateDto> getByTag(String tagName) throws InvalidEntityException {
-        TagDto tagDto = tagService.getByName(tagName);
-        long tagId = Long.parseLong(tagDto.getId());
-        List<GiftCertificate> certificateList = certificateDao.findByTag(tagId);
-        return dtoMapper.toDto(certificateList);
+//        TagDto tagDto = tagService.getByName(tagName);
+//        long tagId = Long.parseLong(tagDto.getId());
+//        List<GiftCertificate> certificateList = certificateDao.findByTag(tagId);
+//        return dtoMapper.toDto(certificateList);
+        return null;
     }
 
     @Override
