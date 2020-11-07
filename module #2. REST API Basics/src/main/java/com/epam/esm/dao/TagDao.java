@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TagDao {
-    long add(Tag tag) throws DuplicateException;
+    long add(Tag tag);
     List<Tag> findAll();
     Optional<Tag> findByName(String name);
     Tag findById(long id);

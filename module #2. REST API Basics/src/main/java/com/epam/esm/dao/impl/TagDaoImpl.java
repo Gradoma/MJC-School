@@ -5,12 +5,15 @@ import static com.epam.esm.dao.column.TagTableConst.*;
 import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
+import com.epam.esm.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +40,15 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public long add(Tag tag) throws DuplicateException{
-        int rowsWithName = jdbcTemplate.queryForObject(COUNT_BY_NAME, Integer.class, tag.getName());
-        if(rowsWithName == 1){
-            throw new DuplicateException("Tag with name " + tag.getName() + " already exist.");
-        }
+    public long add(Tag tag) {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(NAME, tag.getName());
-        Number generatedId = simpleJdbcInsert.executeAndReturnKey(parameters);
+        Number generatedId;
+        try {
+            generatedId = simpleJdbcInsert.executeAndReturnKey(parameters);
+        } catch (DuplicateKeyException e){
+            throw new DuplicateException("Tag with name " + tag.getName() + " already exist.");
+        }
         return generatedId.longValue();
     }
 
@@ -59,7 +63,7 @@ public class TagDaoImpl implements TagDao {
             Tag tag = jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
             return Optional.of(tag);
         } catch (EmptyResultDataAccessException e){
-            return Optional.empty();
+            throw new ResourceNotFoundException("Resource with name (" + name + ") not found");
         }
     }
 

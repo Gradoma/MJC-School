@@ -31,7 +31,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public long save(@Valid TagDto tagDto) throws DuplicateException {
+    public long save(@Valid TagDto tagDto) {
         Tag tag = dtoMapper.toEntity(tagDto);
         return tagDao.add(tag);
     }
@@ -55,12 +55,6 @@ public class TagServiceImpl implements TagService {
     public Optional<TagDto> getByName(@NotNull String name) {
         Optional<Tag> optionalTag = tagDao.findByName(name);
         return optionalTag.map(tag -> dtoMapper.toDto(tag));
-//        if(optionalTag.isPresent()){
-//            Tag tag = optionalTag.get();
-//            return Optional.of(dtoMapper.toDto(tag));
-//        } else {
-//            return Optional.empty();
-//        }
     }
 
     @Override

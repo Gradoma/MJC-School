@@ -36,7 +36,7 @@ class TagServiceImplTest {
     @Autowired
     @InjectMocks
     private TagService tagService;
-    @Autowired
+
     @Mock
     private TagDao tagDao;
     @Autowired
@@ -64,15 +64,15 @@ class TagServiceImplTest {
         assertThrows(ConstraintViolationException.class, () -> tagService.save(tagDto));
     }
 
-//    @Test
-//    void saveNegative_daoThrow() {
+    @Test
+    void saveNegative_daoThrow() {
 //        Tag tag = new Tag();
 //        tag.setName("exception name");
 //        Mockito.when(tagDao.add(tag)).thenThrow(DuplicateException.class);
 //        TagDto tagDto = new TagDto();
 //        tagDto.setName("exception name");
 //        assertThrows(ConstraintViolationException.class, () -> tagService.save(tagDto));
-//    }
+    }
 
     @Test
     @Disabled

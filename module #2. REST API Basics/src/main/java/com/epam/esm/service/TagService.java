@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TagService {
-    long save(@Valid TagDto tagDto) throws DuplicateException;
+    long save(@Valid TagDto tagDto);
     List<TagDto> getAll();
     TagDto getById(long id);
     Optional<TagDto> getByName(@NotNull String name);

@@ -10,7 +10,6 @@ import javax.validation.constraints.Size;
 @Data
 @NoArgsConstructor
 public class TagDto {
-    @Null
     private String id;
     @NotNull
     @Size(min = 1, max = 20)

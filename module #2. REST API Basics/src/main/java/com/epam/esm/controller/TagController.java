@@ -2,6 +2,7 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.DuplicateException;
+import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,31 +36,28 @@ public class TagController {
 //    }
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TagDto> create(@RequestBody TagDto tagDto){
-        try{
-            long generatedId = tagService.save(tagDto);
-            URI resourceUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(URL + "/" + generatedId).build().toUri();
-            return ResponseEntity.created(resourceUri).build();
-        } catch (DuplicateException | ConstraintViolationException e){
-            return ResponseEntity.badRequest().build();
-            // response - bad request
-        }
+        long generatedId = tagService.save(tagDto);
+        URI resourceUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(URL + "/" + generatedId).build().toUri();
+        return ResponseEntity.created(resourceUri).build();
     }
 
     @GetMapping("/search")
     public ResponseEntity<TagDto> getByName(@RequestParam("name") String name){
-        try{
-            Optional<TagDto> optionalTagDto = tagService.getByName(name);
-            if(optionalTagDto.isPresent()){
-                return ResponseEntity.ok().body(optionalTagDto.get());
-                //response - ok, body object
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                // response - not found
-            }
-        } catch (ConstraintViolationException e){
+        Optional<TagDto> optionalTagDto = tagService.getByName(name);
+        return optionalTagDto.map(tagDto -> ResponseEntity.ok().body(tagDto))
+                .orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    }
+
+    @ExceptionHandler({ResourceNotFoundException.class, ConstraintViolationException.class, DuplicateException.class})
+    public ResponseEntity<String> handle(Exception ex) {
+        if(ex.getClass().equals(ResourceNotFoundException.class)){
+            return ResponseEntity.notFound().header("exception", ex.getMessage()).build();
+        }
+        if(ex.getClass().equals(ConstraintViolationException.class) | ex.getClass().equals(DuplicateException.class)){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            //response code bad request
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
