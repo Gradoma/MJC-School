@@ -1,16 +1,10 @@
 package com.epam.esm.config;
 
-import com.epam.esm.dao.mapper.TagMapper;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
@@ -27,12 +21,12 @@ public class SpringConfig {
     }
 
     @Bean
-    public BasicDataSource getDataSource(DbConfig dbConfig) {
+    public BasicDataSource getDataSource(DbProperties dbProperties) {
         BasicDataSource ds = new BasicDataSource();
-        ds.setDriverClassName(dbConfig.getDriver());
-        ds.setUrl(dbConfig.getUrl());
-        ds.setUsername(dbConfig.getUser());
-        ds.setPassword(dbConfig.getPassword());
+        ds.setDriverClassName(dbProperties.getDriver());
+        ds.setUrl(dbProperties.getUrl());
+        ds.setUsername(dbProperties.getUser());
+        ds.setPassword(dbProperties.getPassword());
         return ds;
     }
 

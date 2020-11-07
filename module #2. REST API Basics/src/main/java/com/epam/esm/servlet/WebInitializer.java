@@ -8,8 +8,6 @@ import org.springframework.web.servlet.DispatcherServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
-import org.springframework.util.CollectionUtils
-
 public class WebInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(javax.servlet.ServletContext servletContext) throws ServletException {

@@ -54,12 +54,13 @@ public class TagServiceImpl implements TagService {
     @Override
     public Optional<TagDto> getByName(@NotNull String name) {
         Optional<Tag> optionalTag = tagDao.findByName(name);
-        if(optionalTag.isPresent()){
-            Tag tag = optionalTag.get();
-            return Optional.of(dtoMapper.toDto(tag));
-        } else {
-            return Optional.empty();
-        }
+        return optionalTag.map(tag -> dtoMapper.toDto(tag));
+//        if(optionalTag.isPresent()){
+//            Tag tag = optionalTag.get();
+//            return Optional.of(dtoMapper.toDto(tag));
+//        } else {
+//            return Optional.empty();
+//        }
     }
 
     @Override

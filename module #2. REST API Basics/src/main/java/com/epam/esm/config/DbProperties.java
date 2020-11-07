@@ -1,19 +1,22 @@
 package com.epam.esm.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource("classpath:db/database.properties")
-public class DbConfig {
-    @Autowired
-    private final Environment environment;
-
-    public DbConfig(Environment environment){
-        this.environment = environment;
-    }
+public class DbProperties {
+    @Value("${" + DRIVER + "}")
+    private String dbDriver;
+    @Value("${" + URL + "}")
+    private String dbUrl;
+    @Value("${" + USER + "}")
+    private String dbUser;
+    @Value("${" + PASSWORD + "}")
+    private String dbPassword;
 
     private static final String DRIVER = "db.driver";
     private static final String USER = "db.user";
@@ -21,18 +24,18 @@ public class DbConfig {
     private static final String URL = "db.url";
 
     public String getDriver(){
-        return environment.getProperty(DRIVER);
+        return dbDriver;
     }
 
     public String getUser(){
-        return environment.getProperty(USER);
+        return dbUser;
     }
 
     public String getPassword(){
-        return environment.getProperty(PASSWORD);
+        return dbPassword;
     }
 
     public String getUrl(){
-        return environment.getProperty(URL);
+        return dbUrl;
     }
 }

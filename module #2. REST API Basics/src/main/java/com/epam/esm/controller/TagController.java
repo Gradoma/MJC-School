@@ -46,7 +46,7 @@ public class TagController {
         }
     }
 
-    @GetMapping()
+    @GetMapping("/search")
     public ResponseEntity<TagDto> getByName(@RequestParam("name") String name){
         try{
             Optional<TagDto> optionalTagDto = tagService.getByName(name);
