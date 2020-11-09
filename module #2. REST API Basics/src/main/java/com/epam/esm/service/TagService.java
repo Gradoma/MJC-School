@@ -16,5 +16,5 @@ public interface TagService {
     TagDto getById(long id);
     TagDto getByName(@NotNull @Size(min = 1, max = 20) String name);
     boolean delete(long id);
-    boolean doesExist(@NotNull String tagName);
+    boolean doesExist(@Valid TagDto tagDto);
 }

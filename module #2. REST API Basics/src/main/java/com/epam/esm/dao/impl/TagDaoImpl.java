@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private static final String COUNT_BY_NAME = "SELECT COUNT(*) FROM tag WHERE name=?";
+    private static final String COUNT_BY_NAME = "SELECT COUNT(*) FROM tag WHERE id=? AND name=?";
     private static final String SELECT_ALL = "SELECT id, Name FROM tag";
     private static final String SELECT_BY_ID = "SELECT id, name FROM tag WHERE id=?";
     private static final String SELECT_BY_NAME = "SELECT id, name FROM tag WHERE name=?";
@@ -88,8 +88,8 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public boolean contains(String tagName) {
-        Integer rows = jdbcTemplate.queryForObject(COUNT_BY_NAME, Integer.class, tagName);
+    public boolean contains(Tag tag) {
+        Integer rows = jdbcTemplate.queryForObject(COUNT_BY_NAME, Integer.class, tag.getId(), tag.getName());
         return rows > 0;
     }
 }

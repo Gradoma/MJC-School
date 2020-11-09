@@ -12,5 +12,5 @@ public interface TagDao {
     Tag findByName(String name);
     Tag findById(long id);
     boolean deleteById(long id);
-    boolean contains(String tagName);
+    boolean contains(Tag tag);
 }

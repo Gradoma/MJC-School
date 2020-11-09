@@ -64,7 +64,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean doesExist(@NotNull String tagName) {
-        return tagDao.contains(tagName);
+    public boolean doesExist(@Valid TagDto tagDto) {
+        Tag tag = dtoMapper.toEntity(tagDto);
+        return tagDao.contains(tag);
     }
 }

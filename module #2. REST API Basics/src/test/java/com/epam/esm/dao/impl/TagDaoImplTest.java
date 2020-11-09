@@ -115,8 +115,9 @@ class TagDaoImplTest {
         String testName = "Test name";
         Tag testTag = new Tag();
         testTag.setName(testName);
-        tagDao.add(testTag);
-        assertTrue(tagDao.contains(testName));
+        long id = tagDao.add(testTag);
+        testTag.setId(id);
+        assertTrue(tagDao.contains(testTag));
     }
 
     @Test
@@ -124,7 +125,8 @@ class TagDaoImplTest {
         String testName = "Test name";
         Tag testTag = new Tag();
         testTag.setName(testName);
+        testTag.setId(0);
         tagDao.add(testTag);
-        assertFalse(tagDao.contains("New name"));
+        assertFalse(tagDao.contains(testTag));
     }
 }
