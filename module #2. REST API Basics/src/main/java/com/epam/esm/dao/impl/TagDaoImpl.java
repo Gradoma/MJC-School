@@ -58,10 +58,10 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public Optional<Tag> findByName(String name){
+    public Tag findByName(String name){
         try {
             Tag tag = jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
-            return Optional.of(tag);
+            return tag;
         } catch (EmptyResultDataAccessException e){
             throw new ResourceNotFoundException("Tag: name=" + name);
         }

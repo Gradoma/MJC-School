@@ -43,19 +43,19 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<ErrorResponse> handleConstraintViolationException (ConstraintViolationException ex,
                                                                          WebRequest request) {
         // work ok
-        String exceptionMessage = ex.getMessage();
-        System.out.println(exceptionMessage);
-        return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
+//        String exceptionMessage = ex.getMessage();
+//        System.out.println(exceptionMessage);
+//        return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
 
         // doesn't work (500, no handling)
-        
-//        String exceptionMessage = ex.getMessage();
-//        int startIndex = exceptionMessage.indexOf("{");
-//        int endIndex = exceptionMessage.indexOf("}");
-//        String messageName = exceptionMessage.substring(startIndex, endIndex);
-//        System.out.println(messageName);
-//        String message = messageSource.getMessage(messageName, null,
-//                request.getLocale());
-//        return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
+
+        String exceptionMessage = ex.getMessage();
+        int startIndex = exceptionMessage.indexOf("{");
+        int endIndex = exceptionMessage.indexOf("}");
+        String messageName = exceptionMessage.substring(startIndex, endIndex);
+        System.out.println(messageName);
+        String message = messageSource.getMessage(messageName, null,
+                request.getLocale());
+        return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }
 }

@@ -14,6 +14,6 @@ public interface TagService {
     long save(@Valid TagDto tagDto);
     List<TagDto> getAll();
     TagDto getById(long id);
-    Optional<TagDto> getByName(@NotNull @Size(min = 1, max = 20) String name);
+    TagDto getByName(@NotNull @Size(min = 1, max = 20) String name);
     boolean delete(long id);
 }

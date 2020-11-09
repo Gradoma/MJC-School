@@ -41,9 +41,8 @@ public class TagController {
 
     @GetMapping("/name")    //todo(remove /name - should work without it, and no conflict with getAll)
     public ResponseEntity<TagDto> getByName(@RequestParam("name") String name){
-        Optional<TagDto> optionalTagDto = tagService.getByName(name);
-        return optionalTagDto.map(tagDto -> ResponseEntity.ok().body(tagDto))
-                .orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        TagDto tagDto = tagService.getByName(name);
+        return ResponseEntity.ok().body(tagDto);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

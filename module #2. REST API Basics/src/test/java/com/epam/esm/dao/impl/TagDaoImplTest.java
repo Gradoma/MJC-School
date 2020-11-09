@@ -80,8 +80,8 @@ class TagDaoImplTest {
         } catch (DuplicateException e) {
             fail(e);
         }
-        Optional<Tag> tagFromDao = tagDao.findByName(testTag.getName());
-        assertEquals(testTag.getName(), tagFromDao.get().getName());
+        Tag tagFromDao = tagDao.findByName(testTag.getName());
+        assertEquals(testTag.getName(), tagFromDao.getName());
     }
 
     @Test

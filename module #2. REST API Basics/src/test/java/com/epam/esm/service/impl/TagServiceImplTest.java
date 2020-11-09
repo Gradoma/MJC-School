@@ -89,15 +89,15 @@ class TagServiceImplTest {
     @Disabled
     void getByName() {
         //cant test - exception
-        Tag tag = new Tag();
-        tag.setId(5);
-        tag.setName(POSITIVE_NAME);
-        Mockito.when(tagDao.findByName(POSITIVE_NAME)).thenReturn(Optional.of(tag));
-
-        TagDto expectedDto = new TagDto();
-        expectedDto.setId("5");
-        expectedDto.setName(POSITIVE_NAME);
-        assertEquals(expectedDto, tagService.getByName(POSITIVE_NAME).get());
+//        Tag tag = new Tag();
+//        tag.setId(5);
+//        tag.setName(POSITIVE_NAME);
+//        Mockito.when(tagDao.findByName(POSITIVE_NAME)).thenReturn(Optional.of(tag));
+//
+//        TagDto expectedDto = new TagDto();
+//        expectedDto.setId("5");
+//        expectedDto.setName(POSITIVE_NAME);
+//        assertEquals(expectedDto, tagService.getByName(POSITIVE_NAME));
     }
 
     @Test
