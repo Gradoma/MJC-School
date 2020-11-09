@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagService;
@@ -32,10 +33,19 @@ public class TagController {
         return tagService.getAll();
     }
 
-//    @GetMapping("{/id}")
-//    public TagDto getById(@PathVariable("id")long id){
-//        return tagService.getById(id);
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<TagDto> getById(@PathVariable long id){
+        TagDto tagDto = tagService.getById(id);
+        return ResponseEntity.ok().body(tagDto);
+    }
+
+    @GetMapping("/name")    //todo(remove /name - should work without it, and no conflict with getAll)
+    public ResponseEntity<TagDto> getByName(@RequestParam("name") String name){
+        Optional<TagDto> optionalTagDto = tagService.getByName(name);
+        return optionalTagDto.map(tagDto -> ResponseEntity.ok().body(tagDto))
+                .orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TagDto> create(@RequestBody TagDto tagDto){
         long generatedId = tagService.save(tagDto);
@@ -44,11 +54,10 @@ public class TagController {
         return ResponseEntity.created(resourceUri).build();
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<TagDto> getByName(@RequestParam("name") String name){
-        Optional<TagDto> optionalTagDto = tagService.getByName(name);
-        return optionalTagDto.map(tagDto -> ResponseEntity.ok().body(tagDto))
-                .orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TagDto> deleteById(@PathVariable long id){
+        tagService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 //    @ExceptionHandler({ResourceNotFoundException.class, ConstraintViolationException.class, DuplicateException.class})

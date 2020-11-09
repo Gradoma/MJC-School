@@ -5,6 +5,7 @@ import com.epam.esm.dao.column.TagTableConst;
 import com.epam.esm.config.SpringTestConfig;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
+import com.epam.esm.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,6 @@ class TagDaoImplTest {
 
     @AfterEach
     void after() {
-        firstId = 1 + JdbcTestUtils.countRowsInTable(jdbcTemplate, TagTableConst.TABLE_TAG);
         JdbcTestUtils.deleteFromTables(jdbcTemplate, TagTableConst.TABLE_TAG);
     }
 
@@ -86,8 +86,7 @@ class TagDaoImplTest {
 
     @Test
     void findByNameNegative() {
-        Optional<Tag> tagFromDao = tagDao.findByName("not present name");
-        assertEquals(Optional.empty(), tagFromDao);
+        assertThrows(ResourceNotFoundException.class, () -> tagDao.findByName("not present name"));
     }
 
     @Test
@@ -106,10 +105,28 @@ class TagDaoImplTest {
     }
 
     @Test
-    @Disabled   //todo how to reset id auto increment?
-    void deleteById() {
-        System.out.println(firstId);
-        tagDao.deleteById(firstId);
-        assertEquals(startRows - 1, JdbcTestUtils.countRowsInTable(jdbcTemplate, TagTableConst.TABLE_TAG));
+    void deleteByIdPositive() {
+        Tag testTag = new Tag();
+        testTag.setName("Test name");
+        long id = 0;
+        try {
+            id = tagDao.add(testTag);
+        } catch (DuplicateException e) {
+            fail(e);
+        }
+        assertTrue(tagDao.deleteById(id));
+    }
+
+    @Test
+    void deleteByIdNegative_noSuchId() {
+        Tag testTag = new Tag();
+        testTag.setName("Test name");
+        long id = 0;
+        try {
+            id = tagDao.add(testTag);
+        } catch (DuplicateException e) {
+            fail(e);
+        }
+        assertFalse(tagDao.deleteById(id * 31));
     }
 }

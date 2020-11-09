@@ -63,18 +63,27 @@ public class TagDaoImpl implements TagDao {
             Tag tag = jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
             return Optional.of(tag);
         } catch (EmptyResultDataAccessException e){
-            throw new ResourceNotFoundException("Tag:name=" + name);
+            throw new ResourceNotFoundException("Tag: name=" + name);
         }
     }
 
     @Override
     public Tag findById(long id) {
-        return jdbcTemplate.queryForObject(SELECT_BY_ID, tagMapper, id);
+        try{
+            Tag tag = jdbcTemplate.queryForObject(SELECT_BY_ID, tagMapper, id);
+            return tag;
+        } catch (EmptyResultDataAccessException e){
+            throw new ResourceNotFoundException("Tag: id=" + id);
+        }
     }
 
     @Override
     public boolean deleteById(long id) {
         int rows = jdbcTemplate.update(DELETE_BY_ID, id);
-        return rows > 0;
+        if (rows > 0 ){
+            return true;
+        } else {
+            throw new ResourceNotFoundException("Tag: id=" + id);
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.TagDtoMapper;
 import org.springframework.dao.EmptyResultDataAccessException;
