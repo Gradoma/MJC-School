@@ -86,4 +86,10 @@ public class TagDaoImpl implements TagDao {
             throw new ResourceNotFoundException("Tag: id=" + id);
         }
     }
+
+    @Override
+    public boolean contains(String tagName) {
+        Integer rows = jdbcTemplate.queryForObject(COUNT_BY_NAME, Integer.class, tagName);
+        return rows > 0;
+    }
 }

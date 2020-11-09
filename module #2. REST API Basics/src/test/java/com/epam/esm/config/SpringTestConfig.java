@@ -4,7 +4,10 @@ import com.epam.esm.dao.impl.GiftCertificateDaoImpl;
 import com.epam.esm.dao.impl.TagDaoImpl;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import com.epam.esm.dao.mapper.TagMapper;
+import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.service.impl.TagServiceImpl;
+import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +23,8 @@ import javax.sql.DataSource;
 
 @Configuration
 @Import({TagDaoImpl.class, GiftCertificateDaoImpl.class, TagMapper.class, GiftCertificateMapper.class,
-        TagServiceImpl.class, LocalValidatorFactoryBean.class, TagDtoMapper.class, MethodValidationPostProcessor.class,
-        LocalValidatorFactoryBean.class})
+        TagServiceImpl.class, GiftCertificateServiceImpl.class, LocalValidatorFactoryBean.class, TagDtoMapper.class,
+        GiftCertificateDtoMapper.class, MethodValidationPostProcessor.class, LocalValidatorFactoryBean.class})
 public class SpringTestConfig {
 
     @Bean

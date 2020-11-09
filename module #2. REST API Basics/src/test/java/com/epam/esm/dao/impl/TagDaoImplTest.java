@@ -75,11 +75,7 @@ class TagDaoImplTest {
     void findByNamePositive() {
         Tag testTag = new Tag();
         testTag.setName("Test name");
-        try {
-            tagDao.add(testTag);
-        } catch (DuplicateException e) {
-            fail(e);
-        }
+        tagDao.add(testTag);
         Tag tagFromDao = tagDao.findByName(testTag.getName());
         assertEquals(testTag.getName(), tagFromDao.getName());
     }
@@ -90,30 +86,18 @@ class TagDaoImplTest {
     }
 
     @Test
-    @Disabled   //todo how to reset id auto increment?
     void findById() {
-//        Optional<Tag> optionalTag = null;
-//        try{
-//            optionalTag = tagDao.findById(firstId);
-//        } catch (Exception e){
-//            fail(e);
-//        }
-//        if(!optionalTag.isPresent()){
-//            fail("Generated id=" + firstId + " wasn't found in DB");
-//        }
-//        assertEquals(testName, optionalTag.get().getName());
+        Tag testTag = new Tag();
+        testTag.setName("Test name");
+        long id = tagDao.add(testTag);
+        assertEquals(testTag.getName(), tagDao.findById(id).getName());
     }
 
     @Test
     void deleteByIdPositive() {
         Tag testTag = new Tag();
         testTag.setName("Test name");
-        long id = 0;
-        try {
-            id = tagDao.add(testTag);
-        } catch (DuplicateException e) {
-            fail(e);
-        }
+        long id = tagDao.add(testTag);
         assertTrue(tagDao.deleteById(id));
     }
 
@@ -121,12 +105,26 @@ class TagDaoImplTest {
     void deleteByIdNegative_noSuchId() {
         Tag testTag = new Tag();
         testTag.setName("Test name");
-        long id = 0;
-        try {
-            id = tagDao.add(testTag);
-        } catch (DuplicateException e) {
-            fail(e);
-        }
-        assertFalse(tagDao.deleteById(id * 31));
+        long id = tagDao.add(testTag);
+        long incorrectId = id * 31;
+        assertThrows(ResourceNotFoundException.class, () -> tagDao.deleteById(incorrectId));
+    }
+
+    @Test
+    void contains(){
+        String testName = "Test name";
+        Tag testTag = new Tag();
+        testTag.setName(testName);
+        tagDao.add(testTag);
+        assertTrue(tagDao.contains(testName));
+    }
+
+    @Test
+    void containsFalse(){
+        String testName = "Test name";
+        Tag testTag = new Tag();
+        testTag.setName(testName);
+        tagDao.add(testTag);
+        assertFalse(tagDao.contains("New name"));
     }
 }

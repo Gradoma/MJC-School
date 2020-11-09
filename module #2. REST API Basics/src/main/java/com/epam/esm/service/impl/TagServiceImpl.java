@@ -62,4 +62,9 @@ public class TagServiceImpl implements TagService {
     public boolean delete(long id) {
         return tagDao.deleteById(id);
     }
+
+    @Override
+    public boolean doesExist(@NotNull String tagName) {
+        return tagDao.contains(tagName);
+    }
 }
