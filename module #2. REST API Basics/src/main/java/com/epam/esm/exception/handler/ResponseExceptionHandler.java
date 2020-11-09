@@ -13,6 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import java.util.logging.Logger;
 
 @ControllerAdvice
 public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
@@ -41,7 +42,20 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public final ResponseEntity<ErrorResponse> handleConstraintViolationException (ConstraintViolationException ex,
                                                                          WebRequest request) {
-        // localization?!
+        // work ok
+        String exceptionMessage = ex.getMessage();
+        System.out.println(exceptionMessage);
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
+
+        // doesn't work (500, no handling)
+        
+//        String exceptionMessage = ex.getMessage();
+//        int startIndex = exceptionMessage.indexOf("{");
+//        int endIndex = exceptionMessage.indexOf("}");
+//        String messageName = exceptionMessage.substring(startIndex, endIndex);
+//        System.out.println(messageName);
+//        String message = messageSource.getMessage(messageName, null,
+//                request.getLocale());
+//        return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }
 }

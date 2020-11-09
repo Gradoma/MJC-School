@@ -58,15 +58,16 @@ public class SpringConfig{
 
     @Bean
     public LocalValidatorFactoryBean validator() {
-        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-        bean.setValidationMessageSource(messageSource());
-        return bean;
+//        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+//        bean.setValidationMessageSource(messageSource());
+//        return bean;
+        return new LocalValidatorFactoryBean();
     }
 
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasenames("classpath:lang/message");
+        messageSource.setBasenames("lang/message");
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
