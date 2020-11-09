@@ -47,7 +47,7 @@ public class TagDaoImpl implements TagDao {
         try {
             generatedId = simpleJdbcInsert.executeAndReturnKey(parameters);
         } catch (DuplicateKeyException e){
-            throw new DuplicateException("Tag with name " + tag.getName() + " already exist.");
+            throw new DuplicateException("Tag:name=" + tag.getName());
         }
         return generatedId.longValue();
     }
@@ -63,7 +63,7 @@ public class TagDaoImpl implements TagDao {
             Tag tag = jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
             return Optional.of(tag);
         } catch (EmptyResultDataAccessException e){
-            throw new ResourceNotFoundException("Resource with name (" + name + ") not found");
+            throw new ResourceNotFoundException("Tag:name=" + name);
         }
     }
 

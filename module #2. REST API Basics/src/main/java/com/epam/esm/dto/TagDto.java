@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class TagDto {
     private String id;
-    @NotNull
-    @Size(min = 1, max = 20)
+    @NotNull()
+    @Size(message = "{message.name}", min = 1, max = 20)
     private String name;
 }

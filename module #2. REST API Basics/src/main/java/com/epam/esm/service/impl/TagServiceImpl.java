@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,6 @@ import java.util.Optional;
 @Validated
 @Service
 public class TagServiceImpl implements TagService {
-    private static final int NAME_LENGTH = 20;
     private final TagDao tagDao;
     private final TagDtoMapper dtoMapper;
 
@@ -52,7 +52,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Optional<TagDto> getByName(@NotNull String name) {
+    public Optional<TagDto> getByName(@NotNull @Size(min = 1, max = 20) String name) {
         Optional<Tag> optionalTag = tagDao.findByName(name);
         return optionalTag.map(tag -> dtoMapper.toDto(tag));
     }
@@ -60,12 +60,5 @@ public class TagServiceImpl implements TagService {
     @Override
     public boolean delete(long id) {
         return tagDao.deleteById(id);
-    }
-
-    private boolean isValid(TagDto tagDto){
-        if(tagDto.getId() != null ){
-            return false;
-        }
-        return tagDto.getName() != null && tagDto.getName().length() <= NAME_LENGTH;
     }
 }
