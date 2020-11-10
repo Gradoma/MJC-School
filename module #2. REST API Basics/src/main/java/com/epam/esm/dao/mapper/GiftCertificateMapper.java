@@ -21,8 +21,8 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
     @Override
     public GiftCertificate mapRow(ResultSet resultSet, int i) throws SQLException {
         GiftCertificate certificate = new GiftCertificate();
-        certificate.setId(resultSet.getLong(ID));
-        certificate.setName(resultSet.getString(NAME));
+        certificate.setId(resultSet.getLong(TABLE_CERTIFICATE + "." + ID));
+        certificate.setName(resultSet.getString(TABLE_CERTIFICATE + "." + NAME));
         certificate.setDescription(resultSet.getString(DESCRIPTION));
         certificate.setPrice(resultSet.getDouble(PRICE));
         LocalDateTime createLocalDateTime = resultSet.getObject(CREATE_DATE, LocalDateTime.class);
@@ -34,8 +34,8 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
 
         do{
             Tag tag = new Tag();
-            tag.setId(resultSet.getLong(TagTableConst.ID));
-            tag.setName(resultSet.getString(TagTableConst.NAME));
+            tag.setId(resultSet.getLong(TagTableConst.TABLE_TAG + "." + TagTableConst.ID));
+            tag.setName(resultSet.getString(TagTableConst.TABLE_TAG + "." + TagTableConst.NAME));
             certificate.addTag(tag);
         } while (resultSet.next());
 

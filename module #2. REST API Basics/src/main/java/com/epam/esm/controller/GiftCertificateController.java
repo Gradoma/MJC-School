@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = GiftCertificateController.URL, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -19,6 +20,12 @@ public class GiftCertificateController {
     public GiftCertificateController(GiftCertificateService giftCertificateService){
         this.giftCertificateService = giftCertificateService;
     }
+//
+//    @GetMapping
+//    public ResponseEntity<List<GiftCertificateDto>> getAll(){
+//        List<GiftCertificateDto> certificateDtoList = giftCertificateService.getAll();
+//        return ResponseEntity.ok().body(certificateDtoList);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<GiftCertificateDto> getById(@PathVariable long id){

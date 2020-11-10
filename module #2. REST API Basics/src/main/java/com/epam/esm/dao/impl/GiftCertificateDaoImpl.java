@@ -20,8 +20,10 @@ import java.util.*;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
-    private static final String SELECT_ALL = "SELECT id, name, description, price, create_date, last_update_date, " +
-            "duration_days FROM giftcertificate";
+    private static final String SELECT_ALL = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
+            "create_date, last_update_date, duration_days, tag.id, tag.name FROM giftcertificate " +
+            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
+            "JOIN tag ON tag.id = tag_certificate.tag_id ";
     private static final String SELECT_BY_ID = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
             "create_date, last_update_date, duration_days, tag.id, tag.name FROM giftcertificate " +
             "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +

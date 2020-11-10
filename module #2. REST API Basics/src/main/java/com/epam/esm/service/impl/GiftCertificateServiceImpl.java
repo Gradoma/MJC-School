@@ -40,9 +40,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         GiftCertificate certificate = giftMapper.toEntity(certificateDto);
         List<TagDto> tags = certificateDto.getTags();
         for(TagDto tagDto : tags){
-            logger.log(Level.INFO, "tagDto:", tagDto);
             if(!tagService.doesExist(tagDto)){
-                logger.log(Level.WARNING, "doesnt exist:", tagDto);
                 long generatedId = tagService.save(tagDto);
                 tagDto.setId(Long.toString(generatedId));
             }
