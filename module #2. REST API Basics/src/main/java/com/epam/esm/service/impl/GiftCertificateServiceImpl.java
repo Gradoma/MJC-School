@@ -15,13 +15,11 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Validated
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
-    private final Logger logger = Logger.getLogger("log");
     private final GiftCertificateDao certificateDao;
     private final GiftCertificateDtoMapper giftMapper;
     private final TagDtoMapper tagMapper;
@@ -84,20 +82,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public boolean update(GiftCertificateDto certificateDto, long certificateId)
-            throws InvalidEntityException {
-//        if(!GiftCertificateValidator.isValid(certificateDto)){
-//            throw new InvalidEntityException();
-//        }
-//        GiftCertificate originalCertificate = certificateDao.findById(certificateId);
-//        List<Tag> originalTagList = originalCertificate.getTagList();
-//        String[] updatedTagNames = certificateDto.getTags();
-//        List<Long> deletedTagsId = collectDeletedTagsId(originalTagList, updatedTagNames);
-//        List<Long> addedTagsId = collectAddedTagsId(originalTagList, updatedTagNames);
-//        GiftCertificate updatedCertificate = compareAndPrepareUpdatedCertificate(originalCertificate,
-//                certificateDto);
-//        return certificateDao.update(updatedCertificate, addedTagsId, deletedTagsId);
-        return false;
+    public boolean update(@Valid GiftCertificateDto certificateDto, long certificateId) {
+        GiftCertificateDto originalCertDto = getById(certificateId);
+        List<Long> deletedTagsId = collectDeletedTagsId(originalCertDto.getTags(), certificateDto.getTags());
+        List<Long> addedTagsId = collectAddedTagsId(originalCertDto.getTags(), certificateDto.getTags());
+        GiftCertificate updatedCertificate = prepareUpdatedCertificate(certificateDto, originalCertDto);
+        updatedCertificate.setId(certificateId);
+        return certificateDao.update(updatedCertificate, addedTagsId, deletedTagsId);
     }
 
     @Override
@@ -105,95 +96,50 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return certificateDao.delete(id);
     }
 
-    private List<Long> collectDeletedTagsId(List<Tag> originalTagList, String[] updatedTagNames){
+    private List<Long> collectDeletedTagsId(List<TagDto> originalTagDtoList, List<TagDto> updatedTagDtoList){
         List<Long> deletedTagsId = new ArrayList<>();
-        List<String> updatedTagsNamesList = Arrays.asList(updatedTagNames);
-        for(Tag originalTag : originalTagList){
-            if(!updatedTagsNamesList.contains(originalTag.getName())){
-                deletedTagsId.add(originalTag.getId());
+        for(TagDto originalTagDto : originalTagDtoList){
+            if(!updatedTagDtoList.contains(originalTagDto)){
+                deletedTagsId.add(Long.parseLong(originalTagDto.getId()));
             }
         }
         return deletedTagsId;
     }
 
-    private List<Long> collectAddedTagsId(List<Tag> originalTagList, String[] updatedTagNames)
-            throws InvalidEntityException {
-//        List<Long> addedTagsId = new ArrayList<>();
-//        for(String tagName : updatedTagNames){
-//            Optional<Tag> optionalTag = originalTagList.stream()
-//                    .filter(t -> t.getName().equals(tagName))
-//                    .findAny();
-//            if(!optionalTag.isPresent()){
-//                addedTagsId.add(getIdOrAddAndReturnIdByName(tagName));
-//            }
-//        }
-//        return addedTagsId;
-        return null;
+    private List<Long> collectAddedTagsId(List<TagDto> originalTagDtoList, List<TagDto> updatedTagDtoList) {
+        List<Long> addedTagsId = new ArrayList<>();
+        for(TagDto updatedTagDto : updatedTagDtoList) {
+            if (!tagService.doesExist(updatedTagDto)) {
+                long generatedId = tagService.save(updatedTagDto);
+                updatedTagDto.setId(Long.toString(generatedId));
+            }
+            if (!originalTagDtoList.contains(updatedTagDto)) {
+                addedTagsId.add(Long.parseLong(updatedTagDto.getId()));
+            }
+        }
+        return addedTagsId;
     }
 
-//    private long getIdOrAddAndReturnIdByName(String name) throws InvalidEntityException {
-//        long tagId;
-//        try {
-//            TagDto tagDto = tagService.getByName(name);
-//            tagId = Long.parseLong(tagDto.getId());
-//        } catch (EmptyResultDataAccessException e){
-//            TagDto tagDto = new TagDto();
-//            tagDto.setName(name);
-//            tagId = tagService.save(tagDto);
-//        }
-//        return tagId;
-//    }
-
-    private GiftCertificate compareAndPrepareUpdatedCertificate(GiftCertificate originalCertificate,
-                                                                GiftCertificateDto certificateDto){
-        GiftCertificate updatedCertificate = giftMapper.toEntity(certificateDto);
-        if(!updatedCertificate.getName().equals(originalCertificate.getName())){
-            originalCertificate.setName(updatedCertificate.getName());
+    private GiftCertificate prepareUpdatedCertificate(GiftCertificateDto updatedDto,
+                                                      GiftCertificateDto originalDto){
+        if(!updatedDto.getName().equals(originalDto.getName())){
+            originalDto.setName(updatedDto.getName());
         }
-        if(!updatedCertificate.getDescription().equals(originalCertificate.getDescription())){
-            originalCertificate.setDescription(updatedCertificate.getDescription());
+        if(!updatedDto.getDescription().equals(originalDto.getDescription())){
+            originalDto.setDescription(updatedDto.getDescription());
         }
-        if(updatedCertificate.getPrice() != originalCertificate.getPrice()){
-            originalCertificate.setPrice(updatedCertificate.getPrice());
+        if(!updatedDto.getPrice().equals(originalDto.getPrice())){
+            originalDto.setPrice(updatedDto.getPrice());
         }
-        if(!updatedCertificate.getDuration().equals(originalCertificate.getDuration())){
-            originalCertificate.setDuration(updatedCertificate.getDuration());
+        if(!updatedDto.getDuration().equals(originalDto.getDuration())){
+            originalDto.setDuration(updatedDto.getDuration());
         }
-        if(!updatedCertificate.getCreateDate().equals(originalCertificate.getCreateDate())){
-            originalCertificate.setCreateDate(updatedCertificate.getCreateDate());
+        if(!updatedDto.getCreateDate().equals(originalDto.getCreateDate())){
+            originalDto.setCreateDate(updatedDto.getCreateDate());
         }
-        if(!updatedCertificate.getLastUpdateDate().equals(originalCertificate.getLastUpdateDate())){
-            originalCertificate.setLastUpdateDate(updatedCertificate.getLastUpdateDate());
+        if(!updatedDto.getLastUpdateDate().equals(originalDto.getLastUpdateDate())){
+            originalDto.setLastUpdateDate(updatedDto.getLastUpdateDate());
         }
-        return originalCertificate;
+        return giftMapper.toEntity(originalDto);
     }
-
-//    private boolean isValid(GiftCertificateDto certificateDto){
-//        if(certificateDto.getName() == null || certificateDto.getName().isEmpty() ||
-//                certificateDto.getName().trim().isEmpty() || certificateDto.getName().length() > NAME_LENGTH){
-//            return false;
-//        }
-//        if(certificateDto.getDescription() == null || certificateDto.getDescription().isEmpty() ||
-//                certificateDto.getDescription().trim().isEmpty() ||
-//                certificateDto.getDescription().length() > DESCRIPTION_LENGTH){
-//            return false;
-//        }
-//        Pattern pricePattern = Pattern.compile(PRICE_PATTERN);
-//        Matcher priceMatcher = pricePattern.matcher(certificateDto.getPrice());
-//        if(!priceMatcher.matches()){
-//            return false;
-//        }
-//        Pattern patternDuration = Pattern.compile(DURATION_DAYS);
-//        Matcher matcherDuration = patternDuration.matcher(certificateDto.getDuration());
-//        if(!matcherDuration.matches()){
-//            return false;
-//        }
-//        try{
-//            ZonedDateTime.parse(certificateDto.getCreateDate());
-//            ZonedDateTime.parse(certificateDto.getLastUpdateDate());
-//        } catch (DateTimeParseException e){
-//            return false;
-//        }
-//        return true;
-//    }
 }

@@ -40,4 +40,11 @@ public class GiftCertificateController {
                 .path(URL + "/" + generatedId).build().toUri();
         return ResponseEntity.created(resourceUri).build();
     }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GiftCertificateDto> update(@RequestBody GiftCertificateDto certificateDto,
+                                                     @PathVariable long id){
+        giftCertificateService.update(certificateDto, id);
+        return ResponseEntity.noContent().build();
+    }
 }

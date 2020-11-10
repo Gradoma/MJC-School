@@ -133,14 +133,12 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         for(long id : addedTagsId){
             addTagToCertId(id, certificate.getId());
         }
-
         for(long id : deletedTagsId){
             deleteTagToCert(certificate.getId(), id);
         }
-
         int rows = jdbcTemplate.update(UPDATE, certificate.getName(), certificate.getDescription(),
                 certificate.getPrice(), convertToUtcLocalDateTime(certificate.getLastUpdateDate()),
-                certificate.getDuration().getSeconds());
+                certificate.getDuration().toDays(), certificate.getId());
         return rows > 0;
     }
 

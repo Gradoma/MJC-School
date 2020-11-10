@@ -13,6 +13,6 @@ public interface GiftCertificateService {
     List<GiftCertificateDto> getByName(String name);
     List<GiftCertificateDto> getByDescription(String name);
     List<GiftCertificateDto> getByTag(String tagName) throws InvalidEntityException;
-    boolean update(GiftCertificateDto certificateDto, long certificateId) throws InvalidEntityException;
+    boolean update(@Valid GiftCertificateDto certificateDto, long certificateId);
     boolean delete(long id);
 }
