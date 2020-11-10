@@ -1,13 +1,18 @@
 package com.epam.esm.dao.mapper;
 
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
+
+import com.epam.esm.dao.column.TagToCertificateTableConst;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
@@ -29,6 +34,13 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
 //        certificate.setLastUpdateDate(lastUpdateDate.withZoneSameInstant(ZoneOffset.UTC));
         long durationInDays = resultSet.getLong(DURATION);
         certificate.setDuration(Duration.ofDays(durationInDays));
+
+        do{
+            Tag tag = new Tag();
+            tag.setId(resultSet.getLong(TagToCertificateTableConst.TAG_ID));
+            certificate.addTag(tag);
+        } while (resultSet.next());
+
         return certificate;
     }
 }

@@ -5,10 +5,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -21,6 +18,12 @@ public class GiftCertificateController {
 
     public GiftCertificateController(GiftCertificateService giftCertificateService){
         this.giftCertificateService = giftCertificateService;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GiftCertificateDto> getById(@PathVariable long id){
+        GiftCertificateDto certificateDto = giftCertificateService.getById(id);
+        return ResponseEntity.ok().body(certificateDto);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

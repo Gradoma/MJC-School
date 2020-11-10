@@ -7,6 +7,8 @@ import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.ResourceNotFoundException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -20,8 +22,10 @@ import java.util.*;
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String SELECT_ALL = "SELECT id, name, description, price, create_date, last_update_date, " +
             "duration_days FROM giftcertificate";
-    private static final String SELECT_BY_ID = "SELECT id, name, description, price, create_date, last_update_date, " +
-            "duration_days FROM giftcertificate WHERE id=?";
+    private static final String SELECT_BY_ID = "SELECT giftcertificate.id, name, description, price, create_date, " +
+            "last_update_date, duration_days, tag_certificate.tag_id FROM giftcertificate " +
+            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
+            "WHERE giftcertificate.id = ?";
     private static final String SELECT_BY_NAME = "SELECT id, name, description, price, create_date, last_update_date, " +
             "duration_days FROM giftcertificate WHERE LOWER(name) LIKE LOWER(?)";
     private static final String SELECT_BY_DESCRIPTION = "SELECT id, name, description, price, create_date, " +
@@ -93,11 +97,12 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public GiftCertificate findById(long id) {
-        GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_ID, giftMapper, id);
-        if(certificate != null){
-            certificate.setTagList(collectTagList(certificate.getId()));
+        try{
+            GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_ID, giftMapper, id);
+            return certificate;
+        } catch (EmptyResultDataAccessException e){
+            throw new ResourceNotFoundException("Gift certificate: id=" + id);
         }
-        return certificate;
     }
 
     @Override

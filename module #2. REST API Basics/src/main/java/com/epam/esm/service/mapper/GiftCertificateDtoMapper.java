@@ -35,7 +35,7 @@ public class GiftCertificateDtoMapper {
         certificateDto.setPrice(Double.toString(giftCertificate.getPrice()));
         certificateDto.setCreateDate(giftCertificate.getCreateDate().toString());
         certificateDto.setLastUpdateDate(giftCertificate.getLastUpdateDate().toString());
-        certificateDto.setDuration(giftCertificate.getDuration().toString());
+        certificateDto.setDuration(Long.toString(giftCertificate.getDuration().toDays()));
 //        certificateDto.setTags(giftCertificate.getTagList());
         return certificateDto;
     }
