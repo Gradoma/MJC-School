@@ -47,4 +47,10 @@ public class GiftCertificateController {
         giftCertificateService.update(certificateDto, id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<GiftCertificateDto> deleteById(@PathVariable long id){
+        giftCertificateService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

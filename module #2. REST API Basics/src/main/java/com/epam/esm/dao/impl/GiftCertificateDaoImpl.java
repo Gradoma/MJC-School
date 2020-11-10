@@ -101,8 +101,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public GiftCertificate findById(long id) {
         try{
-            GiftCertificate certificate = jdbcTemplate.queryForObject(SELECT_BY_ID, giftMapper, id);
-            return certificate;
+            return jdbcTemplate.queryForObject(SELECT_BY_ID, giftMapper, id);
         } catch (EmptyResultDataAccessException e){
             throw new ResourceNotFoundException("Gift certificate: id=" + id);
         }
@@ -145,7 +144,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public boolean delete(long id) {
         int rows = jdbcTemplate.update(DELETE_BY_ID, id);
-        return rows > 0;
+        if (rows > 0){
+            return true;
+        } else {
+            throw new ResourceNotFoundException("Gift certificate: id=" + id);
+        }
     }
 
     private List<Tag> collectTagList(long certificateId){
