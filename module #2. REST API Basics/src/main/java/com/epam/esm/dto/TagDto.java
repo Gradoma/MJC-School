@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class TagDto {
     private String id;
-    @NotNull(message = "{message.nameNotNull}")
-    @Size(min = 1, max = 20, message = "{message.nameSize}")
+    @NotNull()
+    @Size(min = 1, max = 20)
     private String name;
 }

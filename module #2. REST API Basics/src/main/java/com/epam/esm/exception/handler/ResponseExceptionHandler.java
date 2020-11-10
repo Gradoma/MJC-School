@@ -13,6 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 @ControllerAdvice
@@ -25,37 +26,22 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public final ResponseEntity<ErrorResponse> handleResourceNotFoundException (ResourceNotFoundException ex,
-                                                                         WebRequest request) {
+                                                                                Locale locale) {
         String message = messageSource.getMessage("message.notFound", new Object[]{ex.getMessage()},
-                request.getLocale());
+                locale);
         return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DuplicateException.class)
     public final ResponseEntity<ErrorResponse> handleDuplicateException (DuplicateException ex,
-                                                                         WebRequest request) {
+                                                                         Locale locale) {
         String message = messageSource.getMessage("message.duplicate", new Object[]{ex.getMessage()},
-                request.getLocale());
+                locale);
         return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public final ResponseEntity<ErrorResponse> handleConstraintViolationException (ConstraintViolationException ex,
-                                                                         WebRequest request) {
-        // work ok
-//        String exceptionMessage = ex.getMessage();
-//        System.out.println(exceptionMessage);
-//        return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
-
-        // doesn't work (500, no handling)
-
-        String exceptionMessage = ex.getMessage();
-        int startIndex = exceptionMessage.indexOf("{");
-        int endIndex = exceptionMessage.indexOf("}");
-        String messageName = exceptionMessage.substring(startIndex, endIndex);
-        System.out.println(messageName);
-        String message = messageSource.getMessage(messageName, null,
-                request.getLocale());
-        return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
+    public final ResponseEntity<ErrorResponse> handleConstraintViolationException (ConstraintViolationException ex) {
+        return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

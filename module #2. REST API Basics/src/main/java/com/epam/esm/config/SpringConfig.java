@@ -20,6 +20,7 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 
+import javax.validation.Validator;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -52,15 +53,14 @@ public class SpringConfig{
     }
 
     @Bean
-    public MethodValidationPostProcessor validationPostProcessor() {
-        return new MethodValidationPostProcessor();
+    public MethodValidationPostProcessor validationPostProcessor(Validator validator) {
+        MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();
+        postProcessor.setValidator(validator);
+        return postProcessor;
     }
 
     @Bean
     public LocalValidatorFactoryBean validator() {
-//        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-//        bean.setValidationMessageSource(messageSource());
-//        return bean;
         return new LocalValidatorFactoryBean();
     }
 
@@ -85,25 +85,4 @@ public class SpringConfig{
         interceptor.setParamName("lang");
         return interceptor;
     }
-
-    //    @Bean
-//    public ExceptionHandlerExceptionResolver exceptionResolver(MappingJackson2HttpMessageConverter converter){
-//        ExceptionHandlerExceptionResolver resolver = new ExceptionHandlerExceptionResolver();
-//        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-//        converters.add(converter);
-//        resolver.setMessageConverters(converters);
-//        return resolver;
-//    }
-//
-//    @Bean
-//    public MappingJackson2HttpMessageConverter jacksonConverter(){
-//        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-//        List<MediaType> mediaTypeList = new ArrayList<>();
-////        mediaTypeList.add(new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8));
-////        mediaTypeList.add(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8));
-//        mediaTypeList.add(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8));
-////        mediaTypeList.add(new MediaType(MediaType.APPLICATION_FORM_URLENCODED, StandardCharsets.UTF_8));
-//        converter.setSupportedMediaTypes(mediaTypeList);
-//        return converter;
-//    }
 }

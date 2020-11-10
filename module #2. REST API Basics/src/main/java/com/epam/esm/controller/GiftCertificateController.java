@@ -33,6 +33,21 @@ public class GiftCertificateController {
         return ResponseEntity.ok().body(certificateDto);
     }
 
+    @GetMapping("/by")
+    public ResponseEntity<GiftCertificateDto>
+    getByCriteria(@RequestParam(value = "tag", required = false) String tag,
+                  @RequestParam(value = "name", required = false) String name,
+                  @RequestParam(value = "description", required = false) String description,
+                  @RequestParam(value = "sort", required = false, defaultValue = "name") String sortBy,
+                  @RequestParam(value = "order", required = false, defaultValue = "asc") String order){
+        if(tag == null & name == null & description == null){
+            return ResponseEntity.badRequest().build();
+        }
+        giftCertificateService.getByCriteria(tag, name, description, sortBy, order);
+        return null;
+    }
+
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GiftCertificateDto> create(@RequestBody GiftCertificateDto certificateDto){
         long generatedId = giftCertificateService.add(certificateDto);

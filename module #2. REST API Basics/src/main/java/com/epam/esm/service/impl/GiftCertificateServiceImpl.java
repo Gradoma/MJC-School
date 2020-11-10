@@ -20,6 +20,10 @@ import java.util.logging.Logger;
 @Validated
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    private static final String NAME_KEY = "name";
+    private static final String DESCRIPTION_KEY = "description";
+    private static final String SORT_BY_KEY = "sortBy";
+    private static final String ORDER_KEY = "order";
     private final GiftCertificateDao certificateDao;
     private final GiftCertificateDtoMapper giftMapper;
     private final TagDtoMapper tagMapper;
@@ -61,6 +65,25 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         GiftCertificateDto resultDto = giftMapper.toDto(certificate);
         resultDto.setTags(tagDtoList);
         return resultDto;
+    }
+
+    @Override
+    public List<GiftCertificateDto> getByCriteria(String tag, String name, String description,
+                                                  String sortBy, String order) {
+        Map<String, String> criteriaMap = new HashMap<>();
+        criteriaMap.put(SORT_BY_KEY, sortBy);
+        criteriaMap.put(ORDER_KEY, order);
+        if(tag != null){
+            // stub
+        }
+        if(name != null && !name.isEmpty()){
+            criteriaMap.put(NAME_KEY, name);
+        }
+        if(description != null && !description.isEmpty()){
+            criteriaMap.put(DESCRIPTION_KEY, description);
+        }
+        certificateDao.findByCriteria(criteriaMap);
+        return null;
     }
 
     @Override

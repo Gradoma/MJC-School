@@ -20,6 +20,7 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
 
     @Override
     public GiftCertificate mapRow(ResultSet resultSet, int i) throws SQLException {
+        //todo (revert to separated cert mapping and fill it tags
         GiftCertificate certificate = new GiftCertificate();
         certificate.setId(resultSet.getLong(TABLE_CERTIFICATE + "." + ID));
         certificate.setName(resultSet.getString(TABLE_CERTIFICATE + "." + NAME));

@@ -108,6 +108,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
+    public List<GiftCertificate> findByCriteria(Map<String, String> criteriaMap) {
+        return null;
+    }
+
+    @Override
     public List<GiftCertificate> findByName(String name) {
         name = "%" + name.trim() + "%";
         List<GiftCertificate> certificateList = jdbcTemplate.query(SELECT_BY_NAME, giftMapper, name);
