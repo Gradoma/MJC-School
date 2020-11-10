@@ -9,69 +9,68 @@ import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
-import com.epam.esm.validation.GiftCertificateValidator;
-import org.springframework.dao.EmptyResultDataAccessException;
+import com.epam.esm.service.mapper.TagDtoMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
-import javax.xml.validation.Validator;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
+import javax.validation.Valid;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+@Validated
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
-    private static final int NAME_LENGTH = 40;
-    private static final int DESCRIPTION_LENGTH = 255;
-    private static final String PRICE_PATTERN = "^((\\p{Digit}){1,5}([.]\\d{1,2})?)$";
-    private static final String DURATION_DAYS = "\\d+";
+    private final Logger logger = Logger.getLogger("log");
     private final GiftCertificateDao certificateDao;
-    private final GiftCertificateDtoMapper dtoMapper;
+    private final GiftCertificateDtoMapper giftMapper;
+    private final TagDtoMapper tagMapper;
     private final TagService tagService;
 
-    public GiftCertificateServiceImpl(GiftCertificateDao certificateDao, GiftCertificateDtoMapper dtoMapper,
-                                      TagService tagService){
+    public GiftCertificateServiceImpl(GiftCertificateDao certificateDao, GiftCertificateDtoMapper giftMapper,
+                                      TagService tagService, TagDtoMapper tagMapper){
         this.certificateDao = certificateDao;
-        this.dtoMapper = dtoMapper;
+        this.giftMapper = giftMapper;
         this.tagService = tagService;
+        this.tagMapper = tagMapper;
     }
 
     @Override
-    public long add(GiftCertificateDto certificateDto) throws InvalidEntityException {
-//        if(!GiftCertificateValidator.isValid(certificateDto)){
-//            throw new InvalidEntityException();
-//        }
-//        GiftCertificate certificate = dtoMapper.toEntity(certificateDto);
-//        String[] tagNames = certificateDto.getTags();
-//        for(String name : tagNames){
-//            Tag tag = new Tag();
-//            tag.setId(getIdOrAddAndReturnIdByName(name));
-//            tag.setName(name);
-//            certificate.addTag(tag);
-//        }
-//        return certificateDao.add(certificate);
-        return 0;
+    public long add(@Valid GiftCertificateDto certificateDto){
+        GiftCertificate certificate = giftMapper.toEntity(certificateDto);
+        List<TagDto> tags = certificateDto.getTags();
+        for(TagDto tagDto : tags){
+            logger.log(Level.INFO, "tagDto:", tagDto);
+            if(!tagService.doesExist(tagDto)){
+                logger.log(Level.WARNING, "doesnt exist:", tagDto);
+                long generatedId = tagService.save(tagDto);
+                tagDto.setId(Long.toString(generatedId));
+            }
+            Tag tag = tagMapper.toEntity(tagDto);
+            tag.setId(Long.parseLong(tagDto.getId()));      //todo(set id to tag from tagDto in mapper)
+            certificate.addTag(tag);
+        }
+        return certificateDao.add(certificate);
     }
 
     @Override
     public List<GiftCertificateDto> getAll() {
-        return dtoMapper.toDto(certificateDao.findAll());
+        return giftMapper.toDto(certificateDao.findAll());
     }
 
     @Override
     public GiftCertificateDto getById(long id) {
-        return dtoMapper.toDto(certificateDao.findById(id));
+        return giftMapper.toDto(certificateDao.findById(id));
     }
 
     @Override
     public List<GiftCertificateDto> getByName(String name) {
-        return dtoMapper.toDto(certificateDao.findByName(name));
+        return giftMapper.toDto(certificateDao.findByName(name));
     }
 
     @Override
     public List<GiftCertificateDto> getByDescription(String description) {
-        return dtoMapper.toDto(certificateDao.findByDescription(description));
+        return giftMapper.toDto(certificateDao.findByDescription(description));
     }
 
     @Override
@@ -86,17 +85,18 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public boolean update(GiftCertificateDto certificateDto, long certificateId)
             throws InvalidEntityException {
-        if(!GiftCertificateValidator.isValid(certificateDto)){
-            throw new InvalidEntityException();
-        }
-        GiftCertificate originalCertificate = certificateDao.findById(certificateId);
-        List<Tag> originalTagList = originalCertificate.getTagList();
-        String[] updatedTagNames = certificateDto.getTags();
-        List<Long> deletedTagsId = collectDeletedTagsId(originalTagList, updatedTagNames);
-        List<Long> addedTagsId = collectAddedTagsId(originalTagList, updatedTagNames);
-        GiftCertificate updatedCertificate = compareAndPrepareUpdatedCertificate(originalCertificate,
-                certificateDto);
-        return certificateDao.update(updatedCertificate, addedTagsId, deletedTagsId);
+//        if(!GiftCertificateValidator.isValid(certificateDto)){
+//            throw new InvalidEntityException();
+//        }
+//        GiftCertificate originalCertificate = certificateDao.findById(certificateId);
+//        List<Tag> originalTagList = originalCertificate.getTagList();
+//        String[] updatedTagNames = certificateDto.getTags();
+//        List<Long> deletedTagsId = collectDeletedTagsId(originalTagList, updatedTagNames);
+//        List<Long> addedTagsId = collectAddedTagsId(originalTagList, updatedTagNames);
+//        GiftCertificate updatedCertificate = compareAndPrepareUpdatedCertificate(originalCertificate,
+//                certificateDto);
+//        return certificateDao.update(updatedCertificate, addedTagsId, deletedTagsId);
+        return false;
     }
 
     @Override
@@ -145,7 +145,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private GiftCertificate compareAndPrepareUpdatedCertificate(GiftCertificate originalCertificate,
                                                                 GiftCertificateDto certificateDto){
-        GiftCertificate updatedCertificate = dtoMapper.toEntity(certificateDto);
+        GiftCertificate updatedCertificate = giftMapper.toEntity(certificateDto);
         if(!updatedCertificate.getName().equals(originalCertificate.getName())){
             originalCertificate.setName(updatedCertificate.getName());
         }

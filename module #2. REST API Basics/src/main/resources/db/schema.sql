@@ -5,8 +5,8 @@ create table if not exists giftcertificate
     name           varchar(40)   not null,
     description    varchar(255)  null,
     price          decimal(5, 2) not null,
-    create_date     datetime        not null,
-    last_update_date datetime        not null,
+    create_date     timestamp      not null,
+    last_update_date timestamp       not null,
     duration_days       bigint        null
 );
 create table if not exists tag

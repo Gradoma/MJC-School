@@ -19,10 +19,14 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         certificate.setName(resultSet.getString(NAME));
         certificate.setDescription(resultSet.getString(DESCRIPTION));
         certificate.setPrice(resultSet.getDouble(PRICE));
-        ZonedDateTime createDate = resultSet.getObject(CREATE_DATE, ZonedDateTime.class);
-        certificate.setCreateDate(createDate.withZoneSameInstant(ZoneOffset.UTC));
-        ZonedDateTime lastUpdateDate = resultSet.getObject(LAST_UPDATE_DATE, ZonedDateTime.class);
-        certificate.setLastUpdateDate(lastUpdateDate.withZoneSameInstant(ZoneOffset.UTC));
+        LocalDateTime createLocalDateTime = resultSet.getObject(CREATE_DATE, LocalDateTime.class);
+        certificate.setCreateDate(ZonedDateTime.of(createLocalDateTime, ZoneOffset.UTC));
+        LocalDateTime updateLocalDateTime = resultSet.getObject(LAST_UPDATE_DATE, LocalDateTime.class);
+        certificate.setLastUpdateDate(ZonedDateTime.of(updateLocalDateTime, ZoneOffset.UTC));
+//        ZonedDateTime createDate = resultSet.getObject(CREATE_DATE, ZonedDateTime.class);
+//        certificate.setCreateDate(createDate.withZoneSameInstant(ZoneOffset.UTC));
+//        ZonedDateTime lastUpdateDate = resultSet.getObject(LAST_UPDATE_DATE, ZonedDateTime.class);
+//        certificate.setLastUpdateDate(lastUpdateDate.withZoneSameInstant(ZoneOffset.UTC));
         long durationInDays = resultSet.getLong(DURATION);
         certificate.setDuration(Duration.ofDays(durationInDays));
         return certificate;

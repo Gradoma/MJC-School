@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -54,8 +55,8 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         parameters.put(NAME, certificate.getName());
         parameters.put(DESCRIPTION, certificate.getDescription());
         parameters.put(PRICE, certificate.getPrice());
-        parameters.put(CREATE_DATE, convertToUtc(certificate.getCreateDate()));
-        parameters.put(LAST_UPDATE_DATE, convertToUtc(certificate.getLastUpdateDate()));
+        parameters.put(CREATE_DATE, convertToUtcLocalDateTime(certificate.getCreateDate()));
+        parameters.put(LAST_UPDATE_DATE, convertToUtcLocalDateTime(certificate.getLastUpdateDate()));
         parameters.put(DURATION, certificate.getDuration().toDays());
         long certificateId = simpleJdbcInsert.executeAndReturnKey(parameters).longValue();
 
@@ -130,7 +131,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         }
 
         int rows = jdbcTemplate.update(UPDATE, certificate.getName(), certificate.getDescription(),
-                certificate.getPrice(), convertToUtc(certificate.getLastUpdateDate()),
+                certificate.getPrice(), convertToUtcLocalDateTime(certificate.getLastUpdateDate()),
                 certificate.getDuration().getSeconds());
         return rows > 0;
     }
@@ -183,7 +184,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         return rows == 1;
     }
 
-    private ZonedDateTime convertToUtc(ZonedDateTime zonedDateTime){
-        return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
+    private LocalDateTime convertToUtcLocalDateTime(ZonedDateTime zonedDateTime){
+        return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     }
 }

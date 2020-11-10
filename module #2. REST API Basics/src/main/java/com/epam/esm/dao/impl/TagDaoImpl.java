@@ -18,9 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Repository
 public class TagDaoImpl implements TagDao {
+    private final Logger logger = Logger.getLogger("tagLog");
     private static final String COUNT_BY_NAME = "SELECT COUNT(*) FROM tag WHERE id=? AND name=?";
     private static final String SELECT_ALL = "SELECT id, Name FROM tag";
     private static final String SELECT_BY_ID = "SELECT id, name FROM tag WHERE id=?";
@@ -89,6 +92,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public boolean contains(Tag tag) {
+        logger.log(Level.INFO, "tag=", tag);
         Integer rows = jdbcTemplate.queryForObject(COUNT_BY_NAME, Integer.class, tag.getId(), tag.getName());
         return rows > 0;
     }

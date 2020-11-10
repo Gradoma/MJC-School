@@ -5,6 +5,7 @@ import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.column.GiftCertificateTableConst;
 import com.epam.esm.dao.column.TagTableConst;
+import com.epam.esm.dao.column.TagToCertificateTableConst;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import org.junit.jupiter.api.*;
@@ -15,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
@@ -30,7 +32,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SpringTestConfig.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Sql("/db/certificate-data.sql")
+@SqlGroup({
+        @Sql("/db/certificate-data.sql"),
+        @Sql("/db/tag-data.sql")
+})
 class GiftCertificateDaoImplTest {      //todo (independent tests)
     private static final String DESCRIPTION_KEYWORD_DESCRIPTION = "description";
     private static final int DESCRIPTION_COUNT = 3;
@@ -44,6 +49,12 @@ class GiftCertificateDaoImplTest {      //todo (independent tests)
 
     @BeforeAll
     static void beforeAll() {
+        Tag tagSport = new Tag();
+        tagSport.setId(1);
+        tagSport.setName("sport");
+        Tag tagShops = new Tag();
+        tagShops.setId(4);
+        tagShops.setName("shops");
         certificate = new GiftCertificate();
         certificate.setName("Name 1");
         certificate.setDescription("some description");
@@ -52,27 +63,34 @@ class GiftCertificateDaoImplTest {      //todo (independent tests)
         certificate.setCreateDate(creationDate);
         certificate.setLastUpdateDate(certificate.getCreateDate());
         certificate.setDuration(Duration.ofDays(17));
+        certificate.addTag(tagShops);
+        certificate.addTag(tagSport);
     }
 
     @AfterEach
     void cleanUp(){
         JdbcTestUtils.deleteFromTables(jdbcTemplate, GiftCertificateTableConst.TABLE_CERTIFICATE);
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, TagToCertificateTableConst.TABLE_TAG_CERT);
     }
 
     @Test
-    @Order(1)
     void add() {
         int startRows = JdbcTestUtils.countRowsInTable(jdbcTemplate, GiftCertificateTableConst.TABLE_CERTIFICATE);
+        int startRowsInTagToCertTable = JdbcTestUtils.countRowsInTable(jdbcTemplate,
+                TagToCertificateTableConst.TABLE_TAG_CERT);
         long generatedId = giftCertificateDao.add(certificate);
         certificate.setId(generatedId);
         assertEquals(startRows + 1,
                 JdbcTestUtils.countRowsInTable(jdbcTemplate, GiftCertificateTableConst.TABLE_CERTIFICATE));
+        assertEquals(startRowsInTagToCertTable + certificate.getTagList().size(),
+                JdbcTestUtils.countRowsInTable(jdbcTemplate, TagToCertificateTableConst.TABLE_TAG_CERT));
     }
 
     @Test
-    @Order(2)
     void findById() {
-        GiftCertificate fromDb = giftCertificateDao.findById(certificate.getId());
+        long id = giftCertificateDao.add(certificate);
+        certificate.setId(id);
+        GiftCertificate fromDb = giftCertificateDao.findById(id);
         ZonedDateTime createDate = fromDb.getCreateDate();
         fromDb.setCreateDate(createDate.withZoneSameInstant(ZoneId.systemDefault()));
         ZonedDateTime lastUpdDate = fromDb.getLastUpdateDate();
@@ -81,6 +99,7 @@ class GiftCertificateDaoImplTest {      //todo (independent tests)
     }
 
     @Test
+    @Disabled
     void findAll(){
         List<GiftCertificate> certificateList = giftCertificateDao.findAll();
         for(GiftCertificate certificate : certificateList){
@@ -90,12 +109,14 @@ class GiftCertificateDaoImplTest {      //todo (independent tests)
     }
 
     @Test
+    @Disabled
     void findByName() {
         List<GiftCertificate> certificateList = giftCertificateDao.findByName(NAME_KEYWORD_TEXT);
         assertEquals(TEXT_COUNT, certificateList.size());
     }
 
     @Test
+    @Disabled
     void findByDescription(){
         List<GiftCertificate> certificateList = giftCertificateDao.findByDescription(DESCRIPTION_KEYWORD_DESCRIPTION);
         assertEquals(DESCRIPTION_COUNT, certificateList.size());

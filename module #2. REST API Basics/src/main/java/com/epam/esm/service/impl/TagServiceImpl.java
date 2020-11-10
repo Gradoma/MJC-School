@@ -66,6 +66,10 @@ public class TagServiceImpl implements TagService {
     @Override
     public boolean doesExist(@Valid TagDto tagDto) {
         Tag tag = dtoMapper.toEntity(tagDto);
+        if(!tagDto.getId().matches("\\d+")){
+            return false;
+        }
+        tag.setId(Long.parseLong(tagDto.getId()));      //todo(set id to tag from tagDto in mapper)
         return tagDao.contains(tag);
     }
 }

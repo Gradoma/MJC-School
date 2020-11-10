@@ -3,8 +3,10 @@ package com.epam.esm.service.mapper;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.ConstraintViolationException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ public class GiftCertificateDtoMapper {
         giftCertificate.setDuration(Duration.ofDays(days));
         giftCertificate.setCreateDate(ZonedDateTime.parse(certificateDto.getCreateDate()));
         giftCertificate.setLastUpdateDate(ZonedDateTime.parse(certificateDto.getLastUpdateDate()));
+//        giftCertificate.setTagList(certificateDto.getTags());
         return giftCertificate;
     }
 
@@ -33,7 +36,7 @@ public class GiftCertificateDtoMapper {
         certificateDto.setCreateDate(giftCertificate.getCreateDate().toString());
         certificateDto.setLastUpdateDate(giftCertificate.getLastUpdateDate().toString());
         certificateDto.setDuration(giftCertificate.getDuration().toString());
-        certificateDto.setTags(convertToTagNamesArray(giftCertificate.getTagList()));
+//        certificateDto.setTags(giftCertificate.getTagList());
         return certificateDto;
     }
 
