@@ -1,8 +1,13 @@
 package com.epam.esm.service.mapper;
 
+import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.dto.TagDto;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class TagDtoMapper {
@@ -19,5 +24,13 @@ public class TagDtoMapper {
         tagDto.setId(Long.toString(tag.getId()));
         tagDto.setName(tag.getName());
         return tagDto;
+    }
+
+    public List<TagDto> toDto(List<Tag> tagList){
+        List<TagDto> resultList = new ArrayList<>();
+        for(Tag tag : tagList){
+            resultList.add(toDto(tag));
+        }
+        return resultList;
     }
 }

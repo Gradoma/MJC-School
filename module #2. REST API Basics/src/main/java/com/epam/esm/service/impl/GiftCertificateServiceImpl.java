@@ -61,12 +61,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public GiftCertificateDto getById(long id) {
         GiftCertificate certificate = certificateDao.findById(id);
+        List<TagDto> tagDtoList = tagMapper.toDto(certificate.getTagList());
         GiftCertificateDto resultDto = giftMapper.toDto(certificate);
-        List<TagDto> tagDtoList = new ArrayList<>();
-        for(Tag tag : certificate.getTagList()){
-            TagDto tagDto = tagService.getById(tag.getId());
-            tagDtoList.add(tagDto);
-        }
         resultDto.setTags(tagDtoList);
         return resultDto;
     }

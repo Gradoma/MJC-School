@@ -2,6 +2,7 @@ package com.epam.esm.dao.mapper;
 
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 
+import com.epam.esm.dao.column.TagTableConst;
 import com.epam.esm.dao.column.TagToCertificateTableConst;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
@@ -28,16 +29,13 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         certificate.setCreateDate(ZonedDateTime.of(createLocalDateTime, ZoneOffset.UTC));
         LocalDateTime updateLocalDateTime = resultSet.getObject(LAST_UPDATE_DATE, LocalDateTime.class);
         certificate.setLastUpdateDate(ZonedDateTime.of(updateLocalDateTime, ZoneOffset.UTC));
-//        ZonedDateTime createDate = resultSet.getObject(CREATE_DATE, ZonedDateTime.class);
-//        certificate.setCreateDate(createDate.withZoneSameInstant(ZoneOffset.UTC));
-//        ZonedDateTime lastUpdateDate = resultSet.getObject(LAST_UPDATE_DATE, ZonedDateTime.class);
-//        certificate.setLastUpdateDate(lastUpdateDate.withZoneSameInstant(ZoneOffset.UTC));
         long durationInDays = resultSet.getLong(DURATION);
         certificate.setDuration(Duration.ofDays(durationInDays));
 
         do{
             Tag tag = new Tag();
-            tag.setId(resultSet.getLong(TagToCertificateTableConst.TAG_ID));
+            tag.setId(resultSet.getLong(TagTableConst.ID));
+            tag.setName(resultSet.getString(TagTableConst.NAME));
             certificate.addTag(tag);
         } while (resultSet.next());
 
