@@ -84,6 +84,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String TAG_CERT_DELETE_BY_TAG_AND_CERT_ID = "DELETE FROM tag_certificate WHERE " +
             "tag_id = ? AND certificate_id = ?";
 
+    private static final String PERCENTAGE = "%";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
     private final TagDao tagDao;
@@ -131,36 +132,36 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         List<GiftCertificate> resultList = new ArrayList<>();
         switch (criteriaSet){
             case GiftCertificateDao.BY_TAG:
-                tagName = "%" + tagName.trim() + "%";
+                tagName = addPercentageWildcard(tagName);
                 resultList = jdbcTemplate.query(SELECT_BY_TAG, mapper, tagName);
                 break;
             case GiftCertificateDao.BY_TAG_AND_NAME:
-                tagName = "%" + tagName.trim() + "%";
-                name = "%" + name.trim() + "%";
+                tagName = addPercentageWildcard(tagName);
+                name = addPercentageWildcard(name);
                 resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_NAME, mapper, name, tagName);
                 break;
             case GiftCertificateDao.BY_NAME:
-                name = "%" + name.trim() + "%";
+                name = addPercentageWildcard(name);
                 resultList = jdbcTemplate.query(SELECT_BY_NAME, mapper, name);
                 break;
             case GiftCertificateDao.BY_TAG_AND_DESCRIPTION:
-                tagName = "%" + tagName.trim() + "%";
-                description = "%" + description.trim() + "%";
+                tagName = addPercentageWildcard(tagName);
+                description = addPercentageWildcard(description);
                 resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_DESCRIPTION, mapper, description, tagName);
                 break;
             case GiftCertificateDao.BY_DESCRIPTION:
-                description = "%" + description.trim() + "%";
+                description = addPercentageWildcard(description);
                 resultList = jdbcTemplate.query(SELECT_BY_DESCRIPTION, mapper, description);
                 break;
             case GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION:
-                tagName = "%" + tagName.trim() + "%";
-                name = "%" + name.trim() + "%";
-                description = "%" + description.trim() + "%";
+                tagName = addPercentageWildcard(tagName);
+                name = addPercentageWildcard(name);
+                description = addPercentageWildcard(description);
                 resultList = jdbcTemplate.query(SELECT_BY_TAG_NAME_DESCRIPTION, mapper, name, description, tagName);
                 break;
             case GiftCertificateDao.BY_NAME_AND_DESCRIPTION:
-                name = "%" + name.trim() + "%";
-                description = "%" + description.trim() + "%";
+                name = addPercentageWildcard(name);
+                description = addPercentageWildcard(description);
                 resultList = jdbcTemplate.query(SELECT_BY_NAME_AND_DESCRIPTION, mapper, name, description);
                 break;
             case GiftCertificateDao.NO_CRITERIA:
@@ -210,5 +211,9 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     private LocalDateTime convertToUtcLocalDateTime(ZonedDateTime zonedDateTime){
         return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+    }
+
+    private String addPercentageWildcard(String param){
+        return PERCENTAGE + param.trim() + PERCENTAGE;
     }
 }
