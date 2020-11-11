@@ -26,11 +26,7 @@ public class GiftCertificateDto {
     @NotNull
     @Pattern(regexp = "^((\\p{Digit}){1,5}([.]\\d{1,2})?)$")
     private String price;
-    @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private String createDate;
-    @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private String lastUpdateDate;
     @NotNull
     @Pattern(regexp = "\\d+")

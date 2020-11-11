@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Validated
@@ -36,8 +38,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public long add(@Valid GiftCertificateDto certificateDto){
-        // todo add fake id (if empty)
         GiftCertificate certificate = giftMapper.toEntity(certificateDto);
+        if(certificate.getCreateDate() == null){
+            certificate.setCreateDate(ZonedDateTime.now());
+            certificate.setLastUpdateDate(certificate.getCreateDate());
+        }
+        if(certificate.getLastUpdateDate() == null){
+            certificate.setLastUpdateDate(ZonedDateTime.now());
+        }
         List<TagDto> tags = certificateDto.getTags();
         for(TagDto tagDto : tags){
             if(!tagService.doesExist(tagDto)){
@@ -45,7 +53,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 tagDto.setId(Long.toString(generatedId));
             }
             Tag tag = tagMapper.toEntity(tagDto);
-//            tag.setId(Long.parseLong(tagDto.getId()));      //todo(set id to tag from tagDto in mapper)
             certificate.addTag(tag);
         }
         return certificateDao.add(certificate);
@@ -116,7 +123,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public boolean update(@Valid GiftCertificateDto certificateDto, long certificateId) {
-        // todo (check if id in certdto null or empty)
         GiftCertificateDto originalCertDto = getById(certificateId);
         List<Long> deletedTagsId = collectDeletedTagsId(originalCertDto.getTags(), certificateDto.getTags());
         List<Long> addedTagsId = collectAddedTagsId(originalCertDto.getTags(), certificateDto.getTags());
@@ -168,12 +174,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if(!updatedDto.getDuration().equals(originalDto.getDuration())){
             originalDto.setDuration(updatedDto.getDuration());
         }
-        if(!updatedDto.getCreateDate().equals(originalDto.getCreateDate())){
-            originalDto.setCreateDate(updatedDto.getCreateDate());
-        }
-        if(!updatedDto.getLastUpdateDate().equals(originalDto.getLastUpdateDate())){
-            originalDto.setLastUpdateDate(updatedDto.getLastUpdateDate());
-        }
-        return giftMapper.toEntity(originalDto);
+//        if(!updatedDto.getCreateDate().equals(originalDto.getCreateDate())){
+//            originalDto.setCreateDate(updatedDto.getCreateDate());
+//        }
+//        if(!updatedDto.getLastUpdateDate().equals(originalDto.getLastUpdateDate())){
+//            originalDto.setLastUpdateDate(updatedDto.getLastUpdateDate());
+//        }
+//        return giftMapper.toEntity(originalDto);
+        GiftCertificate updatedCertificate = giftMapper.toEntity(originalDto);
+        updatedCertificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
+        return updatedCertificate;
     }
 }

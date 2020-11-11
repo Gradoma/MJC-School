@@ -8,17 +8,13 @@ import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.TagDtoMapper;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Validated
 @Service
@@ -40,13 +36,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<TagDto> getAll() {
-//        List<TagDto> resultList = new ArrayList<>();
-        List<Tag> tagList = tagDao.findAll();       // todo (via list conversion)
+        List<Tag> tagList = tagDao.findAll();
         return dtoMapper.toDto(tagList);
-//        for(Tag tag : tagList){
-//            resultList.add(dtoMapper.toDto(tag));
-//        }
-//        return resultList;
     }
 
     @Override
@@ -77,7 +68,6 @@ public class TagServiceImpl implements TagService {
             return false;
         }
         Tag tag = dtoMapper.toEntity(tagDto);
-//        tag.setId(Long.parseLong(tagDto.getId()));      //todo(set id to tag from tagDto in mapper)
         return tagDao.contains(tag);
     }
 }
