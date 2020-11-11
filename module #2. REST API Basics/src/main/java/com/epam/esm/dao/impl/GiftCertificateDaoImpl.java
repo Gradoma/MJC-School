@@ -2,6 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dao.mapper.CertMapper;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
@@ -21,28 +22,68 @@ import java.util.*;
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String SELECT_ALL = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
-            "create_date, last_update_date, duration_days, tag.id, tag.name FROM giftcertificate " +
-            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
-            "JOIN tag ON tag.id = tag_certificate.tag_id ";
+            "create_date, last_update_date, duration_days FROM giftcertificate";
     private static final String SELECT_BY_ID = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
             "create_date, last_update_date, duration_days, tag.id, tag.name FROM giftcertificate " +
             "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
             "JOIN tag ON tag.id = tag_certificate.tag_id " +
             "WHERE giftcertificate.id = ?";
-    private static final String SELECT_BY_NAME = "SELECT id, name, description, price, create_date, last_update_date, " +
-            "duration_days FROM giftcertificate WHERE LOWER(name) LIKE LOWER(?)";
-    private static final String SELECT_BY_DESCRIPTION = "SELECT id, name, description, price, create_date, " +
-            "last_update_date, duration_days FROM giftcertificate WHERE LOWER(description) LIKE LOWER(?)";
+    private static final String SELECT_BY_TAG = "SELECT DISTINCT giftcertificate.id, giftcertificate.name, description, " +
+            "price, create_date, last_update_date, duration_days " +
+            "FROM giftcertificate " +
+            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
+            "JOIN tag ON tag.id = tag_certificate.tag_id " +
+            "WHERE LOWER(tag.name) LIKE LOWER(?)";
+    private static final String SELECT_BY_TAG_AND_NAME = "SELECT giftcertificate.id, giftcertificate.name, description, " +
+            "price, create_date, last_update_date, duration_days " +
+            "FROM giftcertificate " +
+            "WHERE LOWER(giftcertificate.name) LIKE LOWER(?) " +
+            "AND giftcertificate.id IN " +
+            "(SELECT DISTINCT giftcertificate.id FROM giftcertificate " +
+            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
+            "JOIN tag ON tag.id = tag_certificate.tag_id " +
+            "WHERE LOWER(tag.name) LIKE LOWER(?))";
+    private static final String SELECT_BY_TAG_AND_DESCRIPTION = "SELECT giftcertificate.id, giftcertificate.name, description, " +
+            "price, create_date, last_update_date, duration_days " +
+            "FROM giftcertificate " +
+            "WHERE LOWER(description) LIKE LOWER(?) " +
+            "AND giftcertificate.id IN " +
+            "(SELECT DISTINCT giftcertificate.id FROM giftcertificate " +
+            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
+            "JOIN tag ON tag.id = tag_certificate.tag_id " +
+            "WHERE LOWER(tag.name) LIKE LOWER(?))";
+    private static final String SELECT_BY_NAME = "SELECT giftcertificate.id, giftcertificate.name, description, " +
+            "price, create_date, last_update_date, duration_days " +
+            "FROM giftcertificate " +
+            "WHERE LOWER(giftcertificate.name) LIKE LOWER(?)";
+    private static final String SELECT_BY_DESCRIPTION = "SELECT giftcertificate.id, giftcertificate.name, description, " +
+            "price, create_date, last_update_date, duration_days " +
+            "FROM giftcertificate " +
+            "WHERE LOWER(description) LIKE LOWER(?)";
+    private static final String SELECT_BY_NAME_AND_DESCRIPTION = "SELECT giftcertificate.id, giftcertificate.name, " +
+            "description, price, create_date, last_update_date, duration_days " +
+            "FROM giftcertificate " +
+            "WHERE LOWER(giftcertificate.name) LIKE LOWER(?) " +
+            "AND LOWER(description) LIKE LOWER(?)";
+    private static final String SELECT_BY_TAG_NAME_DESCRIPTION = "SELECT giftcertificate.id, giftcertificate.name, " +
+            "description, price, create_date, last_update_date, duration_days " +
+            "FROM giftcertificate " +
+            "WHERE LOWER(giftcertificate.name) LIKE LOWER(?) " +
+            "AND LOWER(description) LIKE LOWER(?) " +
+            "AND giftcertificate.id IN " +
+            "(SELECT DISTINCT giftcertificate.id FROM giftcertificate " +
+            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
+            "JOIN tag ON tag.id = tag_certificate.tag_id " +
+            "WHERE LOWER(tag.name) LIKE LOWER(?))";
+
+
     private static final String UPDATE = "UPDATE giftcertificate SET name = ?, description = ?, price = ?, " +
             "last_update_date = ?, duration_days = ? WHERE id = ?";
     private static final String DELETE_BY_ID = "DELETE FROM giftcertificate WHERE id = ?";
     private static final String TAG_CERT_INSERT = "INSERT INTO tag_certificate (tag_id, certificate_id) VALUES (?, ?)";
-    private static final String TAG_CERT_SELECT_BY_TAG_ID = "SELECT certificate_id FROM tag_certificate WHERE tag_id = ?";
-    private static final String TAG_CERT_SELECT_BY_CERTIFICATE_ID = "SELECT tag_id FROM tag_certificate " +
-            "WHERE certificate_id = ?";
-    private static final String TAG_CERT_DELETE = "DELETE FROM tag_certificate WHERE certificate_id = ?";
     private static final String TAG_CERT_DELETE_BY_TAG_AND_CERT_ID = "DELETE FROM tag_certificate WHERE " +
             "tag_id = ? AND certificate_id = ?";
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
     private final TagDao tagDao;
@@ -75,30 +116,6 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findAllWithTags(){
-        List<GiftCertificate> certificateList = jdbcTemplate.query(SELECT_ALL, giftMapper);
-        for(GiftCertificate certificate : certificateList){
-            certificate.setTagList(collectTagList(certificate.getId()));
-        }
-        return certificateList;
-    }
-
-    @Override
-    public List<GiftCertificate> findAll(){
-        return jdbcTemplate.query(SELECT_ALL, giftMapper);
-    }
-
-    @Override
-    public List<GiftCertificate> findByTag(long tagId){
-        List<GiftCertificate> certificates = new ArrayList<>();
-        List<Long> certificatesId = findByTagId(tagId);
-        for(Long certId : certificatesId){
-            certificates.add(findById(certId));
-        }
-        return certificates;
-    }
-
-    @Override
     public GiftCertificate findById(long id) {
         try{
             return jdbcTemplate.queryForObject(SELECT_BY_ID, giftMapper, id);
@@ -108,28 +125,54 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findByCriteria(Map<String, String> criteriaMap) {
-        return null;
-    }
-
-    @Override
-    public List<GiftCertificate> findByName(String name) {
-        name = "%" + name.trim() + "%";
-        List<GiftCertificate> certificateList = jdbcTemplate.query(SELECT_BY_NAME, giftMapper, name);
-        for(GiftCertificate certificate : certificateList){
-            certificate.setTagList(collectTagList(certificate.getId()));
+    public List<GiftCertificate> findByCriteria(String criteriaSet, String tagName, String name,
+                                                String description) {
+        CertMapper mapper = new CertMapper();
+        List<GiftCertificate> resultList = new ArrayList<>();
+        switch (criteriaSet){
+            case GiftCertificateDao.BY_TAG:
+                tagName = "%" + tagName.trim() + "%";
+                resultList = jdbcTemplate.query(SELECT_BY_TAG, mapper, tagName);
+                break;
+            case GiftCertificateDao.BY_TAG_AND_NAME:
+                tagName = "%" + tagName.trim() + "%";
+                name = "%" + name.trim() + "%";
+                resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_NAME, mapper, name, tagName);
+                break;
+            case GiftCertificateDao.BY_NAME:
+                name = "%" + name.trim() + "%";
+                resultList = jdbcTemplate.query(SELECT_BY_NAME, mapper, name);
+                break;
+            case GiftCertificateDao.BY_TAG_AND_DESCRIPTION:
+                tagName = "%" + tagName.trim() + "%";
+                description = "%" + description.trim() + "%";
+                resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_DESCRIPTION, mapper, description, tagName);
+                break;
+            case GiftCertificateDao.BY_DESCRIPTION:
+                description = "%" + description.trim() + "%";
+                resultList = jdbcTemplate.query(SELECT_BY_DESCRIPTION, mapper, description);
+                break;
+            case GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION:
+                tagName = "%" + tagName.trim() + "%";
+                name = "%" + name.trim() + "%";
+                description = "%" + description.trim() + "%";
+                resultList = jdbcTemplate.query(SELECT_BY_TAG_NAME_DESCRIPTION, mapper, name, description, tagName);
+                break;
+            case GiftCertificateDao.BY_NAME_AND_DESCRIPTION:
+                name = "%" + name.trim() + "%";
+                description = "%" + description.trim() + "%";
+                resultList = jdbcTemplate.query(SELECT_BY_NAME_AND_DESCRIPTION, mapper, name, description);
+                break;
+            case GiftCertificateDao.NO_CRITERIA:
+                resultList = jdbcTemplate.query(SELECT_ALL, mapper);
+                break;
         }
-        return certificateList;
-    }
-
-    @Override
-    public List<GiftCertificate> findByDescription(String description) {
-        description = "%" + description.trim() + "%";
-        List<GiftCertificate> certificateList = jdbcTemplate.query(SELECT_BY_DESCRIPTION, giftMapper, description);
-        for(GiftCertificate certificate : certificateList){
-            certificate.setTagList(collectTagList(certificate.getId()));
+        if(resultList.size() == 0){
+            throw new ResourceNotFoundException("Gift certificate: name=" + name +
+                    ", description=" + description +
+                    ", tag=" + tagName);
         }
-        return certificateList;
+        return resultList;
     }
 
     @Override
@@ -156,45 +199,12 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         }
     }
 
-    private List<Tag> collectTagList(long certificateId){
-        List<Tag> tagList = new ArrayList<>();
-        List<Long> listTagId = findByCertificateId(certificateId);
-        for(Long tagId : listTagId){
-            Tag tag = tagDao.findById(tagId);
-            tagList.add(tag);
-        }
-        return tagList;
-    }
-
-    private <T> GiftCertificate selectByParameter(String sql, T param){
-        GiftCertificate certificate = jdbcTemplate.queryForObject(sql, giftMapper, param);
-        List<Long> listTagId = findByCertificateId(certificate.getId());
-        for(Long tagId : listTagId){
-            Tag tag = tagDao.findById(tagId);
-            certificate.addTag(tag);
-        }
-        return certificate;
-    }
-
     private void addTagToCertId(long tagId, long certificateId){
         jdbcTemplate.update(TAG_CERT_INSERT, tagId, certificateId);
     }
 
-    private List<Long> findByTagId(long tagId) {
-        return jdbcTemplate.queryForList(TAG_CERT_SELECT_BY_TAG_ID, Long.class, tagId);
-    }
-
-    private List<Long> findByCertificateId(long certificateId) {
-        return jdbcTemplate.queryForList(TAG_CERT_SELECT_BY_CERTIFICATE_ID, Long.class, certificateId);
-    }
-
     private boolean deleteTagToCert(long certificateId, long tagId) {
         int rows = jdbcTemplate.update(TAG_CERT_DELETE_BY_TAG_AND_CERT_ID, tagId, certificateId);
-        return rows == 1;
-    }
-
-    private boolean deleteAllTagsByCertificateId(long certificateId) {
-        int rows = jdbcTemplate.update(TAG_CERT_DELETE, certificateId);
         return rows == 1;
     }
 

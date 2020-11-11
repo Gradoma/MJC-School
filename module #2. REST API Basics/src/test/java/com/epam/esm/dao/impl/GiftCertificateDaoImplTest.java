@@ -20,6 +20,7 @@ import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.validation.constraints.Digits;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -96,29 +97,5 @@ class GiftCertificateDaoImplTest {      //todo (independent tests)
         ZonedDateTime lastUpdDate = fromDb.getLastUpdateDate();
         fromDb.setLastUpdateDate(lastUpdDate.withZoneSameInstant(ZoneId.systemDefault()));
         assertEquals(certificate, fromDb);
-    }
-
-    @Test
-    @Disabled
-    void findAll(){
-        List<GiftCertificate> certificateList = giftCertificateDao.findAll();
-        for(GiftCertificate certificate : certificateList){
-            System.out.println(certificate);
-        }
-        assertNotEquals(null, certificateList);
-    }
-
-    @Test
-    @Disabled
-    void findByName() {
-        List<GiftCertificate> certificateList = giftCertificateDao.findByName(NAME_KEYWORD_TEXT);
-        assertEquals(TEXT_COUNT, certificateList.size());
-    }
-
-    @Test
-    @Disabled
-    void findByDescription(){
-        List<GiftCertificate> certificateList = giftCertificateDao.findByDescription(DESCRIPTION_KEYWORD_DESCRIPTION);
-        assertEquals(DESCRIPTION_COUNT, certificateList.size());
     }
 }

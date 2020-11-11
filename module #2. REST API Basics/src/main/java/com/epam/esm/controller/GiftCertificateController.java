@@ -20,12 +20,6 @@ public class GiftCertificateController {
     public GiftCertificateController(GiftCertificateService giftCertificateService){
         this.giftCertificateService = giftCertificateService;
     }
-//
-//    @GetMapping
-//    public ResponseEntity<List<GiftCertificateDto>> getAll(){
-//        List<GiftCertificateDto> certificateDtoList = giftCertificateService.getAll();
-//        return ResponseEntity.ok().body(certificateDtoList);
-//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<GiftCertificateDto> getById(@PathVariable long id){
@@ -34,17 +28,15 @@ public class GiftCertificateController {
     }
 
     @GetMapping("/by")
-    public ResponseEntity<GiftCertificateDto>
+    public ResponseEntity<List<GiftCertificateDto>>
     getByCriteria(@RequestParam(value = "tag", required = false) String tag,
                   @RequestParam(value = "name", required = false) String name,
                   @RequestParam(value = "description", required = false) String description,
                   @RequestParam(value = "sort", required = false, defaultValue = "name") String sortBy,
                   @RequestParam(value = "order", required = false, defaultValue = "asc") String order){
-        if(tag == null & name == null & description == null){
-            return ResponseEntity.badRequest().build();
-        }
-        giftCertificateService.getByCriteria(tag, name, description, sortBy, order);
-        return null;
+        List<GiftCertificateDto> certificateDtoList = giftCertificateService
+                .getByCriteria(tag, name, description, sortBy, order);
+        return ResponseEntity.ok().body(certificateDtoList);
     }
 
 

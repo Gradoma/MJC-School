@@ -14,16 +14,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.*;
 import java.util.logging.Logger;
 
 @Validated
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
-    private static final String NAME_KEY = "name";
-    private static final String DESCRIPTION_KEY = "description";
-    private static final String SORT_BY_KEY = "sortBy";
-    private static final String ORDER_KEY = "order";
     private final GiftCertificateDao certificateDao;
     private final GiftCertificateDtoMapper giftMapper;
     private final TagDtoMapper tagMapper;
@@ -54,11 +53,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getAll() {
-        return giftMapper.toDto(certificateDao.findAll());
-    }
-
-    @Override
     public GiftCertificateDto getById(long id) {
         GiftCertificate certificate = certificateDao.findById(id);
         List<TagDto> tagDtoList = tagMapper.toDto(certificate.getTagList());
@@ -70,38 +64,50 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public List<GiftCertificateDto> getByCriteria(String tag, String name, String description,
                                                   String sortBy, String order) {
-        Map<String, String> criteriaMap = new HashMap<>();
-        criteriaMap.put(SORT_BY_KEY, sortBy);
-        criteriaMap.put(ORDER_KEY, order);
-        if(tag != null){
-            // stub
+        String criteriaSet = defineCriteriaSet(tag, name, description);
+        List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteriaSet, tag, name, description);
+        return giftMapper.toDto(certificateList);
+    }
+
+    private String defineCriteriaSet(String tag, String name, String description){
+        String criteriaSet = "";
+        if(tag != null && !tag.isEmpty()){
+            criteriaSet = criteriaSet + "Tag";
         }
         if(name != null && !name.isEmpty()){
-            criteriaMap.put(NAME_KEY, name);
+            criteriaSet = criteriaSet + "Name";
         }
         if(description != null && !description.isEmpty()){
-            criteriaMap.put(DESCRIPTION_KEY, description);
+            criteriaSet = criteriaSet + "Description";
         }
-        certificateDao.findByCriteria(criteriaMap);
-        return null;
-    }
-
-    @Override
-    public List<GiftCertificateDto> getByName(String name) { return giftMapper.toDto(certificateDao.findByName(name));
-    }
-
-    @Override
-    public List<GiftCertificateDto> getByDescription(String description) {
-        return giftMapper.toDto(certificateDao.findByDescription(description));
-    }
-
-    @Override
-    public List<GiftCertificateDto> getByTag(String tagName) throws InvalidEntityException {
-//        TagDto tagDto = tagService.getByName(tagName);
-//        long tagId = Long.parseLong(tagDto.getId());
-//        List<GiftCertificate> certificateList = certificateDao.findByTag(tagId);
-//        return dtoMapper.toDto(certificateList);
-        return null;
+        String result;
+        switch (criteriaSet){
+            case GiftCertificateDao.BY_TAG:
+                result = GiftCertificateDao.BY_TAG;
+                break;
+            case GiftCertificateDao.BY_TAG_AND_NAME:
+                result = GiftCertificateDao.BY_TAG_AND_NAME;
+                break;
+            case GiftCertificateDao.BY_NAME:
+                result = GiftCertificateDao.BY_NAME;
+                break;
+            case GiftCertificateDao.BY_TAG_AND_DESCRIPTION:
+                result = GiftCertificateDao.BY_TAG_AND_DESCRIPTION;
+                break;
+            case GiftCertificateDao.BY_DESCRIPTION:
+                result = GiftCertificateDao.BY_DESCRIPTION;
+                break;
+            case GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION:
+                result = GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION;
+                break;
+            case GiftCertificateDao.BY_NAME_AND_DESCRIPTION:
+                result = GiftCertificateDao.BY_NAME_AND_DESCRIPTION;
+                break;
+            default:
+                result = GiftCertificateDao.NO_CRITERIA;
+                break;
+        }
+        return result;
     }
 
     @Override

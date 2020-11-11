@@ -7,14 +7,19 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface GiftCertificateDao {
+    String BY_TAG = "Tag";
+    String BY_NAME = "Name";
+    String BY_DESCRIPTION = "Description";
+    String BY_NAME_AND_DESCRIPTION = "NameDescription";
+    String BY_TAG_AND_NAME = "TagName";
+    String BY_TAG_AND_DESCRIPTION= "TagDescription";
+    String BY_TAG_AND_NAME_AND_DESCRIPTION = "TagNameDescription";
+    String NO_CRITERIA = "noCriteria";
+
     long add(GiftCertificate certificate);
-    List<GiftCertificate> findAllWithTags();
-    List<GiftCertificate> findAll();
-    List<GiftCertificate> findByTag(long tagId);
-    List<GiftCertificate> findByCriteria(Map<String, String> criteriaMap);
+    List<GiftCertificate> findByCriteria(String criteriaSet, String tagName, String name,
+                                         String description);
     GiftCertificate findById(long id);
-    List<GiftCertificate> findByName(String name);
-    List<GiftCertificate> findByDescription(String description);
     boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId);
     boolean delete(long id);
 }
