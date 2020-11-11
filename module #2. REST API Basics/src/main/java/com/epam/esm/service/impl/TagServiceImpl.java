@@ -40,7 +40,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<TagDto> getAll() {
         List<TagDto> resultList = new ArrayList<>();
-        List<Tag> tagList = tagDao.findAll();
+        List<Tag> tagList = tagDao.findAll();       // todo (via list conversion)
         for(Tag tag : tagList){
             resultList.add(dtoMapper.toDto(tag));
         }
@@ -56,6 +56,12 @@ public class TagServiceImpl implements TagService {
     public TagDto getByName(@NotNull @Size(min = 1, max = 20) String name) {
         Tag tag = tagDao.findByName(name);
         return dtoMapper.toDto(tag);
+    }
+
+    @Override
+    public List<TagDto> getByGiftCertificateId(long certificateId) {
+        List<Tag> tagList = tagDao.findByCertificateId(certificateId);
+        return dtoMapper.toDto(tagList);
     }
 
     @Override

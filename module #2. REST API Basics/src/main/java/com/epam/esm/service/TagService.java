@@ -15,6 +15,7 @@ public interface TagService {
     List<TagDto> getAll();
     TagDto getById(long id);
     TagDto getByName(@NotNull @Size(min = 1, max = 20) String name);
+    List<TagDto> getByGiftCertificateId(long certificateId);
     boolean delete(long id);
     boolean doesExist(@Valid TagDto tagDto);
 }

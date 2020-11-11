@@ -14,21 +14,21 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private final Logger logger = Logger.getLogger("tagLog");
     private static final String COUNT_BY_NAME = "SELECT COUNT(*) FROM tag WHERE id=? AND name=?";
     private static final String SELECT_ALL = "SELECT id, Name FROM tag";
     private static final String SELECT_BY_ID = "SELECT id, name FROM tag WHERE id=?";
     private static final String SELECT_BY_NAME = "SELECT id, name FROM tag WHERE name=?";
     private static final String DELETE_BY_ID = "DELETE FROM tag WHERE id=?";
+    private static final String SELECT_BY_CERTIFICATE_ID = "SELECT tag.id, tag.Name FROM tag " +
+            "JOIN tag_certificate ON tag_certificate.tag_id = tag.id " +
+            "JOIN giftcertificate ON giftcertificate.id = tag_certificate.certificate_id " +
+            "WHERE giftcertificate.id=?";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
@@ -81,6 +81,16 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
+    public List<Tag> findByCertificateId(long certificateId) {
+        List<Tag> tagList;
+        tagList = jdbcTemplate.query(SELECT_BY_CERTIFICATE_ID, tagMapper, certificateId);
+        if(tagList.size() == 0){
+            throw new ResourceNotFoundException("Tags for Gift Certificate: id=" + certificateId);
+        }
+        return tagList;
+    }
+
+    @Override
     public boolean deleteById(long id) {
         int rows = jdbcTemplate.update(DELETE_BY_ID, id);
         if (rows > 0 ){
@@ -92,7 +102,6 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public boolean contains(Tag tag) {
-        logger.log(Level.INFO, "tag=", tag);
         Integer rows = jdbcTemplate.queryForObject(COUNT_BY_NAME, Integer.class, tag.getId(), tag.getName());
         return rows > 0;
     }

@@ -11,6 +11,7 @@ public interface TagDao {
     List<Tag> findAll();
     Tag findByName(String name);
     Tag findById(long id);
+    List<Tag> findByCertificateId(long certificateId);
     boolean deleteById(long id);
     boolean contains(Tag tag);
 }

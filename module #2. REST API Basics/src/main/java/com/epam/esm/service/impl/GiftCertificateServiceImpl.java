@@ -66,7 +66,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                                                   String sortBy, String order) {
         String criteriaSet = defineCriteriaSet(tag, name, description);
         List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteriaSet, tag, name, description);
-        return giftMapper.toDto(certificateList);
+        List<GiftCertificateDto> dtoList = giftMapper.toDto(certificateList);
+        for(GiftCertificateDto certificateDto : dtoList){
+            List<TagDto> tagDtoList = tagService.getByGiftCertificateId(Long.parseLong(certificateDto.getId()));
+            certificateDto.setTags(tagDtoList);
+        }
+        return dtoList;
     }
 
     private String defineCriteriaSet(String tag, String name, String description){
