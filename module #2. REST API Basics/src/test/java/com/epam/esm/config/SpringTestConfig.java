@@ -4,7 +4,6 @@ import com.epam.esm.dao.impl.GiftCertificateDaoImpl;
 import com.epam.esm.dao.impl.TagDaoImpl;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import com.epam.esm.dao.mapper.TagMapper;
-import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;

@@ -14,7 +14,7 @@ public class TagDtoMapper {
 
     public Tag toEntity(TagDto tagDto){
         Tag tag = new Tag();
-//        tag.setId(Long.parseLong(tagDto.getId()));
+        tag.setId(Long.parseLong(tagDto.getId()));
         tag.setName(tagDto.getName());
         return tag;
     }

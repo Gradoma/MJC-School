@@ -1,10 +1,8 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
-import com.epam.esm.dao.TagDao;
-import com.epam.esm.dao.mapper.CertMapper;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
+import com.epam.esm.entity.GiftCertificate;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 
 import com.epam.esm.entity.Tag;
@@ -24,9 +22,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String SELECT_ALL = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
             "create_date, last_update_date, duration_days FROM giftcertificate";
     private static final String SELECT_BY_ID = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
-            "create_date, last_update_date, duration_days, tag.id, tag.name FROM giftcertificate " +
-            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
-            "JOIN tag ON tag.id = tag_certificate.tag_id " +
+            "create_date, last_update_date, duration_days FROM giftcertificate " +
             "WHERE giftcertificate.id = ?";
     private static final String SELECT_BY_TAG = "SELECT DISTINCT giftcertificate.id, giftcertificate.name, description, " +
             "price, create_date, last_update_date, duration_days " +
@@ -87,12 +83,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String PERCENTAGE = "%";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
-    private final TagDao tagDao;
     private final GiftCertificateMapper giftMapper;
 
-    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, TagDao tagDao, GiftCertificateMapper giftMapper){
+    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, GiftCertificateMapper giftMapper){
         this.giftMapper = giftMapper;
-        this.tagDao = tagDao;
         this.jdbcTemplate = jdbcTemplate;
         simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName(TABLE_CERTIFICATE)
@@ -128,44 +122,43 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public List<GiftCertificate> findByCriteria(String criteriaSet, String tagName, String name,
                                                 String description) {
-        CertMapper mapper = new CertMapper();
         List<GiftCertificate> resultList = new ArrayList<>();
         switch (criteriaSet){
             case GiftCertificateDao.BY_TAG:
                 tagName = addPercentageWildcard(tagName);
-                resultList = jdbcTemplate.query(SELECT_BY_TAG, mapper, tagName);
+                resultList = jdbcTemplate.query(SELECT_BY_TAG, giftMapper, tagName);
                 break;
             case GiftCertificateDao.BY_TAG_AND_NAME:
                 tagName = addPercentageWildcard(tagName);
                 name = addPercentageWildcard(name);
-                resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_NAME, mapper, name, tagName);
+                resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_NAME, giftMapper, name, tagName);
                 break;
             case GiftCertificateDao.BY_NAME:
                 name = addPercentageWildcard(name);
-                resultList = jdbcTemplate.query(SELECT_BY_NAME, mapper, name);
+                resultList = jdbcTemplate.query(SELECT_BY_NAME, giftMapper, name);
                 break;
             case GiftCertificateDao.BY_TAG_AND_DESCRIPTION:
                 tagName = addPercentageWildcard(tagName);
                 description = addPercentageWildcard(description);
-                resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_DESCRIPTION, mapper, description, tagName);
+                resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_DESCRIPTION, giftMapper, description, tagName);
                 break;
             case GiftCertificateDao.BY_DESCRIPTION:
                 description = addPercentageWildcard(description);
-                resultList = jdbcTemplate.query(SELECT_BY_DESCRIPTION, mapper, description);
+                resultList = jdbcTemplate.query(SELECT_BY_DESCRIPTION, giftMapper, description);
                 break;
             case GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION:
                 tagName = addPercentageWildcard(tagName);
                 name = addPercentageWildcard(name);
                 description = addPercentageWildcard(description);
-                resultList = jdbcTemplate.query(SELECT_BY_TAG_NAME_DESCRIPTION, mapper, name, description, tagName);
+                resultList = jdbcTemplate.query(SELECT_BY_TAG_NAME_DESCRIPTION, giftMapper, name, description, tagName);
                 break;
             case GiftCertificateDao.BY_NAME_AND_DESCRIPTION:
                 name = addPercentageWildcard(name);
                 description = addPercentageWildcard(description);
-                resultList = jdbcTemplate.query(SELECT_BY_NAME_AND_DESCRIPTION, mapper, name, description);
+                resultList = jdbcTemplate.query(SELECT_BY_NAME_AND_DESCRIPTION, giftMapper, name, description);
                 break;
             case GiftCertificateDao.NO_CRITERIA:
-                resultList = jdbcTemplate.query(SELECT_ALL, mapper);
+                resultList = jdbcTemplate.query(SELECT_ALL, giftMapper);
                 break;
         }
         if(resultList.size() == 0){

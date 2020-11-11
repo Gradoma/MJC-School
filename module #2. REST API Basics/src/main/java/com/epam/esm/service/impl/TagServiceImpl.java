@@ -33,18 +33,20 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public long save(@Valid TagDto tagDto) {
+        tagDto.setId("0");
         Tag tag = dtoMapper.toEntity(tagDto);
         return tagDao.add(tag);
     }
 
     @Override
     public List<TagDto> getAll() {
-        List<TagDto> resultList = new ArrayList<>();
+//        List<TagDto> resultList = new ArrayList<>();
         List<Tag> tagList = tagDao.findAll();       // todo (via list conversion)
-        for(Tag tag : tagList){
-            resultList.add(dtoMapper.toDto(tag));
-        }
-        return resultList;
+        return dtoMapper.toDto(tagList);
+//        for(Tag tag : tagList){
+//            resultList.add(dtoMapper.toDto(tag));
+//        }
+//        return resultList;
     }
 
     @Override
@@ -71,11 +73,11 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public boolean doesExist(@Valid TagDto tagDto) {
-        Tag tag = dtoMapper.toEntity(tagDto);
         if(!tagDto.getId().matches("\\d+")){
             return false;
         }
-        tag.setId(Long.parseLong(tagDto.getId()));      //todo(set id to tag from tagDto in mapper)
+        Tag tag = dtoMapper.toEntity(tagDto);
+//        tag.setId(Long.parseLong(tagDto.getId()));      //todo(set id to tag from tagDto in mapper)
         return tagDao.contains(tag);
     }
 }

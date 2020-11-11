@@ -5,7 +5,6 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
@@ -14,15 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.*;
-import java.util.logging.Logger;
 
 @Validated
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    private static final String TAG = "Tag";
+    private static final String NAME = "Name";
+    private static final String DESCRIPTION = "Description";
     private final GiftCertificateDao certificateDao;
     private final GiftCertificateDtoMapper giftMapper;
     private final TagDtoMapper tagMapper;
@@ -38,6 +36,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public long add(@Valid GiftCertificateDto certificateDto){
+        // todo add fake id (if empty)
         GiftCertificate certificate = giftMapper.toEntity(certificateDto);
         List<TagDto> tags = certificateDto.getTags();
         for(TagDto tagDto : tags){
@@ -46,7 +45,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 tagDto.setId(Long.toString(generatedId));
             }
             Tag tag = tagMapper.toEntity(tagDto);
-            tag.setId(Long.parseLong(tagDto.getId()));      //todo(set id to tag from tagDto in mapper)
+//            tag.setId(Long.parseLong(tagDto.getId()));      //todo(set id to tag from tagDto in mapper)
             certificate.addTag(tag);
         }
         return certificateDao.add(certificate);
@@ -55,7 +54,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public GiftCertificateDto getById(long id) {
         GiftCertificate certificate = certificateDao.findById(id);
-        List<TagDto> tagDtoList = tagMapper.toDto(certificate.getTagList());
+        List<TagDto> tagDtoList = tagService.getByGiftCertificateId(certificate.getId());
         GiftCertificateDto resultDto = giftMapper.toDto(certificate);
         resultDto.setTags(tagDtoList);
         return resultDto;
@@ -77,13 +76,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private String defineCriteriaSet(String tag, String name, String description){
         String criteriaSet = "";
         if(tag != null && !tag.isEmpty()){
-            criteriaSet = criteriaSet + "Tag";
+            criteriaSet = criteriaSet + TAG;
         }
         if(name != null && !name.isEmpty()){
-            criteriaSet = criteriaSet + "Name";
+            criteriaSet = criteriaSet + NAME;
         }
         if(description != null && !description.isEmpty()){
-            criteriaSet = criteriaSet + "Description";
+            criteriaSet = criteriaSet + DESCRIPTION;
         }
         String result;
         switch (criteriaSet){
@@ -117,6 +116,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public boolean update(@Valid GiftCertificateDto certificateDto, long certificateId) {
+        // todo (check if id in certdto null or empty)
         GiftCertificateDto originalCertDto = getById(certificateId);
         List<Long> deletedTagsId = collectDeletedTagsId(originalCertDto.getTags(), certificateDto.getTags());
         List<Long> addedTagsId = collectAddedTagsId(originalCertDto.getTags(), certificateDto.getTags());
