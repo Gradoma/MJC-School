@@ -1,7 +1,5 @@
 package com.epam.esm.service.mapper;
 
-import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.dto.TagDto;
 import org.springframework.stereotype.Component;

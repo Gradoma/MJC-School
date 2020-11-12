@@ -7,6 +7,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
+import com.epam.esm.service.comparator.DateComparator;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private static final String TAG = "Tag";
     private static final String NAME = "Name";
     private static final String DESCRIPTION = "Description";
+    private static final String ASC = "ASC";
+    private static final String SORT_BY_DATE = "DATE";
+    private final DateComparator dateComparator = new DateComparator();
     private final GiftCertificateDao certificateDao;
     private final GiftCertificateDtoMapper giftMapper;
     private final TagDtoMapper tagMapper;
@@ -77,49 +81,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             List<TagDto> tagDtoList = tagService.getByGiftCertificateId(Long.parseLong(certificateDto.getId()));
             certificateDto.setTags(tagDtoList);
         }
-        return dtoList;
+        return sortResultList(dtoList, sortBy, order);
     }
 
-    private String defineCriteriaSet(String tag, String name, String description){
-        String criteriaSet = "";
-        if(tag != null && !tag.isEmpty()){
-            criteriaSet = criteriaSet + TAG;
-        }
-        if(name != null && !name.isEmpty()){
-            criteriaSet = criteriaSet + NAME;
-        }
-        if(description != null && !description.isEmpty()){
-            criteriaSet = criteriaSet + DESCRIPTION;
-        }
-        String result;
-        switch (criteriaSet){
-            case GiftCertificateDao.BY_TAG:
-                result = GiftCertificateDao.BY_TAG;
-                break;
-            case GiftCertificateDao.BY_TAG_AND_NAME:
-                result = GiftCertificateDao.BY_TAG_AND_NAME;
-                break;
-            case GiftCertificateDao.BY_NAME:
-                result = GiftCertificateDao.BY_NAME;
-                break;
-            case GiftCertificateDao.BY_TAG_AND_DESCRIPTION:
-                result = GiftCertificateDao.BY_TAG_AND_DESCRIPTION;
-                break;
-            case GiftCertificateDao.BY_DESCRIPTION:
-                result = GiftCertificateDao.BY_DESCRIPTION;
-                break;
-            case GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION:
-                result = GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION;
-                break;
-            case GiftCertificateDao.BY_NAME_AND_DESCRIPTION:
-                result = GiftCertificateDao.BY_NAME_AND_DESCRIPTION;
-                break;
-            default:
-                result = GiftCertificateDao.NO_CRITERIA;
-                break;
-        }
-        return result;
-    }
+
 
     @Override
     public boolean update(@Valid GiftCertificateDto certificateDto, long certificateId) {
@@ -174,15 +139,71 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if(!updatedDto.getDuration().equals(originalDto.getDuration())){
             originalDto.setDuration(updatedDto.getDuration());
         }
-//        if(!updatedDto.getCreateDate().equals(originalDto.getCreateDate())){
-//            originalDto.setCreateDate(updatedDto.getCreateDate());
-//        }
-//        if(!updatedDto.getLastUpdateDate().equals(originalDto.getLastUpdateDate())){
-//            originalDto.setLastUpdateDate(updatedDto.getLastUpdateDate());
-//        }
-//        return giftMapper.toEntity(originalDto);
         GiftCertificate updatedCertificate = giftMapper.toEntity(originalDto);
         updatedCertificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
         return updatedCertificate;
+    }
+
+    private String defineCriteriaSet(String tag, String name, String description){
+        String criteriaSet = "";
+        if(tag != null && !tag.isEmpty()){
+            criteriaSet = criteriaSet + TAG;
+        }
+        if(name != null && !name.isEmpty()){
+            criteriaSet = criteriaSet + NAME;
+        }
+        if(description != null && !description.isEmpty()){
+            criteriaSet = criteriaSet + DESCRIPTION;
+        }
+        String result;
+        switch (criteriaSet){
+            case GiftCertificateDao.BY_TAG:
+                result = GiftCertificateDao.BY_TAG;
+                break;
+            case GiftCertificateDao.BY_TAG_AND_NAME:
+                result = GiftCertificateDao.BY_TAG_AND_NAME;
+                break;
+            case GiftCertificateDao.BY_NAME:
+                result = GiftCertificateDao.BY_NAME;
+                break;
+            case GiftCertificateDao.BY_TAG_AND_DESCRIPTION:
+                result = GiftCertificateDao.BY_TAG_AND_DESCRIPTION;
+                break;
+            case GiftCertificateDao.BY_DESCRIPTION:
+                result = GiftCertificateDao.BY_DESCRIPTION;
+                break;
+            case GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION:
+                result = GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION;
+                break;
+            case GiftCertificateDao.BY_NAME_AND_DESCRIPTION:
+                result = GiftCertificateDao.BY_NAME_AND_DESCRIPTION;
+                break;
+            default:
+                result = GiftCertificateDao.NO_CRITERIA;
+                break;
+        }
+        return result;
+    }
+
+    private List<GiftCertificateDto> sortResultList(List<GiftCertificateDto> resultList, String sortBy,
+                                                    String order){
+        boolean isAscending = false;
+        if(ASC.equalsIgnoreCase(order)){
+            isAscending = true;
+        }
+        if (SORT_BY_DATE.equalsIgnoreCase(sortBy)) {
+            if (isAscending) {
+                resultList.sort(dateComparator);
+            } else {
+                resultList.sort(dateComparator.reversed());
+            }
+        } else {
+            if (isAscending) {
+                Collections.sort(resultList);
+            } else {
+                resultList.sort(Comparator.reverseOrder());
+            }
+        }
+        return resultList;
     }
 }

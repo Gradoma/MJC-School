@@ -16,12 +16,13 @@ import static com.epam.esm.dao.column.GiftCertificateTableConst.DURATION;
 
 @Component
 public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
+    private static final String DOT = ".";
 
     @Override
     public GiftCertificate mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         GiftCertificate certificate = new GiftCertificate();
-        certificate.setId(resultSet.getLong(TABLE_CERTIFICATE + "." + ID));
-        certificate.setName(resultSet.getString(TABLE_CERTIFICATE + "." + NAME));
+        certificate.setId(resultSet.getLong(TABLE_CERTIFICATE + DOT + ID));
+        certificate.setName(resultSet.getString(TABLE_CERTIFICATE + DOT + NAME));
         certificate.setDescription(resultSet.getString(DESCRIPTION));
         certificate.setPrice(resultSet.getDouble(PRICE));
         LocalDateTime createLocalDateTime = resultSet.getObject(CREATE_DATE, LocalDateTime.class);

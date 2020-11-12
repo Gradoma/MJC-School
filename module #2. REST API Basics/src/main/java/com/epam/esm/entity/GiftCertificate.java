@@ -8,7 +8,7 @@ import java.util.List;
 public class GiftCertificate {
     private long id;
     private String name;
-    private List<Tag> tagList = new ArrayList<>();     //todo (Set)
+    private List<Tag> tagList = new ArrayList<>();
     private String description;
     private Double price;
     private ZonedDateTime createDate;
@@ -126,7 +126,7 @@ public class GiftCertificate {
     public String toString() {
         return getClass().getName() + "{" +
                 "id=" + id +
-                "name=" + name +
+                ", name=" + name +
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", createTime=" + createDate +

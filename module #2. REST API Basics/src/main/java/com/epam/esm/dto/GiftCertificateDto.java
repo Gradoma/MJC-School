@@ -1,11 +1,8 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.entity.Tag;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -13,7 +10,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class GiftCertificateDto {
+public class GiftCertificateDto implements Comparable<GiftCertificateDto>{
     private String id;
     @NotNull
     @Size(min = 1, max = 40)
@@ -31,4 +28,9 @@ public class GiftCertificateDto {
     @NotNull
     @Pattern(regexp = "\\d+")
     private String duration;
+
+    @Override
+    public int compareTo(GiftCertificateDto o) {
+        return name.compareTo(o.getName());
+    }
 }

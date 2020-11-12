@@ -1,7 +1,6 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.exception.InvalidEntityException;
 
 import javax.validation.Valid;
 import java.util.List;

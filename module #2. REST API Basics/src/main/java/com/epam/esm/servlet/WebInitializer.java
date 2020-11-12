@@ -12,8 +12,6 @@ import java.util.EnumSet;
 public class WebInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(javax.servlet.ServletContext servletContext) throws ServletException {
-//        servletContext.setRequestCharacterEncoding("UTF-8");
-//        servletContext.setResponseCharacterEncoding("UTF-8");
         // Load Spring web application configuration
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
         context.register(SpringConfig.class);
