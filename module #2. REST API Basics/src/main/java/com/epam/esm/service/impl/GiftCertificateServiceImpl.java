@@ -153,34 +153,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if(description != null && !description.isEmpty()){
             criteriaSet = criteriaSet + DESCRIPTION;
         }
-        String result;
-        switch (criteriaSet){
-            case GiftCertificateDao.BY_TAG:
-                result = GiftCertificateDao.BY_TAG;
-                break;
-            case GiftCertificateDao.BY_TAG_AND_NAME:
-                result = GiftCertificateDao.BY_TAG_AND_NAME;
-                break;
-            case GiftCertificateDao.BY_NAME:
-                result = GiftCertificateDao.BY_NAME;
-                break;
-            case GiftCertificateDao.BY_TAG_AND_DESCRIPTION:
-                result = GiftCertificateDao.BY_TAG_AND_DESCRIPTION;
-                break;
-            case GiftCertificateDao.BY_DESCRIPTION:
-                result = GiftCertificateDao.BY_DESCRIPTION;
-                break;
-            case GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION:
-                result = GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION;
-                break;
-            case GiftCertificateDao.BY_NAME_AND_DESCRIPTION:
-                result = GiftCertificateDao.BY_NAME_AND_DESCRIPTION;
-                break;
-            default:
-                result = GiftCertificateDao.NO_CRITERIA;
-                break;
-        }
-        return result;
+        return criteriaSet;
     }
 
     private List<GiftCertificateDto> sortResultList(List<GiftCertificateDto> resultList, String sortBy,

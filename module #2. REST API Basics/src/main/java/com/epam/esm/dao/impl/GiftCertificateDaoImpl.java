@@ -1,6 +1,8 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
+import com.epam.esm.dao.criteria.CriteriaSet;
+import com.epam.esm.dao.criteria.GiftCertificateSelector;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import com.epam.esm.entity.GiftCertificate;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
@@ -18,60 +20,9 @@ import java.util.*;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
-    private static final String SELECT_ALL = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
-            "create_date, last_update_date, duration_days FROM giftcertificate";
     private static final String SELECT_BY_ID = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
             "create_date, last_update_date, duration_days FROM giftcertificate " +
             "WHERE giftcertificate.id = ?";
-    private static final String SELECT_BY_TAG = "SELECT DISTINCT giftcertificate.id, giftcertificate.name, description, " +
-            "price, create_date, last_update_date, duration_days " +
-            "FROM giftcertificate " +
-            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
-            "JOIN tag ON tag.id = tag_certificate.tag_id " +
-            "WHERE LOWER(tag.name) LIKE LOWER(?)";
-    private static final String SELECT_BY_TAG_AND_NAME = "SELECT giftcertificate.id, giftcertificate.name, description, " +
-            "price, create_date, last_update_date, duration_days " +
-            "FROM giftcertificate " +
-            "WHERE LOWER(giftcertificate.name) LIKE LOWER(?) " +
-            "AND giftcertificate.id IN " +
-            "(SELECT DISTINCT giftcertificate.id FROM giftcertificate " +
-            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
-            "JOIN tag ON tag.id = tag_certificate.tag_id " +
-            "WHERE LOWER(tag.name) LIKE LOWER(?))";
-    private static final String SELECT_BY_TAG_AND_DESCRIPTION = "SELECT giftcertificate.id, giftcertificate.name, description, " +
-            "price, create_date, last_update_date, duration_days " +
-            "FROM giftcertificate " +
-            "WHERE LOWER(description) LIKE LOWER(?) " +
-            "AND giftcertificate.id IN " +
-            "(SELECT DISTINCT giftcertificate.id FROM giftcertificate " +
-            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
-            "JOIN tag ON tag.id = tag_certificate.tag_id " +
-            "WHERE LOWER(tag.name) LIKE LOWER(?))";
-    private static final String SELECT_BY_NAME = "SELECT giftcertificate.id, giftcertificate.name, description, " +
-            "price, create_date, last_update_date, duration_days " +
-            "FROM giftcertificate " +
-            "WHERE LOWER(giftcertificate.name) LIKE LOWER(?)";
-    private static final String SELECT_BY_DESCRIPTION = "SELECT giftcertificate.id, giftcertificate.name, description, " +
-            "price, create_date, last_update_date, duration_days " +
-            "FROM giftcertificate " +
-            "WHERE LOWER(description) LIKE LOWER(?)";
-    private static final String SELECT_BY_NAME_AND_DESCRIPTION = "SELECT giftcertificate.id, giftcertificate.name, " +
-            "description, price, create_date, last_update_date, duration_days " +
-            "FROM giftcertificate " +
-            "WHERE LOWER(giftcertificate.name) LIKE LOWER(?) " +
-            "AND LOWER(description) LIKE LOWER(?)";
-    private static final String SELECT_BY_TAG_NAME_DESCRIPTION = "SELECT giftcertificate.id, giftcertificate.name, " +
-            "description, price, create_date, last_update_date, duration_days " +
-            "FROM giftcertificate " +
-            "WHERE LOWER(giftcertificate.name) LIKE LOWER(?) " +
-            "AND LOWER(description) LIKE LOWER(?) " +
-            "AND giftcertificate.id IN " +
-            "(SELECT DISTINCT giftcertificate.id FROM giftcertificate " +
-            "JOIN tag_certificate ON tag_certificate.certificate_id = giftcertificate.id " +
-            "JOIN tag ON tag.id = tag_certificate.tag_id " +
-            "WHERE LOWER(tag.name) LIKE LOWER(?))";
-
-
     private static final String UPDATE = "UPDATE giftcertificate SET name = ?, description = ?, price = ?, " +
             "last_update_date = ?, duration_days = ? WHERE id = ?";
     private static final String DELETE_BY_ID = "DELETE FROM giftcertificate WHERE id = ?";
@@ -79,7 +30,6 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String TAG_CERT_DELETE_BY_TAG_AND_CERT_ID = "DELETE FROM tag_certificate WHERE " +
             "tag_id = ? AND certificate_id = ?";
 
-    private static final String PERCENTAGE = "%";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
     private final GiftCertificateMapper giftMapper;
@@ -119,44 +69,8 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     public List<GiftCertificate> findByCriteria(String criteriaSet, String tagName, String name,
                                                 String description) {
         List<GiftCertificate> resultList = new ArrayList<>();
-        switch (criteriaSet){
-            case GiftCertificateDao.BY_TAG:
-                tagName = addPercentageWildcard(tagName);
-                resultList = jdbcTemplate.query(SELECT_BY_TAG, giftMapper, tagName);
-                break;
-            case GiftCertificateDao.BY_TAG_AND_NAME:
-                tagName = addPercentageWildcard(tagName);
-                name = addPercentageWildcard(name);
-                resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_NAME, giftMapper, name, tagName);
-                break;
-            case GiftCertificateDao.BY_NAME:
-                name = addPercentageWildcard(name);
-                resultList = jdbcTemplate.query(SELECT_BY_NAME, giftMapper, name);
-                break;
-            case GiftCertificateDao.BY_TAG_AND_DESCRIPTION:
-                tagName = addPercentageWildcard(tagName);
-                description = addPercentageWildcard(description);
-                resultList = jdbcTemplate.query(SELECT_BY_TAG_AND_DESCRIPTION, giftMapper, description, tagName);
-                break;
-            case GiftCertificateDao.BY_DESCRIPTION:
-                description = addPercentageWildcard(description);
-                resultList = jdbcTemplate.query(SELECT_BY_DESCRIPTION, giftMapper, description);
-                break;
-            case GiftCertificateDao.BY_TAG_AND_NAME_AND_DESCRIPTION:
-                tagName = addPercentageWildcard(tagName);
-                name = addPercentageWildcard(name);
-                description = addPercentageWildcard(description);
-                resultList = jdbcTemplate.query(SELECT_BY_TAG_NAME_DESCRIPTION, giftMapper, name, description, tagName);
-                break;
-            case GiftCertificateDao.BY_NAME_AND_DESCRIPTION:
-                name = addPercentageWildcard(name);
-                description = addPercentageWildcard(description);
-                resultList = jdbcTemplate.query(SELECT_BY_NAME_AND_DESCRIPTION, giftMapper, name, description);
-                break;
-            case GiftCertificateDao.NO_CRITERIA:
-                resultList = jdbcTemplate.query(SELECT_ALL, giftMapper);
-                break;
-        }
+        GiftCertificateSelector selector = CriteriaSet.getByName(criteriaSet).getSelector();
+        resultList = selector.select(tagName, name, description, jdbcTemplate, giftMapper);
         if(resultList.size() == 0){
             throw new ResourceNotFoundException("Gift certificate: name=" + name +
                     ", description=" + description +
@@ -196,9 +110,5 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     private LocalDateTime convertToUtcLocalDateTime(ZonedDateTime zonedDateTime){
         return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
-    }
-
-    private String addPercentageWildcard(String param){
-        return PERCENTAGE + param.trim() + PERCENTAGE;
     }
 }

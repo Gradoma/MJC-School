@@ -161,7 +161,7 @@ class GiftCertificateDaoImplTest {
         giftCertificateDao.add(certBC);
         giftCertificateDao.add(certAC);
 
-        List<GiftCertificate> certList2 = giftCertificateDao.findByCriteria(GiftCertificateDao.BY_NAME_AND_DESCRIPTION,
+        List<GiftCertificate> certList2 = giftCertificateDao.findByCriteria("NameDescription",
                 null, "a", "desc");
         assertEquals(3, certList2.size());
     }
