@@ -29,6 +29,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,6 +70,24 @@ class GiftCertificateDaoImplTest {
     void cleanUp(){
         JdbcTestUtils.deleteFromTables(jdbcTemplate, GiftCertificateTableConst.TABLE_CERTIFICATE);
         JdbcTestUtils.deleteFromTables(jdbcTemplate, TagToCertificateTableConst.TABLE_TAG_CERT);
+    }
+
+    @Test
+    void containsDbCredentials(){
+        String user = null;
+        String pass = null;
+        Map<String, String> map = System.getenv();
+        for (Map.Entry <String, String> entry: map.entrySet()) {
+            if(entry.getKey().equalsIgnoreCase("DB_USER")){
+                user = entry.getKey();
+                System.out.println(entry.getValue());
+            }
+            if(entry.getKey().equalsIgnoreCase("DB_PASS")){
+                pass = entry.getKey();
+            }
+        }
+        assertEquals("DB_USER", user);
+        assertEquals("DB_PASS", pass);
     }
 
     @Test
