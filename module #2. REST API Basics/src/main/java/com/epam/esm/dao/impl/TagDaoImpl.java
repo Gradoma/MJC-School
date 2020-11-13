@@ -17,7 +17,7 @@ import java.util.*;
 @Repository
 public class TagDaoImpl implements TagDao {
     private static final String COUNT_BY_NAME = "SELECT COUNT(*) FROM tag WHERE id=? AND name=?";
-    private static final String SELECT_ALL = "SELECT id, Name FROM tag";
+    private static final String SELECT_ALL = "SELECT id, name FROM tag ORDER BY id";
     private static final String SELECT_BY_ID = "SELECT id, name FROM tag WHERE id=?";
     private static final String SELECT_BY_NAME = "SELECT id, name FROM tag WHERE name=?";
     private static final String DELETE_BY_ID = "DELETE FROM tag WHERE id=?";
@@ -59,8 +59,7 @@ public class TagDaoImpl implements TagDao {
     @Override
     public Tag findByName(String name){
         try {
-            Tag tag = jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
-            return tag;
+            return jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
         } catch (EmptyResultDataAccessException e){
             throw new ResourceNotFoundException("Tag: name=" + name);
         }
@@ -69,8 +68,7 @@ public class TagDaoImpl implements TagDao {
     @Override
     public Tag findById(long id) {
         try{
-            Tag tag = jdbcTemplate.queryForObject(SELECT_BY_ID, tagMapper, id);
-            return tag;
+            return jdbcTemplate.queryForObject(SELECT_BY_ID, tagMapper, id);
         } catch (EmptyResultDataAccessException e){
             throw new ResourceNotFoundException("Tag: id=" + id);
         }

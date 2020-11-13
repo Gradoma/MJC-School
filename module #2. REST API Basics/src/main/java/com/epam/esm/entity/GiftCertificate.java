@@ -1,14 +1,16 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.entity.util.CertificateTagsUtil;
+
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GiftCertificate {
     private long id;
     private String name;
-    private List<Tag> tagList = new ArrayList<>();
+    private Set<Tag> tagSet = new HashSet<>();
     private String description;
     private Double price;
     private ZonedDateTime createDate;
@@ -33,22 +35,16 @@ public class GiftCertificate {
         this.name = name;
     }
 
-    public List<Tag> getTagList() {
-        List<Tag> listReturn = new ArrayList<>();
-        for(Tag currentTag : tagList){
-            listReturn.add(new Tag(currentTag));
-        }
-        return listReturn;
+    public Set<Tag> getTagSet() {
+        return CertificateTagsUtil.getTagList(tagSet);
     }
 
-    public void setTagList(List<Tag> list) {
-        for(Tag currentTag : list){
-            tagList.add(new Tag(currentTag));
-        }
+    public void setTagSet(Set<Tag> tagSet) {
+        CertificateTagsUtil.setTagsToCertificate(this, tagSet);
     }
 
     public void addTag(Tag tag){
-        tagList.add(new Tag(tag));
+        tagSet.add(new Tag(tag));
     }
 
     public String getDescription() {
@@ -100,7 +96,7 @@ public class GiftCertificate {
 
         if (id != that.id) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (tagList != null ? !tagList.equals(that.tagList) : that.tagList != null) return false;
+        if (tagSet != null ? !tagSet.equals(that.tagSet) : that.tagSet != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (price != null ? !price.equals(that.price) : that.price != null) return false;
         if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null) return false;
@@ -113,7 +109,7 @@ public class GiftCertificate {
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (tagList != null ? tagList.hashCode() : 0);
+        result = 31 * result + (tagSet != null ? tagSet.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (price != null ? price.hashCode() : 0);
         result = 31 * result + (createDate != null ? createDate.hashCode() : 0);

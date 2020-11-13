@@ -50,15 +50,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if(certificate.getLastUpdateDate() == null){
             certificate.setLastUpdateDate(ZonedDateTime.now());
         }
-        List<TagDto> tags = certificateDto.getTags();
-        for(TagDto tagDto : tags){
-            if(!tagService.doesExist(tagDto)){
-                long generatedId = tagService.save(tagDto);
-                tagDto.setId(Long.toString(generatedId));
-            }
+        certificateDto.getTags().forEach(tagDto -> {
+            saveTagIfNew(tagDto);
             Tag tag = tagMapper.toEntity(tagDto);
             certificate.addTag(tag);
-        }
+        });
         return certificateDao.add(certificate);
     }
 
@@ -77,14 +73,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         String criteriaSet = defineCriteriaSet(tag, name, description);
         List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteriaSet, tag, name, description);
         List<GiftCertificateDto> dtoList = giftMapper.toDto(certificateList);
-        for(GiftCertificateDto certificateDto : dtoList){
+        dtoList.forEach(certificateDto -> {
             List<TagDto> tagDtoList = tagService.getByGiftCertificateId(Long.parseLong(certificateDto.getId()));
             certificateDto.setTags(tagDtoList);
-        }
+        });
         return sortResultList(dtoList, sortBy, order);
     }
-
-
 
     @Override
     public boolean update(@Valid GiftCertificateDto certificateDto, long certificateId) {
@@ -101,27 +95,31 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return certificateDao.delete(id);
     }
 
+    private void saveTagIfNew(TagDto tagDto){
+        if (!tagService.doesExist(tagDto)) {
+            long generatedId = tagService.save(tagDto);
+            tagDto.setId(Long.toString(generatedId));
+        }
+    }
+
     private List<Long> collectDeletedTagsId(List<TagDto> originalTagDtoList, List<TagDto> updatedTagDtoList){
         List<Long> deletedTagsId = new ArrayList<>();
-        for(TagDto originalTagDto : originalTagDtoList){
-            if(!updatedTagDtoList.contains(originalTagDto)){
-                deletedTagsId.add(Long.parseLong(originalTagDto.getId()));
+        originalTagDtoList.forEach(tagDto -> {
+            if(!updatedTagDtoList.contains(tagDto)){
+                deletedTagsId.add(Long.parseLong(tagDto.getId()));
             }
-        }
+        });
         return deletedTagsId;
     }
 
     private List<Long> collectAddedTagsId(List<TagDto> originalTagDtoList, List<TagDto> updatedTagDtoList) {
         List<Long> addedTagsId = new ArrayList<>();
-        for(TagDto updatedTagDto : updatedTagDtoList) {
-            if (!tagService.doesExist(updatedTagDto)) {
-                long generatedId = tagService.save(updatedTagDto);
-                updatedTagDto.setId(Long.toString(generatedId));
+        updatedTagDtoList.forEach(tagDto -> {
+            saveTagIfNew(tagDto);
+            if (!originalTagDtoList.contains(tagDto)) {
+                addedTagsId.add(Long.parseLong(tagDto.getId()));
             }
-            if (!originalTagDtoList.contains(updatedTagDto)) {
-                addedTagsId.add(Long.parseLong(updatedTagDto.getId()));
-            }
-        }
+        });
         return addedTagsId;
     }
 

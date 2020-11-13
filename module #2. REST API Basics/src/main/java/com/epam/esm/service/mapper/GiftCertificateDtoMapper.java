@@ -41,9 +41,7 @@ public class GiftCertificateDtoMapper {
 
     public List<GiftCertificateDto> toDto(List<GiftCertificate> certificateList){
         List<GiftCertificateDto> resultList = new ArrayList<>();
-        for(GiftCertificate certificate : certificateList){
-            resultList.add(toDto(certificate));
-        }
+        certificateList.forEach(certificate -> resultList.add(toDto(certificate)));
         return resultList;
     }
 }

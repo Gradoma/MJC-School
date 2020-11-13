@@ -5,7 +5,6 @@ import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import com.epam.esm.entity.GiftCertificate;
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 
-import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -103,10 +102,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         parameters.put(DURATION, certificate.getDuration().toDays());
         long certificateId = simpleJdbcInsert.executeAndReturnKey(parameters).longValue();
 
-        for(Tag tag : certificate.getTagList()){
-            addTagToCertId(tag.getId(), certificateId);
-        }
-
+        certificate.getTagSet().forEach(tag -> addTagToCertId(tag.getId(), certificateId));
         return certificateId;
     }
 
@@ -171,12 +167,8 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId) {
-        for(long id : addedTagsId){
-            addTagToCertId(id, certificate.getId());
-        }
-        for(long id : deletedTagsId){
-            deleteTagToCert(certificate.getId(), id);
-        }
+        addedTagsId.forEach(tagIdToAdd -> addTagToCertId(tagIdToAdd, certificate.getId()));
+        deletedTagsId.forEach(tagIdToDelete -> deleteTagToCert(certificate.getId(), tagIdToDelete));
         int rows = jdbcTemplate.update(UPDATE, certificate.getName(), certificate.getDescription(),
                 certificate.getPrice(), convertToUtcLocalDateTime(certificate.getLastUpdateDate()),
                 certificate.getDuration().toDays(), certificate.getId());

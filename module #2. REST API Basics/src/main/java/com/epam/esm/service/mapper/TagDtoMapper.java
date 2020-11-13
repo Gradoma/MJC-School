@@ -26,9 +26,7 @@ public class TagDtoMapper {
 
     public List<TagDto> toDto(List<Tag> tagList){
         List<TagDto> resultList = new ArrayList<>();
-        for(Tag tag : tagList){
-            resultList.add(toDto(tag));
-        }
+        tagList.forEach(tag -> resultList.add(toDto(tag)));
         return resultList;
     }
 }
