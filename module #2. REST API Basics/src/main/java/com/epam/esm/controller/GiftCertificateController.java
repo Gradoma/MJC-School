@@ -4,12 +4,15 @@ import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping(value = GiftCertificateController.URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class GiftCertificateController {
@@ -40,7 +43,7 @@ public class GiftCertificateController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GiftCertificateDto> create(@RequestBody GiftCertificateDto certificateDto){
+    public ResponseEntity<GiftCertificateDto> create(@RequestBody @Valid GiftCertificateDto certificateDto){
         long generatedId = giftCertificateService.add(certificateDto);
         URI resourceUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(URL + "/" + generatedId).build().toUri();
@@ -48,7 +51,7 @@ public class GiftCertificateController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GiftCertificateDto> update(@RequestBody GiftCertificateDto certificateDto,
+    public ResponseEntity<GiftCertificateDto> update(@RequestBody @Valid GiftCertificateDto certificateDto,
                                                      @PathVariable long id){
         giftCertificateService.update(certificateDto, id);
         return ResponseEntity.noContent().build();

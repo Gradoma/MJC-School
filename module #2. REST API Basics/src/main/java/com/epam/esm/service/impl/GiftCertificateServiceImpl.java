@@ -8,6 +8,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.comparator.DateComparator;
+import com.epam.esm.service.comparator.NameComparator;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-@Validated
+//@Validated
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private static final String TAG = "Tag";
@@ -27,6 +28,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private static final String ASC = "ASC";
     private static final String SORT_BY_DATE = "DATE";
     private final DateComparator dateComparator = new DateComparator();
+    private final NameComparator nameComparator = new NameComparator();
     private final GiftCertificateDao certificateDao;
     private final GiftCertificateDtoMapper giftMapper;
     private final TagDtoMapper tagMapper;
@@ -41,7 +43,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public long add(@Valid GiftCertificateDto certificateDto){
+    public long add(GiftCertificateDto certificateDto){
         GiftCertificate certificate = giftMapper.toEntity(certificateDto);
         if(certificate.getCreateDate() == null){
             certificate.setCreateDate(ZonedDateTime.now());
@@ -81,7 +83,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public boolean update(@Valid GiftCertificateDto certificateDto, long certificateId) {
+    public boolean update(GiftCertificateDto certificateDto, long certificateId) {
         GiftCertificateDto originalCertDto = getById(certificateId);
         List<Long> deletedTagsId = collectDeletedTagsId(originalCertDto.getTags(), certificateDto.getTags());
         List<Long> addedTagsId = collectAddedTagsId(originalCertDto.getTags(), certificateDto.getTags());
@@ -170,9 +172,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             }
         } else {
             if (isAscending) {
-                Collections.sort(resultList);
+                resultList.sort(nameComparator);
             } else {
-                resultList.sort(Comparator.reverseOrder());
+                resultList.sort(nameComparator.reversed());
             }
         }
         return resultList;
