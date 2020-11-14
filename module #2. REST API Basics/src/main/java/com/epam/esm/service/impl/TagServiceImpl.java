@@ -8,9 +8,6 @@ import com.epam.esm.service.mapper.TagDtoMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @Validated
@@ -25,7 +22,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public long save(@Valid TagDto tagDto) {
+    public long save(TagDto tagDto) {
         tagDto.setId("0");
         Tag tag = dtoMapper.toEntity(tagDto);
         return tagDao.add(tag);
@@ -43,7 +40,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagDto getByName(@NotNull @Size(min = 1, max = 20) String name) {
+    public TagDto getByName(String name) {
         Tag tag = tagDao.findByName(name);
         return dtoMapper.toDto(tag);
     }
@@ -60,7 +57,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean doesExist(@Valid TagDto tagDto) {
+    public boolean doesExist(TagDto tagDto) {
         if(!tagDto.getId().matches("\\d+")){
             return false;
         }

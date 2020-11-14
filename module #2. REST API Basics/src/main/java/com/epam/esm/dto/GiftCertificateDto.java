@@ -3,6 +3,7 @@ package com.epam.esm.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -10,12 +11,13 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class GiftCertificateDto implements Comparable<GiftCertificateDto>{
+public class GiftCertificateDto{
     private String id;
     @NotNull
     @Size(min = 1, max = 40)
     private String name;
     @NotNull
+    @Valid
     private List<TagDto> tags;
     @NotNull
     @Size(min = 1, max = 255)
@@ -28,9 +30,4 @@ public class GiftCertificateDto implements Comparable<GiftCertificateDto>{
     @NotNull
     @Pattern(regexp = "\\d+")
     private String duration;
-
-    @Override
-    public int compareTo(GiftCertificateDto o) {
-        return name.compareTo(o.getName());
-    }
 }
