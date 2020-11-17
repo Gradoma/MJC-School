@@ -1,4 +1,4 @@
-package com.epam.esm.exception.handler;
+package com.epam.esm.handler;
 
 public class ErrorResponse {
     private String message;

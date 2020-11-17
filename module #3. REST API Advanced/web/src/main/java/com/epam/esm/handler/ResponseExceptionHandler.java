@@ -1,4 +1,4 @@
-package com.epam.esm.exception.handler;
+package com.epam.esm.handler;
 
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
@@ -14,7 +14,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 @ControllerAdvice
-public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
+public class ResponseExceptionHandler{
     private final MessageSource messageSource;
 
     public ResponseExceptionHandler(MessageSource messageSource){
