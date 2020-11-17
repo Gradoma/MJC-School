@@ -1,0 +1,15 @@
+package com.epam.esm.service;
+
+import com.epam.esm.dto.TagDto;
+
+import java.util.List;
+
+public interface TagService {
+    long save(TagDto tagDto);
+    List<TagDto> getAll();
+    TagDto getById(long id);
+    TagDto getByName(String name);
+    List<TagDto> getByGiftCertificateId(long certificateId);
+    boolean delete(long id);
+    boolean doesExist(TagDto tagDto);
+}
