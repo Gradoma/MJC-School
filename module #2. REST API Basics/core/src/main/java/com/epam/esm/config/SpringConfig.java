@@ -23,12 +23,12 @@ import java.util.Locale;
 public class SpringConfig{
 
     @Bean
-    public JdbcTemplate getJdbcTemplate(BasicDataSource dataSource){
+    public JdbcTemplate jdbcTemplate(BasicDataSource dataSource){
         return new JdbcTemplate(dataSource);
     }
 
     @Bean
-    public BasicDataSource getDataSource(DbProperties dbProperties) {
+    public BasicDataSource dataSource(DbProperties dbProperties) {
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName(dbProperties.getDriver());
         ds.setUrl(dbProperties.getUrl());
