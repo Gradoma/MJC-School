@@ -3,7 +3,7 @@ package com.epam.esm.dao.criteria;
 import com.epam.esm.dao.criteria.impl.*;
 
 public enum CriteriaSet {
-    BY_TAG("Tag", new SelectorByTag()),
+    BY_TAG("Tag", new SelectorByTagAndParam()),
     BY_CERTIFICATE_PARAM("CertificateParam", new SelectorByCertificateParam());
 
     private String criteriaName;

@@ -6,31 +6,28 @@ import com.epam.esm.entity.GiftCertificate;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 public class SelectorByCertificateParam implements GiftCertificateSelector {
 
     @Override
     public List<GiftCertificate> select(String tagName, String name, String description, JdbcTemplate jdbcTemplate,
                                         GiftCertificateMapper giftMapper) {
-        String query = DEFAULT_QUERY;
-        boolean wasModified = false;
-        if(name != null){
-            query = query + WHERE + BY_NAME;
-            wasModified = true;
-            name = addPercentageWildcard(name);
+        Map<String, String> queryParamMap = prepareQuery(name, description);
+        String query = queryParamMap.get(RESULT_QUERY) + SEMI;
+        List<GiftCertificate> resultList;
+        switch (queryParamMap.size() - 1){
+            case 1:
+                resultList = jdbcTemplate.query(query, giftMapper, queryParamMap.get(FIRST_PARAM));
+                break;
+            case 2:
+                resultList = jdbcTemplate.query(query, giftMapper, queryParamMap.get(FIRST_PARAM),
+                        queryParamMap.get(SECOND_PARAM));
+                break;
+            default:
+                resultList = jdbcTemplate.query(query, giftMapper);
+                break;
         }
-        if(description != null){
-            description = addPercentageWildcard(description);
-            if(wasModified){
-                query = query + AND + BY_DESCRIPTION;
-                return jdbcTemplate.query(query, giftMapper, name, description);
-            } else {
-                query = query + WHERE + BY_DESCRIPTION;
-            }
-            query = query + SEMI;
-            return jdbcTemplate.query(query, giftMapper, description);
-        }
-        query = query + SEMI;
-        return jdbcTemplate.query(query, giftMapper, name);     //todo (fix default search)
+        return resultList;
     }
 }
