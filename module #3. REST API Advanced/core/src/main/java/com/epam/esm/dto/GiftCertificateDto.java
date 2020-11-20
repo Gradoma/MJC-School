@@ -25,7 +25,7 @@ public class GiftCertificateDto{
     @NotNull
     @Pattern(regexp = "^((\\p{Digit}){1,5}([.]\\d{1,2})?)$")
     private String price;
-    private String createDate;
+    private String createDate;      //todo custom annotation validation
     private String lastUpdateDate;
     @NotNull
     @Pattern(regexp = "\\d+")
