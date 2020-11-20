@@ -6,7 +6,7 @@ import com.epam.esm.entity.Order;
 import java.util.List;
 
 public interface OrderService {
-    long add(OrderDto orderDto);
+    long save(OrderDto orderDto);
     List<OrderDto> getByUserId(long userId);
     OrderDto getById(long orderId);
 }

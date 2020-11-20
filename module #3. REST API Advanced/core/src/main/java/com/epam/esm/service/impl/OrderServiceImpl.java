@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public long add(OrderDto orderDto) {
+    public long save(OrderDto orderDto) {
         Order order = orderDtoMapper.toEntity(orderDto);
         GiftCertificateDto certificateDto = giftCertificateService.getById(order.getCertificateId());
         order.setCost(Double.parseDouble(certificateDto.getPrice()));
