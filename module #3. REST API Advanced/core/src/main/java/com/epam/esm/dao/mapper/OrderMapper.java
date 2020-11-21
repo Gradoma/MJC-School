@@ -1,6 +1,6 @@
 package com.epam.esm.dao.mapper;
 
-import static com.epam.esm.dao.column.OrderTableConst.*;
+import static com.epam.esm.dao.column.OrdersTableConst.*;
 import com.epam.esm.entity.Order;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;

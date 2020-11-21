@@ -1,9 +1,7 @@
 package com.epam.esm.service.mapper;
 
-import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.Order;
-import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
 import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
@@ -14,8 +12,8 @@ import java.util.List;
 public class OrderDtoMapper {
     public Order toEntity(OrderDto orderDto){
         Order order = new Order();
-        order.setUserId(Long.parseLong(orderDto.getUser_id()));
-        order.setCertificateId(Long.parseLong(orderDto.getCertificate_id()));
+        order.setUserId(Long.parseLong(orderDto.getUserId()));
+        order.setCertificateId(Long.parseLong(orderDto.getCertificateId()));
         if(orderDto.getPurchase_date() != null){
             order.setPurchaseDate(ZonedDateTime.parse(orderDto.getPurchase_date()));
         }
@@ -25,8 +23,8 @@ public class OrderDtoMapper {
     public OrderDto toDto(Order order){
         OrderDto orderDto = new OrderDto();
         orderDto.setId(Long.toString(order.getId()));
-        orderDto.setUser_id(Long.toString(order.getUserId()));
-        orderDto.setCertificate_id(Long.toString(order.getCertificateId()));
+        orderDto.setUserId(Long.toString(order.getUserId()));
+        orderDto.setCertificateId(Long.toString(order.getCertificateId()));
         orderDto.setCost(Double.toString(order.getCost()));
         orderDto.setPurchase_date(order.getPurchaseDate().toString());
 
