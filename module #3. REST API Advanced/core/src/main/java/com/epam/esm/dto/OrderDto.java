@@ -6,9 +6,11 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.hateoas.RepresentationModel;
+
 @Data
 @NoArgsConstructor
-public class OrderDto {
+public class OrderDto extends RepresentationModel<OrderDto> {
     private String id;
     @NotNull
     @Digits(integer = 20, fraction = 0)

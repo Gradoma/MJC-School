@@ -5,6 +5,8 @@ import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.TagService;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 @Validated
 @RestController
@@ -34,8 +37,14 @@ public class OrderController {
 
     @GetMapping("/by")
     public ResponseEntity<List<OrderDto>> getByUserId(@RequestParam(value = "user") long userId){
-        List<OrderDto> orderDto = orderService.getByUserId(userId);
-        return ResponseEntity.ok().body(orderDto);
+        List<OrderDto> orderDtoList = orderService.getByUserId(userId);
+        for(OrderDto orderDto : orderDtoList){
+            long orderId = Long.parseLong(orderDto.getId());
+            Link orderLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrderController.class).getById(orderId))
+                    .withRel("order");
+            orderDto.add(orderLink);
+        }
+        return ResponseEntity.ok().body(orderDtoList);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
