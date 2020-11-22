@@ -32,18 +32,14 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderDto> getById(@PathVariable long id){
         OrderDto orderDto = orderService.getById(id);
+        addLinks(orderDto);
         return ResponseEntity.ok().body(orderDto);
     }
 
     @GetMapping("/by")
     public ResponseEntity<List<OrderDto>> getByUserId(@RequestParam(value = "user") long userId){
         List<OrderDto> orderDtoList = orderService.getByUserId(userId);
-        for(OrderDto orderDto : orderDtoList){
-            long orderId = Long.parseLong(orderDto.getId());
-            Link orderLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrderController.class).getById(orderId))
-                    .withRel("order");
-            orderDto.add(orderLink);
-        }
+        orderDtoList.forEach(orderDto -> addLinks(orderDto));
         return ResponseEntity.ok().body(orderDtoList);
     }
 
@@ -53,5 +49,14 @@ public class OrderController {
         URI resourceUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(URL + "/" + generatedId).build().toUri();
         return ResponseEntity.created(resourceUri).build();
+    }
+
+    private void addLinks(OrderDto orderDto){
+        long certificateId = Long.parseLong(orderDto.getCertificateId());
+        Link certificateLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
+                .getById(certificateId))
+                .withRel("certificate");
+        orderDto.add(certificateLink);
+        // todo add user link
     }
 }

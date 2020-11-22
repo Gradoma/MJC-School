@@ -2,6 +2,8 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.service.GiftCertificateService;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +28,7 @@ public class GiftCertificateController {
     @GetMapping("/{id}")
     public ResponseEntity<GiftCertificateDto> getById(@PathVariable long id){
         GiftCertificateDto certificateDto = giftCertificateService.getById(id);
+        addLinks(certificateDto);
         return ResponseEntity.ok().body(certificateDto);
     }
 
@@ -38,6 +41,7 @@ public class GiftCertificateController {
                   @RequestParam(value = "order", required = false, defaultValue = "asc") String order){
         List<GiftCertificateDto> certificateDtoList = giftCertificateService
                 .getByCriteria(tag, name, description, sortBy, order);
+        certificateDtoList.forEach(certificateDto -> addLinks(certificateDto));
         return ResponseEntity.ok().body(certificateDtoList);
     }
 
@@ -61,5 +65,15 @@ public class GiftCertificateController {
     public ResponseEntity<GiftCertificateDto> deleteById(@PathVariable long id){
         giftCertificateService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void addLinks(GiftCertificateDto certificateDto){
+        certificateDto.getTags().forEach(tagDto -> {
+            long tagId = Long.parseLong(tagDto.getId());
+            Link tagLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
+                    .getById(tagId))
+                    .withRel("tag");
+            tagDto.add(tagLink);
+        });
     }
 }
