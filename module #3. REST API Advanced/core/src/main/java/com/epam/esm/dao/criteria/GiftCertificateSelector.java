@@ -22,7 +22,7 @@ public interface GiftCertificateSelector {
     String FIRST_PARAM = "firstParam";
     String SECOND_PARAM = "secondParam";
 
-    List<GiftCertificate> select(String tagName, String name, String description, JdbcTemplate jdbcTemplate,
+    List<GiftCertificate> select(List<String> tagNames, String name, String description, JdbcTemplate jdbcTemplate,
                                  GiftCertificateMapper giftMapper);
 
     default String addPercentageWildcard(String param){

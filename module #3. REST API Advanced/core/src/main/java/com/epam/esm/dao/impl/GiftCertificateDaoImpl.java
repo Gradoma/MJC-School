@@ -69,15 +69,15 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findByCriteria(String criteriaSet, String tagName, String name,
+    public List<GiftCertificate> findByCriteria(String criteriaSet, List<String> tagNames, String name,
                                                 String description) {
         List<GiftCertificate> resultList = new ArrayList<>();
         GiftCertificateSelector selector = CriteriaSet.getByName(criteriaSet).getSelector();
-        resultList = selector.select(tagName, name, description, jdbcTemplate, giftMapper);
+        resultList = selector.select(tagNames, name, description, jdbcTemplate, giftMapper);
         if(resultList.size() == 0){
             throw new ResourceNotFoundException("Gift certificate: name=" + name +
                     ", description=" + description +
-                    ", tag=" + tagName);
+                    ", tags=" + tagNames);
         }
         return resultList;
     }

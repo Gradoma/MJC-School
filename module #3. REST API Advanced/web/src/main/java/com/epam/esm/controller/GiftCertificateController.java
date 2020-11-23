@@ -2,6 +2,8 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.service.GiftCertificateService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
@@ -20,6 +22,7 @@ import java.util.List;
 public class GiftCertificateController {
     public static final String URL = "/certificate";
     private final GiftCertificateService giftCertificateService;
+    private static final Logger log = LogManager.getLogger();
 
     public GiftCertificateController(GiftCertificateService giftCertificateService){
         this.giftCertificateService = giftCertificateService;
@@ -34,13 +37,14 @@ public class GiftCertificateController {
 
     @GetMapping("/by")
     public ResponseEntity<List<GiftCertificateDto>>
-    getByCriteria(@RequestParam(value = "tag", required = false) String tag,
+    getByCriteria(@RequestParam(value = "tag", required = false) List<String> tags,
                   @RequestParam(value = "name", required = false) String name,
                   @RequestParam(value = "description", required = false) String description,
                   @RequestParam(value = "sort", required = false, defaultValue = "name") String sortBy,
                   @RequestParam(value = "order", required = false, defaultValue = "asc") String order){
+       log.debug("tag List:" + tags);
         List<GiftCertificateDto> certificateDtoList = giftCertificateService
-                .getByCriteria(tag, name, description, sortBy, order);
+                .getByCriteria(tags, name, description, sortBy, order);
         certificateDtoList.forEach(certificateDto -> addLinks(certificateDto));
         return ResponseEntity.ok().body(certificateDtoList);
     }

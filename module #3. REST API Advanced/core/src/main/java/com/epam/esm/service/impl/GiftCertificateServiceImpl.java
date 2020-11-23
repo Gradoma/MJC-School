@@ -68,10 +68,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getByCriteria(String tag, String name, String description,
+    public List<GiftCertificateDto> getByCriteria(List<String> tags, String name, String description,
                                                   String sortBy, String order) {
-        String criteriaSet = defineCriteriaSet(tag, name, description);
-        List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteriaSet, tag, name, description);
+        String criteriaSet = defineCriteriaSet(tags, name, description);
+        List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteriaSet, tags, name, description);
         List<GiftCertificateDto> dtoList = giftMapper.toDto(certificateList);
         dtoList.forEach(certificateDto -> {
             List<TagDto> tagDtoList = tagService.getByGiftCertificateId(Long.parseLong(certificateDto.getId()));
@@ -142,9 +142,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return updatedCertificate;
     }
 
-    private String defineCriteriaSet(String tag, String name, String description){
+    private String defineCriteriaSet(List<String> tags, String name, String description){
         String criteriaSet = "";
-        if(tag != null && !tag.isEmpty()){
+        if(tags != null){
+            System.out.println("tags != null");
             criteriaSet = criteriaSet + TAG;
         }
         if(name != null && !name.isEmpty()){

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface GiftCertificateDao {
     long add(GiftCertificate certificate);
-    List<GiftCertificate> findByCriteria(String criteriaSet, String tagName, String name,
+    List<GiftCertificate> findByCriteria(String criteriaSet, List<String> tagNames, String name,
                                          String description);
     GiftCertificate findById(long id);
     boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId);

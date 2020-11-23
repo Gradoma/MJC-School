@@ -11,7 +11,7 @@ import java.util.Map;
 public class SelectorByCertificateParam implements GiftCertificateSelector {
 
     @Override
-    public List<GiftCertificate> select(String tagName, String name, String description, JdbcTemplate jdbcTemplate,
+    public List<GiftCertificate> select(List<String> tagNames, String name, String description, JdbcTemplate jdbcTemplate,
                                         GiftCertificateMapper giftMapper) {
         Map<String, String> queryParamMap = prepareQuery(name, description);
         String query = queryParamMap.get(RESULT_QUERY) + SEMI;
