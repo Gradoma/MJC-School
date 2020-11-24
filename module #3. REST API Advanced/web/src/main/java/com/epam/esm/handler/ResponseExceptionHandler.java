@@ -1,13 +1,13 @@
 package com.epam.esm.handler;
 
 import com.epam.esm.exception.DuplicateException;
+import com.epam.esm.exception.InvalidSortingException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
 import java.time.format.DateTimeParseException;
@@ -33,6 +33,14 @@ public class ResponseExceptionHandler{
     public final ResponseEntity<ErrorResponse> handleDuplicateException (DuplicateException ex,
                                                                          Locale locale) {
         String message = messageSource.getMessage("message.duplicate", new Object[]{ex.getMessage()},
+                locale);
+        return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidSortingException.class)
+    public final ResponseEntity<ErrorResponse> handleInvalidSortingOrderException (InvalidSortingException ex,
+                                                                                   Locale locale) {
+        String message = messageSource.getMessage("message.sorting", new Object[]{ex.getMessage()},
                 locale);
         return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }

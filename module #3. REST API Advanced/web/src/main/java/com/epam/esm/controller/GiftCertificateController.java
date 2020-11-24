@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.net.URI;
 import java.util.List;
 
@@ -40,8 +41,10 @@ public class GiftCertificateController {
     getByCriteria(@RequestParam(value = "tag", required = false) List<String> tags,
                   @RequestParam(value = "name", required = false) String name,
                   @RequestParam(value = "description", required = false) String description,
-                  @RequestParam(value = "sort", required = false, defaultValue = "name") String sortBy,
-                  @RequestParam(value = "order", required = false, defaultValue = "asc") String order){
+                  @RequestParam(value = "sort", required = false, defaultValue = "date")
+                  @Pattern(regexp = "date|name", flags = Pattern.Flag.CASE_INSENSITIVE) String sortBy,
+                  @RequestParam(value = "order", required = false, defaultValue = "desc")
+                  @Pattern(regexp = "asc|desc", flags = Pattern.Flag.CASE_INSENSITIVE) String order){
        log.debug("tag List:" + tags);
         List<GiftCertificateDto> certificateDtoList = giftCertificateService
                 .getByCriteria(tags, name, description, sortBy, order);

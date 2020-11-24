@@ -11,10 +11,10 @@ import java.util.Map;
 public class SelectorByCertificateParam implements GiftCertificateSelector {
 
     @Override
-    public List<GiftCertificate> select(List<String> tagNames, String name, String description, JdbcTemplate jdbcTemplate,
-                                        GiftCertificateMapper giftMapper) {
+    public List<GiftCertificate> select(List<String> tagNames, String name, String description, String orderBy,
+                                        JdbcTemplate jdbcTemplate, GiftCertificateMapper giftMapper) {
         Map<String, String> queryParamMap = prepareQuery(name, description);
-        String query = queryParamMap.get(RESULT_QUERY) + SEMI;
+        String query = queryParamMap.get(RESULT_QUERY) + orderBy + SEMI;
         List<GiftCertificate> resultList;
         switch (queryParamMap.size() - 1){
             case 1:

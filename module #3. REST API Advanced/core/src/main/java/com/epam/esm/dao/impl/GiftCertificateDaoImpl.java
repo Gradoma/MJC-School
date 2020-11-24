@@ -4,6 +4,8 @@ import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.criteria.CriteriaSet;
 import com.epam.esm.dao.criteria.GiftCertificateSelector;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
+import com.epam.esm.dao.sorting.Order;
+import com.epam.esm.dao.sorting.Sorter;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -70,10 +72,11 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public List<GiftCertificate> findByCriteria(String criteriaSet, List<String> tagNames, String name,
-                                                String description) {
+                                                String description, String sortByColumn, Order orderEnum) {
         List<GiftCertificate> resultList = new ArrayList<>();
+        String queryOrderPart = Sorter.prepareSorting(sortByColumn, orderEnum);
         GiftCertificateSelector selector = CriteriaSet.getByName(criteriaSet).getSelector();
-        resultList = selector.select(tagNames, name, description, jdbcTemplate, giftMapper);
+        resultList = selector.select(tagNames, name, description, queryOrderPart, jdbcTemplate, giftMapper);
         if(resultList.size() == 0){
             throw new ResourceNotFoundException("Gift certificate: name=" + name +
                     ", description=" + description +

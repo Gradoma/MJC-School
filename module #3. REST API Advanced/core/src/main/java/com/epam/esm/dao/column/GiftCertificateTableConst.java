@@ -1,5 +1,7 @@
 package com.epam.esm.dao.column;
 
+import java.util.Arrays;
+
 public final class GiftCertificateTableConst {
     public static final String TABLE_CERTIFICATE = "giftcertificate";
     public static final String ID = "id";

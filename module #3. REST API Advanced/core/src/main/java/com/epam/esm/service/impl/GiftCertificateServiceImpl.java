@@ -1,6 +1,8 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
+import com.epam.esm.dao.column.GiftCertificateTableConst;
+import com.epam.esm.dao.sorting.Order;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
@@ -11,12 +13,15 @@ import com.epam.esm.service.comparator.DateComparator;
 import com.epam.esm.service.comparator.NameComparator;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
+import com.epam.esm.service.sorting.SortingDefiner;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
@@ -71,13 +76,16 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public List<GiftCertificateDto> getByCriteria(List<String> tags, String name, String description,
                                                   String sortBy, String order) {
         String criteriaSet = defineCriteriaSet(tags, name, description);
-        List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteriaSet, tags, name, description);
+        Order orderEnum = SortingDefiner.defineOrder(order);
+        String column = SortingDefiner.defineColumn(sortBy);
+        List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteriaSet, tags, name,
+                description, column, orderEnum);
         List<GiftCertificateDto> dtoList = giftMapper.toDto(certificateList);
         dtoList.forEach(certificateDto -> {
             List<TagDto> tagDtoList = tagService.getByGiftCertificateId(Long.parseLong(certificateDto.getId()));
             certificateDto.setTags(tagDtoList);
         });
-        return sortResultList(dtoList, sortBy, order);
+        return dtoList;
     }
 
     @Override

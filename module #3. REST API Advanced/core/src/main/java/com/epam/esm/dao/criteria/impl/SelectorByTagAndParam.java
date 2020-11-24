@@ -25,8 +25,8 @@ public class SelectorByTagAndParam implements GiftCertificateSelector {
             "WHERE LOWER(tag.name) LIKE LOWER(?)";
 
     @Override
-    public List<GiftCertificate> select(List<String> tagNames, String name, String description, JdbcTemplate jdbcTemplate,
-                                        GiftCertificateMapper giftMapper) {
+    public List<GiftCertificate> select(List<String> tagNames, String name, String description, String orderBy,
+                                        JdbcTemplate jdbcTemplate, GiftCertificateMapper giftMapper) {
         Map<String, String> queryParamMap = prepareQuery(name, description);
         String query = queryParamMap.get(RESULT_QUERY);
         StringBuilder queryBuilder = new StringBuilder(query);
@@ -36,7 +36,9 @@ public class SelectorByTagAndParam implements GiftCertificateSelector {
                 log.debug("case 1");
                 log.debug("param: " + queryParamMap.get(FIRST_PARAM));
                 queryBuilder.append(AND_CERT_ID_IN);
-                query = addSelectByTagQueries(tagNames.size(), queryBuilder).append(SEMI).toString();
+                query = addSelectByTagQueries(tagNames.size(), queryBuilder)
+                        .append(orderBy)
+                        .append(SEMI).toString();
                 log.debug("query = " + query);
                 resultList = jdbcTemplate.query(query, giftMapper, prepareArrayTags(tagNames,
                         queryParamMap.get(FIRST_PARAM)));
@@ -46,7 +48,9 @@ public class SelectorByTagAndParam implements GiftCertificateSelector {
                 log.debug("param 1: " + queryParamMap.get(FIRST_PARAM));
                 log.debug("param 2: " + queryParamMap.get(SECOND_PARAM));
                 queryBuilder.append(AND_CERT_ID_IN);
-                query = addSelectByTagQueries(tagNames.size(), queryBuilder).append(SEMI).toString();
+                query = addSelectByTagQueries(tagNames.size(), queryBuilder)
+                        .append(orderBy)
+                        .append(SEMI).toString();
                 log.debug("query = " + query);
                 resultList = jdbcTemplate.query(query, giftMapper, prepareArrayTags(tagNames,
                         queryParamMap.get(FIRST_PARAM), queryParamMap.get(SECOND_PARAM)));
@@ -54,7 +58,9 @@ public class SelectorByTagAndParam implements GiftCertificateSelector {
             default:
                 log.debug("no addition params");
                 queryBuilder.append(WHERE_CERT_ID_IN);
-                query = addSelectByTagQueries(tagNames.size(), queryBuilder).append(SEMI).toString();
+                query = addSelectByTagQueries(tagNames.size(), queryBuilder)
+                        .append(orderBy)
+                        .append(SEMI).toString();
                 log.debug("query = " + query);
                 resultList = jdbcTemplate.query(query, giftMapper, prepareArrayTags(tagNames));
                 break;
