@@ -44,6 +44,12 @@ public class TagController {
         return ResponseEntity.ok().body(tagDto);
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<TagDto> getPopular(){
+        TagDto tagDto = tagService.getMostPopular();
+        return ResponseEntity.ok().body(tagDto);
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TagDto> create(@RequestBody @Valid TagDto tagDto){        //todo (rename to createTag?)
         long generatedId = tagService.save(tagDto);

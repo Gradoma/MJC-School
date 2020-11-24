@@ -28,6 +28,18 @@ public class TagDaoImpl implements TagDao {
             "JOIN tag_certificate ON tag_certificate.tag_id = tag.id " +
             "JOIN giftcertificate ON giftcertificate.id = tag_certificate.certificate_id " +
             "WHERE giftcertificate.id=?";
+    private static final String SELECT_MOST_POPULAR_TAG = "SELECT tag.id, tag.name " +
+            "FROM tag " +
+            "JOIN tag_certificate ON tag_certificate.tag_id = tag.id " +
+            "JOIN giftcertificate ON giftcertificate.id = tag_certificate.certificate_id " +
+            "WHERE giftcertificate.id IN " +
+            "(SELECT certificate_id FROM orders " +
+            "WHERE user_id= " +
+            "    (SELECT user_id FROM orders WHERE cost = (SELECT MAX(cost) FROM orders)) " +
+            "    ) " +
+            "GROUP BY tag.name " +
+            "ORDER BY COUNT(tag.name) DESC " +
+            "LIMIT 1";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
@@ -85,6 +97,11 @@ public class TagDaoImpl implements TagDao {
             throw new ResourceNotFoundException("Tags for Gift Certificate: id=" + certificateId);
         }
         return tagList;
+    }
+
+    @Override
+    public Tag findMostPopular() {
+        return jdbcTemplate.queryForObject(SELECT_MOST_POPULAR_TAG, tagMapper);
     }
 
     @Override

@@ -9,6 +9,7 @@ public interface TagService {
     List<TagDto> getAll();
     TagDto getById(long id);
     TagDto getByName(String name);
+    TagDto getMostPopular();
     List<TagDto> getByGiftCertificateId(long certificateId);
     boolean delete(long id);
     boolean doesExist(TagDto tagDto);

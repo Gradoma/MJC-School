@@ -46,6 +46,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public TagDto getMostPopular() {
+        Tag tag = tagDao.findMostPopular();
+        return dtoMapper.toDto(tag);
+    }
+
+    @Override
     public List<TagDto> getByGiftCertificateId(long certificateId) {
         List<Tag> tagList = tagDao.findByCertificateId(certificateId);
         return dtoMapper.toDto(tagList);
