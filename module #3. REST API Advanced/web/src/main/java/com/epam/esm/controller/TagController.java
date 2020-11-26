@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = TagController.URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class TagController {
-    public static final String URL = "/tag";
+    public static final String URL = "/tags";
     private final TagService tagService;
 
     public TagController(TagService tagService){

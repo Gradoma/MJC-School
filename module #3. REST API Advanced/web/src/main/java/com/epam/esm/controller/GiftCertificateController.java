@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = GiftCertificateController.URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class GiftCertificateController {
-    public static final String URL = "/certificate";
+    public static final String URL = "/certificates";
     private final GiftCertificateService giftCertificateService;
     private static final Logger log = LogManager.getLogger();
 

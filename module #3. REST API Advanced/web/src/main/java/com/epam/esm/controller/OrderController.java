@@ -22,7 +22,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 @RestController
 @RequestMapping(value = OrderController.URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
-    public static final String URL = "/order";
+    public static final String URL = "/orders";
     private final OrderService orderService;
 
     public OrderController(OrderService orderService){
