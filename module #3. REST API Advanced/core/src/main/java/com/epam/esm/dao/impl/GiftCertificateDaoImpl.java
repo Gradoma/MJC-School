@@ -98,6 +98,34 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         return resultList;
     }
 
+    @Override
+    public List<GiftCertificate> findByCriteriaAndCondition(CertificateCriteria criteria) {
+        List<GiftCertificate> resultList = new ArrayList<>();
+        String query = QueryBuilder.makeQueryAndTagCondition(criteria);
+        List<String> queryParams = new ArrayList<>();
+        if(criteria.getName() != null){
+            queryParams.add(addPercentageWildcard(criteria.getName()));
+        }
+        if(criteria.getDescription() != null){
+            queryParams.add(addPercentageWildcard(criteria.getDescription()));
+        }
+        if(criteria.getTags() != null){
+            queryParams.addAll(criteria.getTags());
+        }
+        if(queryParams.size() > 0){
+            String[] paramsArray = queryParams.stream().toArray(String[]::new);
+            resultList = jdbcTemplate.query(query, giftMapper, paramsArray);
+        } else {
+            resultList = jdbcTemplate.query(query, giftMapper);
+        }
+        if(resultList.size() == 0){
+            throw new ResourceNotFoundException("Gift certificate: name=" + criteria.getName() +
+                    ", description=" + criteria.getDescription() +
+                    ", tags=" + criteria.getTags());
+        }
+        return resultList;
+    }
+
     private String addPercentageWildcard(String param){
         return PERCENTAGE + param.trim() + PERCENTAGE;
     }
