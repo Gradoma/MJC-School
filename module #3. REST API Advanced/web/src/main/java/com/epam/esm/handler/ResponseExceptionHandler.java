@@ -46,8 +46,8 @@ public class ResponseExceptionHandler{
         return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public final ResponseEntity<ErrorResponse> handleConversionFailedException(IllegalArgumentException ex){
+    @ExceptionHandler(ConversionFailedException.class)
+    public final ResponseEntity<ErrorResponse> handleConversionFailedException(ConversionFailedException ex){
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
