@@ -1,15 +1,15 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
-import com.epam.esm.dao.criteria.CriteriaSet;
-import com.epam.esm.dao.criteria.GiftCertificateSelector;
+import com.epam.esm.dao.builder.QueryBuilder;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
-import com.epam.esm.dao.sorting.Order;
-import com.epam.esm.dao.sorting.Sorter;
+import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
@@ -34,14 +34,18 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String TAG_CERT_INSERT = "INSERT INTO tag_certificate (tag_id, certificate_id) VALUES (?, ?)";
     private static final String TAG_CERT_DELETE_BY_TAG_AND_CERT_ID = "DELETE FROM tag_certificate WHERE " +
             "tag_id = ? AND certificate_id = ?";
+    private static final String PERCENTAGE = "%";
 
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
     private final GiftCertificateMapper giftMapper;
 
-    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, GiftCertificateMapper giftMapper){
+    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, GiftCertificateMapper giftMapper,
+                                  NamedParameterJdbcTemplate namedParameterJdbcTemplate){
         this.giftMapper = giftMapper;
         this.jdbcTemplate = jdbcTemplate;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
         simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName(TABLE_CERTIFICATE)
                 .usingGeneratedKeyColumns(ID);
@@ -71,18 +75,31 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findByCriteria(String criteriaSet, List<String> tagNames, String name,
-                                                String description, String sortByColumn, Order orderEnum) {
+    public List<GiftCertificate> findByCriteria(CertificateCriteria criteria) {
         List<GiftCertificate> resultList = new ArrayList<>();
-        String queryOrderPart = Sorter.prepareSorting(sortByColumn, orderEnum);
-        GiftCertificateSelector selector = CriteriaSet.getByName(criteriaSet).getSelector();
-        resultList = selector.select(tagNames, name, description, queryOrderPart, jdbcTemplate, giftMapper);
+        String query = QueryBuilder.makeQuery(criteria);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        if(criteria.getTags() != null){
+            parameters.addValue("tag_names", criteria.getTags());
+        }
+        if(criteria.getName() != null){
+            parameters.addValue("name", addPercentageWildcard(criteria.getName()));
+        }
+        if(criteria.getDescription() != null){
+            parameters.addValue("description", addPercentageWildcard(criteria.getDescription()));
+        }
+        resultList = namedParameterJdbcTemplate.query(query,
+                parameters, giftMapper);
         if(resultList.size() == 0){
-            throw new ResourceNotFoundException("Gift certificate: name=" + name +
-                    ", description=" + description +
-                    ", tags=" + tagNames);
+            throw new ResourceNotFoundException("Gift certificate: name=" + criteria.getName() +
+                    ", description=" + criteria.getDescription() +
+                    ", tags=" + criteria.getTags());
         }
         return resultList;
+    }
+
+    private String addPercentageWildcard(String param){
+        return PERCENTAGE + param.trim() + PERCENTAGE;
     }
 
     @Override

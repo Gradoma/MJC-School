@@ -44,13 +44,8 @@ public class GiftCertificateController {
 
     @GetMapping()
     public ResponseEntity<List<GiftCertificateDto>> getByCriteria(CertificateCriteria criteria){
-       String sortBy = criteria.getCriteria().getColumn();
-       String orderString = criteria.getOrder().toString();
-       List<String> tags = criteria.getTags();
-       String name = criteria.getName();
-       String description = criteria.getDescription();
         List<GiftCertificateDto> certificateDtoList = giftCertificateService
-                .getByCriteria(tags, name, description, sortBy, orderString);
+                .getByCriteria(criteria);
         certificateDtoList.forEach(certificateDto -> addLinks(certificateDto));
         return ResponseEntity.ok().body(certificateDtoList);
     }

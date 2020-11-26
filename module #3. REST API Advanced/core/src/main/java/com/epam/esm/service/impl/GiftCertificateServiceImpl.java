@@ -1,37 +1,24 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
-import com.epam.esm.dao.column.GiftCertificateTableConst;
-import com.epam.esm.dao.sorting.Order;
+import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
-import com.epam.esm.service.comparator.DateComparator;
-import com.epam.esm.service.comparator.NameComparator;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
-import com.epam.esm.service.sorting.SortingDefiner;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
-    private static final String TAG = "Tag";
-    private static final String NAME = "Name";
-    private static final String DESCRIPTION = "Description";
-    private static final String ASC = "ASC";
-    private static final String SORT_BY_DATE = "DATE";
-    private final DateComparator dateComparator = new DateComparator();
-    private final NameComparator nameComparator = new NameComparator();
     private final GiftCertificateDao certificateDao;
     private final GiftCertificateDtoMapper giftMapper;
     private final TagDtoMapper tagMapper;
@@ -73,13 +60,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificateDto> getByCriteria(List<String> tags, String name, String description,
-                                                  String sortBy, String order) {
-        String criteriaSet = defineCriteriaSet(tags, name, description);
-        Order orderEnum = SortingDefiner.defineOrder(order);
-        String column = SortingDefiner.defineColumn(sortBy);
-        List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteriaSet, tags, name,
-                description, column, orderEnum);
+    public List<GiftCertificateDto> getByCriteria(CertificateCriteria criteria) {
+        List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteria);
         List<GiftCertificateDto> dtoList = giftMapper.toDto(certificateList);
         dtoList.forEach(certificateDto -> {
             List<TagDto> tagDtoList = tagService.getByGiftCertificateId(Long.parseLong(certificateDto.getId()));
@@ -148,42 +130,5 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         GiftCertificate updatedCertificate = giftMapper.toEntity(originalDto);
         updatedCertificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
         return updatedCertificate;
-    }
-
-    private String defineCriteriaSet(List<String> tags, String name, String description){
-        String criteriaSet = "";
-        if(tags != null){
-            System.out.println("tags != null");
-            criteriaSet = criteriaSet + TAG;
-        }
-        if(name != null && !name.isEmpty()){
-            criteriaSet = criteriaSet + NAME;
-        }
-        if(description != null && !description.isEmpty()){
-            criteriaSet = criteriaSet + DESCRIPTION;
-        }
-        return criteriaSet;
-    }
-
-    private List<GiftCertificateDto> sortResultList(List<GiftCertificateDto> resultList, String sortBy,
-                                                    String order){
-        boolean isAscending = false;
-        if(ASC.equalsIgnoreCase(order)){
-            isAscending = true;
-        }
-        if (SORT_BY_DATE.equalsIgnoreCase(sortBy)) {
-            if (isAscending) {
-                resultList.sort(dateComparator);
-            } else {
-                resultList.sort(dateComparator.reversed());
-            }
-        } else {
-            if (isAscending) {
-                resultList.sort(nameComparator);
-            } else {
-                resultList.sort(nameComparator.reversed());
-            }
-        }
-        return resultList;
     }
 }
