@@ -1,7 +1,11 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.service.sorting.Order;
+import com.epam.esm.service.sorting.SortingCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.hateoas.Link;
@@ -15,6 +19,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Validated
@@ -37,17 +43,14 @@ public class GiftCertificateController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<GiftCertificateDto>>
-    getByCriteria(@RequestParam(value = "tag", required = false) List<String> tags,
-                  @RequestParam(value = "name", required = false) String name,
-                  @RequestParam(value = "description", required = false) String description,
-                  @RequestParam(value = "sort", required = false, defaultValue = "date")
-                  @Pattern(regexp = "date|name", flags = Pattern.Flag.CASE_INSENSITIVE) String sortBy,
-                  @RequestParam(value = "order", required = false, defaultValue = "desc")
-                  @Pattern(regexp = "asc|desc", flags = Pattern.Flag.CASE_INSENSITIVE) String order){
-       log.debug("tag List:" + tags);
+    public ResponseEntity<List<GiftCertificateDto>> getByCriteria(CertificateCriteria criteria){
+       String sortBy = criteria.getCriteria().getColumn();
+       String orderString = criteria.getOrder().toString();
+       List<String> tags = criteria.getTags();
+       String name = criteria.getName();
+       String description = criteria.getDescription();
         List<GiftCertificateDto> certificateDtoList = giftCertificateService
-                .getByCriteria(tags, name, description, sortBy, order);
+                .getByCriteria(tags, name, description, sortBy, orderString);
         certificateDtoList.forEach(certificateDto -> addLinks(certificateDto));
         return ResponseEntity.ok().body(certificateDtoList);
     }
