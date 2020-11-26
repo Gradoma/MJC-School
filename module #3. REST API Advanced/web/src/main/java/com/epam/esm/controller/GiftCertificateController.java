@@ -36,7 +36,7 @@ public class GiftCertificateController {
         return ResponseEntity.ok().body(certificateDto);
     }
 
-    @GetMapping("/by")
+    @GetMapping()
     public ResponseEntity<List<GiftCertificateDto>>
     getByCriteria(@RequestParam(value = "tag", required = false) List<String> tags,
                   @RequestParam(value = "name", required = false) String name,
