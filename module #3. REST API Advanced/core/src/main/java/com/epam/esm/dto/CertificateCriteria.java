@@ -20,6 +20,6 @@ public class CertificateCriteria {
     @NotNull
     private SortingCriteria criteria = SortingCriteria.DATE;
     @NotNull
-    private Order order;
+    private Order order = Order.DESC;
 
 }

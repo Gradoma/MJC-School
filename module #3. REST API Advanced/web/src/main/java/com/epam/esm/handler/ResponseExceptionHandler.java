@@ -4,6 +4,7 @@ import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.InvalidSortingException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.springframework.context.MessageSource;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -43,6 +44,11 @@ public class ResponseExceptionHandler{
         String message = messageSource.getMessage("message.sorting", new Object[]{ex.getMessage()},
                 locale);
         return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public final ResponseEntity<ErrorResponse> handleConversionFailedException(IllegalArgumentException ex){
+        return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
