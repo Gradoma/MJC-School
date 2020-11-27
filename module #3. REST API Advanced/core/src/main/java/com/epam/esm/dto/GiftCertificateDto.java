@@ -4,15 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 public class GiftCertificateDto{
-    private String id;
+    private Long id;
     @NotNull
     @Size(min = 1, max = 40)
     private String name;
@@ -23,11 +21,11 @@ public class GiftCertificateDto{
     @Size(min = 1, max = 255)
     private String description;
     @NotNull
-    @Pattern(regexp = "^((\\p{Digit}){1,5}([.]\\d{1,2})?)$")
-    private String price;
+    @Digits(integer = 5, fraction = 2)
+    private Double price;
     private String createDate;      //todo custom annotation validation
     private String lastUpdateDate;
     @NotNull
-    @Pattern(regexp = "\\d+")
-    private String duration;
+    @Min(1)
+    private Long duration;
 }

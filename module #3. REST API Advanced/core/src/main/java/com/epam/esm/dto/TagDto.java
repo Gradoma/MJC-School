@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Data
 @NoArgsConstructor
 public class TagDto extends RepresentationModel<TagDto> {
-    private String id;
+    private Long id;
     @NotNull()
     @Size(min = 1, max = 20)
     private String name;

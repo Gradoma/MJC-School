@@ -7,15 +7,20 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 @ControllerAdvice
-public class ResponseExceptionHandler{
+@Component
+public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     private final MessageSource messageSource;
 
     public ResponseExceptionHandler(MessageSource messageSource){
@@ -46,18 +51,20 @@ public class ResponseExceptionHandler{
         return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ConversionFailedException.class)
+    @ExceptionHandler(ConversionFailedException.class)          //todo fix
     public final ResponseEntity<ErrorResponse> handleConversionFailedException(ConversionFailedException ex){
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler(ConstraintViolationException.class)       //todo fix
     public final ResponseEntity<ErrorResponse> handleConstraintViolationException (ConstraintViolationException ex) {
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DateTimeParseException.class)
-    public final ResponseEntity<ErrorResponse> handleDateTimeParseException (DateTimeParseException ex) {
-        return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
+    public final ResponseEntity<ErrorResponse> handleDateTimeParseException (DateTimeParseException ex, Locale locale) {
+        String message = messageSource.getMessage("message.parsing", new Object[]{ex.getMessage()},
+                locale);
+        return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }
 }

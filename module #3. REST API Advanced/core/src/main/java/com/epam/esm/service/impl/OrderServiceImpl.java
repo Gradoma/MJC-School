@@ -29,7 +29,7 @@ public class OrderServiceImpl implements OrderService {
     public long save(OrderDto orderDto) {
         Order order = orderDtoMapper.toEntity(orderDto);
         GiftCertificateDto certificateDto = giftCertificateService.getById(order.getCertificateId());
-        order.setCost(Double.parseDouble(certificateDto.getPrice()));
+        order.setCost(certificateDto.getPrice());
         if(order.getPurchaseDate() == null){
             order.setPurchaseDate(ZonedDateTime.now());
         }

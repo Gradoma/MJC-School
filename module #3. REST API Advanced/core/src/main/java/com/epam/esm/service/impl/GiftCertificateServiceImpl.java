@@ -64,7 +64,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteria);
         List<GiftCertificateDto> dtoList = giftMapper.toDto(certificateList);
         dtoList.forEach(certificateDto -> {
-            List<TagDto> tagDtoList = tagService.getByGiftCertificateId(Long.parseLong(certificateDto.getId()));
+            List<TagDto> tagDtoList = tagService.getByGiftCertificateId(certificateDto.getId());
             certificateDto.setTags(tagDtoList);
         });
         return dtoList;
@@ -88,7 +88,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private void saveTagIfNew(TagDto tagDto){
         if (!tagService.doesExist(tagDto)) {
             long generatedId = tagService.save(tagDto);
-            tagDto.setId(Long.toString(generatedId));
+            tagDto.setId(generatedId);
         }
     }
 
@@ -96,7 +96,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         List<Long> deletedTagsId = new ArrayList<>();
         originalTagDtoList.forEach(tagDto -> {
             if(!updatedTagDtoList.contains(tagDto)){
-                deletedTagsId.add(Long.parseLong(tagDto.getId()));
+                deletedTagsId.add(tagDto.getId());
             }
         });
         return deletedTagsId;
@@ -107,7 +107,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         updatedTagDtoList.forEach(tagDto -> {
             saveTagIfNew(tagDto);
             if (!originalTagDtoList.contains(tagDto)) {
-                addedTagsId.add(Long.parseLong(tagDto.getId()));
+                addedTagsId.add(tagDto.getId());
             }
         });
         return addedTagsId;

@@ -5,7 +5,6 @@ import com.epam.esm.service.sorting.SortingCriteria;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -16,5 +15,4 @@ public class CertificateCriteria {
     private String description;
     private SortingCriteria criteria = SortingCriteria.DATE;
     private Order order = Order.DESC;
-
 }

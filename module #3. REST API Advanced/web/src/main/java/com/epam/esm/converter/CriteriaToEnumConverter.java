@@ -1,6 +1,5 @@
 package com.epam.esm.converter;
 
-import com.epam.esm.dao.criteria.CriteriaSet;
 import com.epam.esm.service.sorting.SortingCriteria;
 import org.springframework.core.convert.converter.Converter;
 

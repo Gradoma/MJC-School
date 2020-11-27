@@ -11,13 +11,13 @@ import org.springframework.hateoas.RepresentationModel;
 @Data
 @NoArgsConstructor
 public class OrderDto extends RepresentationModel<OrderDto> {
-    private String id;
+    private Long id;
     @NotNull
     @Digits(integer = 20, fraction = 0)
-    private String userId;
+    private Long userId;
     @NotNull
     @Digits(integer = 20, fraction = 0)
-    private String certificateId;
-    private String cost;
+    private Long certificateId;
+    private Double cost;
     private String purchase_date;   //todo custom annotation validation
 }

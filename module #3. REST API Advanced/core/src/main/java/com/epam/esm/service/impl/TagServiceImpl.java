@@ -23,7 +23,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public long save(TagDto tagDto) {
-        tagDto.setId("0");
+        tagDto.setId(0L);
         Tag tag = dtoMapper.toEntity(tagDto);
         return tagDao.add(tag);
     }
@@ -64,9 +64,6 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public boolean doesExist(TagDto tagDto) {
-        if(!tagDto.getId().matches("\\d+")){
-            return false;
-        }
         Tag tag = dtoMapper.toEntity(tagDto);
         return tagDao.contains(tag);
     }

@@ -12,8 +12,8 @@ import java.util.List;
 public class OrderDtoMapper {
     public Order toEntity(OrderDto orderDto){
         Order order = new Order();
-        order.setUserId(Long.parseLong(orderDto.getUserId()));
-        order.setCertificateId(Long.parseLong(orderDto.getCertificateId()));
+        order.setUserId(orderDto.getUserId());
+        order.setCertificateId(orderDto.getCertificateId());
         if(orderDto.getPurchase_date() != null){
             order.setPurchaseDate(ZonedDateTime.parse(orderDto.getPurchase_date()));
         }
@@ -22,10 +22,10 @@ public class OrderDtoMapper {
 
     public OrderDto toDto(Order order){
         OrderDto orderDto = new OrderDto();
-        orderDto.setId(Long.toString(order.getId()));
-        orderDto.setUserId(Long.toString(order.getUserId()));
-        orderDto.setCertificateId(Long.toString(order.getCertificateId()));
-        orderDto.setCost(Double.toString(order.getCost()));
+        orderDto.setId(order.getId());
+        orderDto.setUserId(order.getUserId());
+        orderDto.setCertificateId(order.getCertificateId());
+        orderDto.setCost(order.getCost());
         orderDto.setPurchase_date(order.getPurchaseDate().toString());
 
         return orderDto;

@@ -74,7 +74,7 @@ public class GiftCertificateController {
 
     private void addLinks(GiftCertificateDto certificateDto){
         certificateDto.getTags().forEach(tagDto -> {
-            long tagId = Long.parseLong(tagDto.getId());
+            long tagId = tagDto.getId();
             Link tagLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
                     .getById(tagId))
                     .withRel("tag");

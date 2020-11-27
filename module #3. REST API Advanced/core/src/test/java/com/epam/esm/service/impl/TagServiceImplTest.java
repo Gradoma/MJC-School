@@ -45,7 +45,7 @@ class TagServiceImplTest {
     @Test
     void saveNegative_InvalidId() {
         TagDto tagDto = new TagDto();
-        tagDto.setId("31");
+        tagDto.setId(31L);
         tagDto.setName("slkdnfl");
         assertThrows(ConstraintViolationException.class, () -> tagService.save(tagDto));
     }

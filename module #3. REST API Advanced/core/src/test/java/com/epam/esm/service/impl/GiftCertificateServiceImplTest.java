@@ -31,11 +31,11 @@ class GiftCertificateServiceImplTest {
     void addNegative_ValidationDate() {
         GiftCertificateDto certificateDto = new GiftCertificateDto();
         certificateDto.setName("name");
-        certificateDto.setPrice("23.55");
+        certificateDto.setPrice(23.55);
         certificateDto.setDescription("descript");
         certificateDto.setCreateDate("incorrect date");
         certificateDto.setLastUpdateDate("2020-08-29T06:12:15.156-03:00");
-        certificateDto.setDuration("23");
+        certificateDto.setDuration(23L);
 
         assertThrows(ConstraintViolationException.class, () -> tagService.add(certificateDto));
     }

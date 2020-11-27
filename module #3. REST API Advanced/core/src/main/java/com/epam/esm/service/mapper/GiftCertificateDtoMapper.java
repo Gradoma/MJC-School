@@ -15,8 +15,8 @@ public class GiftCertificateDtoMapper {
         GiftCertificate giftCertificate = new GiftCertificate();
         giftCertificate.setName(certificateDto.getName());
         giftCertificate.setDescription(certificateDto.getDescription());
-        giftCertificate.setPrice(Double.parseDouble(certificateDto.getPrice()));
-        long days = Long.parseLong(certificateDto.getDuration());
+        giftCertificate.setPrice(certificateDto.getPrice());
+        long days = certificateDto.getDuration();
         giftCertificate.setDuration(Duration.ofDays(days));
         if(certificateDto.getCreateDate() != null){
             giftCertificate.setCreateDate(ZonedDateTime.parse(certificateDto.getCreateDate()));
@@ -29,13 +29,13 @@ public class GiftCertificateDtoMapper {
 
     public GiftCertificateDto toDto(GiftCertificate giftCertificate){
         GiftCertificateDto certificateDto = new GiftCertificateDto();
-        certificateDto.setId(Long.toString(giftCertificate.getId()));
+        certificateDto.setId(giftCertificate.getId());
         certificateDto.setName(giftCertificate.getName());
         certificateDto.setDescription(giftCertificate.getDescription());
-        certificateDto.setPrice(Double.toString(giftCertificate.getPrice()));
+        certificateDto.setPrice(giftCertificate.getPrice());
         certificateDto.setCreateDate(giftCertificate.getCreateDate().toString());
         certificateDto.setLastUpdateDate(giftCertificate.getLastUpdateDate().toString());
-        certificateDto.setDuration(Long.toString(giftCertificate.getDuration().toDays()));
+        certificateDto.setDuration(giftCertificate.getDuration().toDays());
         return certificateDto;
     }
 

@@ -52,7 +52,7 @@ public class OrderController {
     }
 
     private void addLinks(OrderDto orderDto){
-        long certificateId = Long.parseLong(orderDto.getCertificateId());
+        long certificateId = orderDto.getCertificateId();
         Link certificateLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
                 .getById(certificateId))
                 .withRel("certificate");
