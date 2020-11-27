@@ -11,5 +11,6 @@ public interface GiftCertificateDao {
     List<GiftCertificate> findByCriteriaAndCondition(CertificateCriteria criteria);
     GiftCertificate findById(long id);
     boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId);
+    boolean patch(GiftCertificate certificate);
     boolean delete(long id);
 }

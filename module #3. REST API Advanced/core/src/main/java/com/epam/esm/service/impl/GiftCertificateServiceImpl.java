@@ -12,6 +12,7 @@ import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -78,6 +79,23 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         GiftCertificate updatedCertificate = prepareUpdatedCertificate(certificateDto, originalCertDto);
         updatedCertificate.setId(certificateId);
         return certificateDao.update(updatedCertificate, addedTagsId, deletedTagsId);
+    }
+
+    @Override
+    public boolean patch(GiftCertificateDto certificateDto, long id) {
+        GiftCertificate certificateWithPatchField = new GiftCertificate();
+        if(certificateDto.getName() != null){
+            certificateWithPatchField.setName(certificateDto.getName());
+        }
+        if(certificateDto.getDescription() != null){
+            certificateWithPatchField.setDescription(certificateDto.getDescription());
+        }
+        if(certificateDto.getDuration() != null){
+            long days = certificateDto.getDuration();
+            certificateWithPatchField.setDuration(Duration.ofDays(days));
+        }
+        certificateWithPatchField.setId(id);
+        return certificateDao.patch(certificateWithPatchField);
     }
 
     @Override

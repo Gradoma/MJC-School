@@ -1,6 +1,10 @@
 package com.epam.esm.dao.builder;
 
+import com.epam.esm.dao.column.GiftCertificateTableConst;
 import com.epam.esm.dto.CertificateCriteria;
+import com.epam.esm.entity.GiftCertificate;
+
+import java.util.Map;
 
 public class QueryBuilder {
     private static final String DEFAULT_QUERY = "SELECT giftcertificate.id, giftcertificate.name, " +
@@ -25,6 +29,8 @@ public class QueryBuilder {
             "INNER JOIN tag ON tag_certificate.tag_id = tag.id " +
             "WHERE LOWER(tag.name) LIKE LOWER(?)";
     private static final String AND_CERT_ID_IN = " AND certificate_id IN ";
+    private static final String UPDATE = "UPDATE giftcertificate SET ";
+    private static final String WHERE_ID = "' WHERE id = ";
 
     public static String makeQuery(CertificateCriteria criteria){
         int counter = 0;
@@ -89,6 +95,30 @@ public class QueryBuilder {
         builder.append(criteria.getCriteria().getColumn());
         builder.append(SPACE);
         builder.append(criteria.getOrder().toString());
+        builder.append(SEMI);
+        return builder.toString();
+    }
+
+    public static String makePatchQuery(GiftCertificate certificate){
+        StringBuilder builder = new StringBuilder(UPDATE);
+        String equal = "='";
+        if(certificate.getName() != null){
+            builder.append(GiftCertificateTableConst.NAME);
+            builder.append(equal);
+            builder.append(certificate.getName());
+        }
+        if(certificate.getDescription() != null){
+            builder.append(GiftCertificateTableConst.DESCRIPTION);
+            builder.append(equal);
+            builder.append(certificate.getDescription());
+        }
+        if(certificate.getDuration() != null){
+            builder.append(GiftCertificateTableConst.DURATION);
+            builder.append(equal);
+            builder.append(certificate.getDuration().toDays());
+        }
+        builder.append(WHERE_ID);
+        builder.append(certificate.getId());
         builder.append(SEMI);
         return builder.toString();
     }

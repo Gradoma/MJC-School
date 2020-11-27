@@ -1,5 +1,9 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.dto.method.DescriptionPatch;
+import com.epam.esm.dto.method.DurationPatch;
+import com.epam.esm.dto.method.NamePatch;
+import com.epam.esm.dto.method.New;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,21 +15,21 @@ import java.util.List;
 @NoArgsConstructor
 public class GiftCertificateDto{
     private Long id;
-    @NotNull
-    @Size(min = 1, max = 40)
+    @NotNull(groups = {New.class, NamePatch.class})
+    @Size(groups = {New.class, NamePatch.class}, min = 1, max = 40)
     private String name;
-    @NotNull
+    @NotNull(groups = {New.class})
     @Valid
     private List<TagDto> tags;
-    @NotNull
-    @Size(min = 1, max = 255)
+    @NotNull(groups = {New.class, DescriptionPatch.class})
+    @Size(groups = {New.class, DescriptionPatch.class}, min = 1, max = 255)
     private String description;
-    @NotNull
-    @Digits(integer = 5, fraction = 2)
+    @NotNull(groups = {New.class})
+    @Digits(groups = {New.class}, integer = 5, fraction = 2)
     private Double price;
     private String createDate;      //todo custom annotation validation
     private String lastUpdateDate;
-    @NotNull
-    @Min(1)
+    @NotNull(groups = {New.class, DurationPatch.class})
+    @Min(groups = {New.class, DurationPatch.class}, value = 1)
     private Long duration;
 }

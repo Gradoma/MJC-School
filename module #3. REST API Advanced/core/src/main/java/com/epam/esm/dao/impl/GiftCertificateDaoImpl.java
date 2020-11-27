@@ -141,6 +141,18 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
+    public boolean patch(GiftCertificate certificate) {
+        String query = QueryBuilder.makePatchQuery(certificate);
+        System.out.println(query);
+        int rows = jdbcTemplate.update(query);
+        if (rows > 0){
+            return true;
+        } else {
+            throw new ResourceNotFoundException("Gift certificate: id=" + certificate.getId());
+        }
+    }
+
+    @Override
     public boolean delete(long id) {
         int rows = jdbcTemplate.update(DELETE_BY_ID, id);
         if (rows > 0){

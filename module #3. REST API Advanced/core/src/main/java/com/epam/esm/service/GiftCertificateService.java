@@ -10,5 +10,6 @@ public interface GiftCertificateService {
     GiftCertificateDto getById(long id);
     List<GiftCertificateDto> getByCriteria(CertificateCriteria criteria);
     boolean update(GiftCertificateDto certificateDto, long certificateId);
+    boolean patch(GiftCertificateDto certificateDto, long id);
     boolean delete(long id);
 }
