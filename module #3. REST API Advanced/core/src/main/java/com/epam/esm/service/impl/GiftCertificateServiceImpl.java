@@ -62,6 +62,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public List<GiftCertificateDto> getByCriteria(CertificateCriteria criteria) {
+        if(criteria.getLimit() == null){
+            criteria.setLimit(5);
+        }
         List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteria);
         List<GiftCertificateDto> dtoList = giftMapper.toDto(certificateList);
         dtoList.forEach(certificateDto -> {

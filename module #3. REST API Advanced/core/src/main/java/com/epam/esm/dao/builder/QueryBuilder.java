@@ -1,8 +1,10 @@
 package com.epam.esm.dao.builder;
 
 import com.epam.esm.dao.column.GiftCertificateTableConst;
+import com.epam.esm.dao.criteria.CriteriaSet;
 import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.service.sorting.Order;
 
 import java.util.Map;
 
@@ -15,7 +17,7 @@ public class QueryBuilder {
     private static final String BY_NAME = " LOWER(giftcertificate.name) LIKE LOWER(:name)";
     private static final String BY_DESCRIPTION = " LOWER(description) LIKE LOWER(:description)";
     private static final String AND = " AND";
-    private static final String WHERE = " WHERE";
+    private static final String WHERE = " WHERE ";
     private static final String ORDER_BY = " ORDER BY ";
     private static final String SPACE = " ";
     private static final String SEMI = ";";
@@ -31,12 +33,21 @@ public class QueryBuilder {
     private static final String AND_CERT_ID_IN = " AND certificate_id IN ";
     private static final String UPDATE = "UPDATE giftcertificate SET ";
     private static final String WHERE_ID = "' WHERE id = ";
+    private static final String LIMIT = " LIMIT ";
 
     public static String makeQuery(CertificateCriteria criteria){
         int counter = 0;
         StringBuilder builder = new StringBuilder(DEFAULT_QUERY);
+        if(criteria.getOffset() != null){
+            builder.append(addOffset(criteria));
+            counter += 1;
+        }
         if(criteria.getTags() != null){
-            builder.append(WHERE);
+            if(counter == 0){
+                builder.append(WHERE);
+            } else {
+                builder.append(AND);
+            }
             builder.append(SELECT_ID_BY_TAGS);
             counter += 1;
         }
@@ -57,10 +68,13 @@ public class QueryBuilder {
             }
             builder.append(BY_DESCRIPTION);
         }
-        builder.append(ORDER_BY);
-        builder.append(criteria.getCriteria().getColumn());
-        builder.append(SPACE);
-        builder.append(criteria.getOrder().toString());
+//        builder.append(ORDER_BY);
+//        builder.append(criteria.getCriteria().getColumn());
+//        builder.append(SPACE);
+//        builder.append(criteria.getOrder().toString());
+        builder.append(addSorting(criteria.getCriteria().getColumn(), criteria.getOrder().toString()));
+        builder.append(LIMIT);
+        builder.append(criteria.getLimit());
         builder.append(SEMI);
         return builder.toString();
     }
@@ -91,10 +105,11 @@ public class QueryBuilder {
             builder.append(GIFT_CERT_ID_IN);
             addSelectForEveryTag(builder, criteria.getTags().size());
         }
-        builder.append(ORDER_BY);
-        builder.append(criteria.getCriteria().getColumn());
-        builder.append(SPACE);
-        builder.append(criteria.getOrder().toString());
+//        builder.append(ORDER_BY);
+//        builder.append(criteria.getCriteria().getColumn());
+//        builder.append(SPACE);
+//        builder.append(criteria.getOrder().toString());
+        builder.append(addSorting(criteria.getCriteria().getColumn(), criteria.getOrder().toString()));
         builder.append(SEMI);
         return builder.toString();
     }
@@ -121,6 +136,30 @@ public class QueryBuilder {
         builder.append(certificate.getId());
         builder.append(SEMI);
         return builder.toString();
+    }
+
+    public static String addSorting(String byColumn, String order){
+        StringBuilder builder = new StringBuilder();
+        builder.append(ORDER_BY);
+        builder.append(byColumn);
+        builder.append(SPACE);
+        builder.append(order);
+        return builder.toString();
+    }
+
+    private static String addOffset(CertificateCriteria criteria){
+        StringBuilder builder = new StringBuilder();
+        String sign;
+        if(criteria.getOrder() == Order.ASC){
+            sign = ">'";
+        } else {
+            sign = "<'";
+        }
+        builder.append(WHERE);
+        builder.append(criteria.getCriteria().getColumn());
+        builder.append(sign);
+        builder.append(criteria.getOffset());
+        return builder.append("'").toString();
     }
 
     private static StringBuilder addSelectForEveryTag(StringBuilder builder, int tagCount){
