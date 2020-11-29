@@ -7,6 +7,8 @@ import com.epam.esm.entity.Order;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.mapper.OrderDtoMapper;
+import com.epam.esm.service.sorting.OrderSortingCriteria;
+import com.epam.esm.service.sorting.SortingOrder;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -37,8 +39,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getByUserId(long userId) {
-        List<Order> orderList = orderDao.findByUser(userId);
+    public List<OrderDto> getByUserId(long userId, String offset, Integer limit) {
+        if(limit == null){
+            limit = 5;
+        }
+        OrderSortingCriteria defaultSorting = OrderSortingCriteria.DATE;
+        SortingOrder defaultOrder = SortingOrder.DESC;
+        List<Order> orderList = orderDao.findByUser(userId, defaultSorting, defaultOrder, offset, limit);
         return orderDtoMapper.toDto(orderList);
     }
 

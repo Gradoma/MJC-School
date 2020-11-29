@@ -5,7 +5,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.TagDtoMapper;
-import com.epam.esm.service.sorting.Order;
+import com.epam.esm.service.sorting.SortingOrder;
 import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -36,8 +36,8 @@ public class TagServiceImpl implements TagService {
             limit = 5;
         }
         TagSortingCriteria defaultSorting = TagSortingCriteria.ID;
-        Order defaultOrder = Order.ASC;
-        List<Tag> tagList = tagDao.findAll(defaultSorting, defaultOrder, offset, limit);
+        SortingOrder defaultSortingOrder = SortingOrder.ASC;
+        List<Tag> tagList = tagDao.findAll(defaultSorting, defaultSortingOrder, offset, limit);
         return dtoMapper.toDto(tagList);
     }
 

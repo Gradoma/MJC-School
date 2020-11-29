@@ -37,8 +37,10 @@ public class OrderController {
     }
 
     @GetMapping("/by")
-    public ResponseEntity<List<OrderDto>> getByUserId(@RequestParam(value = "user") long userId){
-        List<OrderDto> orderDtoList = orderService.getByUserId(userId);
+    public ResponseEntity<List<OrderDto>> getByUserId(@RequestParam(value = "user") long userId,
+                                                      @RequestParam(value = "offset", required = false) String offset,
+                                                      @RequestParam(value = "limit", required = false) Integer limit){
+        List<OrderDto> orderDtoList = orderService.getByUserId(userId, offset, limit);
         orderDtoList.forEach(orderDto -> addLinks(orderDto));
         return ResponseEntity.ok().body(orderDtoList);
     }

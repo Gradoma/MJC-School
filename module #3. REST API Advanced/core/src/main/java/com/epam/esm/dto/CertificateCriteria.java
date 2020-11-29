@@ -1,6 +1,6 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.service.sorting.Order;
+import com.epam.esm.service.sorting.SortingOrder;
 import com.epam.esm.service.sorting.CertificateSortingCriteria;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ public class CertificateCriteria {
     private String name;
     private String description;
     private CertificateSortingCriteria criteria = CertificateSortingCriteria.DATE;
-    private Order order = Order.DESC;
+    private SortingOrder sortingOrder = SortingOrder.DESC;
     private Integer limit;
     private String offset;
 }

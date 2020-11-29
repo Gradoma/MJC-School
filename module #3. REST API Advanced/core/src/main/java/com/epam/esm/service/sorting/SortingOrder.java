@@ -1,5 +1,5 @@
 package com.epam.esm.service.sorting;
 
-public enum Order {
+public enum SortingOrder {
     ASC, DESC;
 }

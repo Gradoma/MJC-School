@@ -6,7 +6,7 @@ import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
-import com.epam.esm.service.sorting.Order;
+import com.epam.esm.service.sorting.SortingOrder;
 import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -70,12 +70,12 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public List<Tag> findAll(TagSortingCriteria sortingCriteria, Order order, String offset, int limit) {
+    public List<Tag> findAll(TagSortingCriteria sortingCriteria, SortingOrder sortingOrder, String offset, int limit) {
         StringBuilder builder = new StringBuilder(SELECT_ALL);
         if(offset != null){
-            builder.append(QueryBuilder.addOffset(sortingCriteria.getColumn(), offset, order));
+            builder.append(QueryBuilder.addOffset(sortingCriteria.getColumn(), offset, sortingOrder, true));
         }
-        builder.append(QueryBuilder.addSorting(sortingCriteria.getColumn(), order.toString()));
+        builder.append(QueryBuilder.addSorting(sortingCriteria.getColumn(), sortingOrder.toString()));
         builder.append(QueryBuilder.addLimit(limit));
         return jdbcTemplate.query(builder.toString(), tagMapper);
     }

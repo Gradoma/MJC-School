@@ -3,7 +3,7 @@ package com.epam.esm.dao.builder;
 import com.epam.esm.dao.column.GiftCertificateTableConst;
 import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.service.sorting.Order;
+import com.epam.esm.service.sorting.SortingOrder;
 
 public class QueryBuilder {
     private static final String DEFAULT_QUERY = "SELECT giftcertificate.id, giftcertificate.name, " +
@@ -36,7 +36,8 @@ public class QueryBuilder {
         int counter = 0;
         StringBuilder builder = new StringBuilder(DEFAULT_QUERY);
         if(criteria.getOffset() != null){
-            builder.append(addOffset(criteria.getCriteria().getColumn(), criteria.getOffset(), criteria.getOrder()));
+            builder.append(addOffset(criteria.getCriteria().getColumn(), criteria.getOffset(),
+                    criteria.getSortingOrder(), true));
             counter += 1;
         }
         if(criteria.getTags() != null){
@@ -65,7 +66,7 @@ public class QueryBuilder {
             }
             builder.append(BY_DESCRIPTION);
         }
-        builder.append(addSorting(criteria.getCriteria().getColumn(), criteria.getOrder().toString()));
+        builder.append(addSorting(criteria.getCriteria().getColumn(), criteria.getSortingOrder().toString()));
         builder.append(addLimit(criteria.getLimit()));
         return builder.toString();
     }
@@ -96,7 +97,7 @@ public class QueryBuilder {
             builder.append(GIFT_CERT_ID_IN);
             addSelectForEveryTag(builder, criteria.getTags().size());
         }
-        builder.append(addSorting(criteria.getCriteria().getColumn(), criteria.getOrder().toString()));
+        builder.append(addSorting(criteria.getCriteria().getColumn(), criteria.getSortingOrder().toString()));
         builder.append(addLimit(criteria.getLimit()));
         builder.append(SEMI);
         return builder.toString();
@@ -135,15 +136,20 @@ public class QueryBuilder {
         return builder.toString();
     }
 
-    public static String addOffset(String columnName, String offset, Order order){
+    public static String addOffset(String columnName, String offset, SortingOrder sortingOrder, boolean firstCondition){
         StringBuilder builder = new StringBuilder();
         String sign;
-        if(order == Order.ASC){
+        if(sortingOrder == SortingOrder.ASC){
             sign = ">'";
         } else {
             sign = "<'";
         }
-        builder.append(WHERE);
+        if (firstCondition) {
+            builder.append(WHERE);
+        } else {
+            builder.append(AND);
+            builder.append(SPACE);
+        }
         builder.append(columnName);
         builder.append(sign);
         builder.append(offset);

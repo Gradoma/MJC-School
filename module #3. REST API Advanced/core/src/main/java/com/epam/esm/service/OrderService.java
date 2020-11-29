@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface OrderService {
     long save(OrderDto orderDto);
-    List<OrderDto> getByUserId(long userId);
+    List<OrderDto> getByUserId(long userId, String offset, Integer limit);
     OrderDto getById(long orderId);
 }
