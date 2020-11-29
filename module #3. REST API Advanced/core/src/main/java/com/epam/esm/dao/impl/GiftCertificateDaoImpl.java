@@ -78,7 +78,6 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     public List<GiftCertificate> findByCriteria(CertificateCriteria criteria) {
         List<GiftCertificate> resultList = new ArrayList<>();
         String query = QueryBuilder.makeQuery(criteria);
-        System.out.println(query);
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         if(criteria.getTags() != null){
             parameters.addValue("tag_names", criteria.getTags());

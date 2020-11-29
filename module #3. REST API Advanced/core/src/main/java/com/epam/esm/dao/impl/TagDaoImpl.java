@@ -1,10 +1,13 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dao.builder.QueryBuilder;
 import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
+import com.epam.esm.service.sorting.Order;
+import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,7 +23,7 @@ import static com.epam.esm.dao.column.TagTableConst.*;
 @Repository
 public class TagDaoImpl implements TagDao {
     private static final String COUNT_BY_NAME = "SELECT COUNT(*) FROM tag WHERE id=? AND name=?";
-    private static final String SELECT_ALL = "SELECT id, name FROM tag ORDER BY id";
+    private static final String SELECT_ALL = "SELECT id, name FROM tag";
     private static final String SELECT_BY_ID = "SELECT id, name FROM tag WHERE id=?";
     private static final String SELECT_BY_NAME = "SELECT id, name FROM tag WHERE name=?";
     private static final String DELETE_BY_ID = "DELETE FROM tag WHERE id=?";
@@ -67,8 +70,14 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public List<Tag> findAll() {
-        return jdbcTemplate.query(SELECT_ALL, tagMapper);
+    public List<Tag> findAll(TagSortingCriteria sortingCriteria, Order order, String offset, int limit) {
+        StringBuilder builder = new StringBuilder(SELECT_ALL);
+        if(offset != null){
+            builder.append(QueryBuilder.addOffset(sortingCriteria.getColumn(), offset, order));
+        }
+        builder.append(QueryBuilder.addSorting(sortingCriteria.getColumn(), order.toString()));
+        builder.append(QueryBuilder.addLimit(limit));
+        return jdbcTemplate.query(builder.toString(), tagMapper);
     }
 
     @Override
