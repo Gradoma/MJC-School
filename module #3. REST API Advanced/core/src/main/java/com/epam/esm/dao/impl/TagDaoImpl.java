@@ -3,17 +3,22 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.builder.QueryBuilder;
 import com.epam.esm.dao.mapper.TagMapper;
+import com.epam.esm.dao.util.HibernateUtil;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.sorting.SortingOrder;
 import com.epam.esm.service.sorting.TagSortingCriteria;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,15 +63,17 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public long add(Tag tag) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put(NAME, tag.getName());
-        Number generatedId;
-        try {
-            generatedId = simpleJdbcInsert.executeAndReturnKey(parameters);
-        } catch (DuplicateKeyException e){
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        try{
+            session.save(tag);
+            transaction.commit();
+        } catch (ConstraintViolationException e){
             throw new DuplicateException("Tag:name=" + tag.getName());
+        } finally {
+            session.close();
         }
-        return generatedId.longValue();
+        return tag.getId();
     }
 
     @Override

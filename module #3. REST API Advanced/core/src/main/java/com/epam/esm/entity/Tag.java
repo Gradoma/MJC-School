@@ -1,7 +1,16 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.dao.column.TagTableConst;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = TagTableConst.TABLE_TAG)
 public class Tag{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(name = TagTableConst.NAME, length = 20, unique = true)
     private String name;
 
     public Tag(){}
