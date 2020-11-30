@@ -127,10 +127,10 @@ public class QueryBuilder {
         return builder.toString();
     }
 
-    public static String addSorting(String byColumn, String order){
+    public static String addSorting(String byField, String order){     //ORDER BY t.id DESC
         StringBuilder builder = new StringBuilder();
         builder.append(ORDER_BY);
-        builder.append(byColumn);
+        builder.append(byField);
         builder.append(SPACE);
         builder.append(order);
         return builder.toString();

@@ -3,9 +3,20 @@ package com.epam.esm.entity;
 import com.epam.esm.dao.column.TagTableConst;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = TagTableConst.TABLE_TAG)
+@NamedNativeQueries({
+        @NamedNativeQuery(
+                name = "findByCertificateId",
+                query = "SELECT tag.id, tag.Name FROM tag " +
+                        "JOIN tag_certificate ON tag_certificate.tag_id = tag.id " +
+                        "JOIN giftcertificate ON giftcertificate.id = tag_certificate.certificate_id " +
+                        "WHERE giftcertificate.id = :id",
+                resultClass = Tag.class
+        )
+})
 public class Tag{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

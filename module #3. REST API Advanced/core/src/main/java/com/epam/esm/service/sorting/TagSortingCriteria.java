@@ -1,11 +1,8 @@
 package com.epam.esm.service.sorting;
 
-import com.epam.esm.dao.column.GiftCertificateTableConst;
-import com.epam.esm.dao.column.TagTableConst;
-
 public enum TagSortingCriteria {
-    ID(TagTableConst.ID),
-    NAME(TagTableConst.NAME);
+    ID("t.id"),
+    NAME("t.name");
 
     private final String column;
 

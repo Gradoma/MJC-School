@@ -12,11 +12,15 @@ import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
@@ -64,10 +68,8 @@ public class TagDaoImpl implements TagDao {
     @Override
     public long add(Tag tag) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
         try{
             session.save(tag);
-            transaction.commit();
         } catch (ConstraintViolationException e){
             throw new DuplicateException("Tag:name=" + tag.getName());
         } finally {
@@ -77,38 +79,48 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public List<Tag> findAll(TagSortingCriteria sortingCriteria, SortingOrder sortingOrder, String offset, int limit) {
-        StringBuilder builder = new StringBuilder(SELECT_ALL);
-        if(offset != null){
-            builder.append(QueryBuilder.addOffset(sortingCriteria.getColumn(), offset, sortingOrder, true));
-        }
+    public List<Tag> findAll(TagSortingCriteria sortingCriteria, SortingOrder sortingOrder, String offset,
+                             int limit) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        StringBuilder builder = new StringBuilder("FROM Tag t");
         builder.append(QueryBuilder.addSorting(sortingCriteria.getColumn(), sortingOrder.toString()));
-        builder.append(QueryBuilder.addLimit(limit));
-        return jdbcTemplate.query(builder.toString(), tagMapper);
+        Query<Tag> query = session.createQuery(builder.toString());
+        // add pagination
+        return query.list();
     }
 
     @Override
     public Tag findByName(String name){
-        try {
-            return jdbcTemplate.queryForObject(SELECT_BY_NAME, tagMapper, name);
-        } catch (EmptyResultDataAccessException e){
+        String hql = "FROM Tag WHERE name=:name";
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Query query = session.createQuery(hql);
+        query.setParameter("name", name);
+        Tag resultTag = (Tag) query.uniqueResult();
+        if (resultTag == null){
             throw new ResourceNotFoundException("Tag: name=" + name);
         }
+        return resultTag;
     }
 
     @Override
     public Tag findById(long id) {
-        try{
-            return jdbcTemplate.queryForObject(SELECT_BY_ID, tagMapper, id);
-        } catch (EmptyResultDataAccessException e){
+        String hql = "FROM Tag WHERE id=:id";
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Query query = session.createQuery(hql);
+        query.setParameter("id", id);
+        Tag resultTag = (Tag) query.uniqueResult();
+        if (resultTag == null){
             throw new ResourceNotFoundException("Tag: id=" + id);
         }
+        return resultTag;
     }
 
     @Override
-    public List<Tag> findByCertificateId(long certificateId) {
-        List<Tag> tagList;
-        tagList = jdbcTemplate.query(SELECT_BY_CERTIFICATE_ID, tagMapper, certificateId);
+    public List<Tag> findByCertificateId(long certificateId) {          // TODO TEST!
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Tag> tagList = session.getNamedNativeQuery("findByCertificateId")
+                .setParameter("id", certificateId)
+                .list();
         if(tagList.size() == 0){
             throw new ResourceNotFoundException("Tags for Gift Certificate: id=" + certificateId);
         }
@@ -120,12 +132,20 @@ public class TagDaoImpl implements TagDao {
         return jdbcTemplate.queryForObject(SELECT_MOST_POPULAR_TAG, tagMapper);
     }
 
+    @Transactional
     @Override
-    public boolean deleteById(long id) {
-        int rows = jdbcTemplate.update(DELETE_BY_ID, id);
+    public boolean deleteById(long id) {        // maybe cant delete binding tags (if tags bind with some cert)
+        String hql = "DELETE Tag WHERE id = :id";
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery(hql);
+        query.setParameter("id", id);
+        int rows = query.executeUpdate();
         if (rows > 0 ){
+            transaction.commit();
             return true;
         } else {
+            transaction.rollback();
             throw new ResourceNotFoundException("Tag: id=" + id);
         }
     }
