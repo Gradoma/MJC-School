@@ -14,6 +14,7 @@ import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
+import org.hibernate.type.IntegerType;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -128,13 +129,13 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public Tag findMostPopular() {
+    public Tag findMostPopular() {          // todo
         return jdbcTemplate.queryForObject(SELECT_MOST_POPULAR_TAG, tagMapper);
     }
 
     @Transactional
     @Override
-    public boolean deleteById(long id) {        // maybe cant delete binding tags (if tags bind with some cert)
+    public boolean deleteById(long id) {
         String hql = "DELETE Tag WHERE id = :id";
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
@@ -152,7 +153,13 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public boolean contains(Tag tag) {
-        Integer rows = jdbcTemplate.queryForObject(COUNT_BY_NAME, Integer.class, tag.getId(), tag.getName());
+        String sql = "SELECT COUNT(*) AS c FROM tag WHERE id = :id AND name = :name";
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Integer rows = (Integer) session.createSQLQuery(sql)
+                .setParameter("id", tag.getId())
+                .setParameter("name", tag.getName())
+                .addScalar("c", IntegerType.INSTANCE)
+                .uniqueResult();
         return rows > 0;
     }
 }

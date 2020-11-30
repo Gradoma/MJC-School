@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -29,6 +30,11 @@ public class SpringTestConfig {
     @Bean
     public JdbcTemplate getJdbcTemplate(@Qualifier("h2DataSource") DataSource dataSource){
         return new JdbcTemplate(dataSource);
+    }
+
+    @Bean
+    public NamedParameterJdbcTemplate namedParameterJdbcTemplate(@Qualifier("h2DataSource") DataSource dataSource){
+        return new NamedParameterJdbcTemplate(dataSource);
     }
 
     @Bean
