@@ -5,6 +5,10 @@ import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.service.sorting.SortingOrder;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
 public class QueryBuilder {
     private static final String DEFAULT_QUERY = "SELECT giftcertificate.id, giftcertificate.name, " +
             "description, price, create_date, last_update_date, duration_days " +
@@ -28,7 +32,7 @@ public class QueryBuilder {
             "INNER JOIN tag ON tag_certificate.tag_id = tag.id " +
             "WHERE LOWER(tag.name) LIKE LOWER(?)";
     private static final String AND_CERT_ID_IN = " AND certificate_id IN ";
-    private static final String UPDATE = "UPDATE giftcertificate SET ";
+    private static final String UPDATE = "UPDATE giftcertificate SET last_update_date ";
     private static final String WHERE_ID = "' WHERE id = ";
     private static final String LIMIT = " LIMIT ";
 
@@ -104,8 +108,12 @@ public class QueryBuilder {
     }
 
     public static String makePatchQuery(GiftCertificate certificate){
-        StringBuilder builder = new StringBuilder(UPDATE);
         String equal = "='";
+        StringBuilder builder = new StringBuilder(UPDATE);
+        builder.append(equal);
+        builder.append(convertToUtcLocalDateTime(certificate.getLastUpdateDate()).toString());
+        builder.append("'");
+        builder.append(", ");
         if(certificate.getName() != null){
             builder.append(GiftCertificateTableConst.NAME);
             builder.append(equal);
@@ -170,5 +178,9 @@ public class QueryBuilder {
         }
         builder.append(CLOSE_BRACKET);
         return builder;
+    }
+
+    private static LocalDateTime convertToUtcLocalDateTime(ZonedDateTime zonedDateTime){
+        return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     }
 }

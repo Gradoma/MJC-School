@@ -12,7 +12,7 @@ public class TagDtoMapper {
 
     public Tag toEntity(TagDto tagDto){
         Tag tag = new Tag();
-        tag.setId(tagDto.getId());
+        tag.setId(tagDto.getId());      // todo (check all endpoints, maybe add if-not null-check)
         tag.setName(tagDto.getName());
         return tag;
     }

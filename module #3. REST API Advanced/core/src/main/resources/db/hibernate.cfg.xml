@@ -9,6 +9,7 @@
         <property name="hibernate.connection.password">Gradoma08061997</property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQL57Dialect</property>
+        <property name="hibernate.jdbc.time_zone">UTC</property>
         <property name="show_sql">true</property>
 
         <mapping class="com.epam.esm.entity.Tag"/>

@@ -98,6 +98,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             certificateWithPatchField.setDuration(Duration.ofDays(days));
         }
         certificateWithPatchField.setId(id);
+        certificateWithPatchField.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
         return certificateDao.patch(certificateWithPatchField);
     }
 
