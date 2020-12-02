@@ -83,11 +83,10 @@ public class TagDaoImpl implements TagDao {
         query.setMaxResults(criteria.getResultLimit());
         query.setFirstResult(criteria.getFirstResult());
         List<Tag> resultList = query.list();
-        if(resultList.size() > 0){
-            return resultList;
-        } else {
+        if(resultList.size() == 0){
             throw new ResourceNotFoundException();
         }
+        return resultList;
     }
 
     @Override

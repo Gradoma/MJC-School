@@ -1,6 +1,7 @@
 package com.epam.esm.dao.util;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Order;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.HibernateInitializationException;
 import org.hibernate.SessionFactory;
@@ -19,6 +20,7 @@ public class HibernateUtil {
                 Configuration configuration = new Configuration().configure(XML_PATH);
                 configuration.addAnnotatedClass(Tag.class);
                 configuration.addAnnotatedClass(GiftCertificate.class);
+                configuration.addAnnotatedClass(Order.class);
                 StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
                         .applySettings(configuration.getProperties());
                 sessionFactory = configuration.buildSessionFactory(builder.build());

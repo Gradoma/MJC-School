@@ -2,11 +2,18 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.builder.QueryBuilder;
+import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dao.mapper.OrderMapper;
+import com.epam.esm.dao.util.HibernateUtil;
 import com.epam.esm.entity.Order;
+import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.sorting.OrderSortingCriteria;
 import com.epam.esm.service.sorting.SortingOrder;
+import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.query.Query;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -42,40 +49,39 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public long add(Order order) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put(USER_ID, order.getUserId());
-        parameters.put(CERTIFICATE_ID, order.getCertificateId());
-        parameters.put(COST, order.getCost());
-        parameters.put(PURCHASE_TIME, convertToUtcLocalDateTime(order.getPurchaseDate()));
-        long orderId = simpleJdbcInsert.executeAndReturnKey(parameters).longValue();
-
-        return orderId;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            session.save(order);
+            return order.getId();
+        }
     }
 
     @Override
     public Order findById(long orderId) {
-        try{
-            return jdbcTemplate.queryForObject(SELECT_BY_ID, orderMapper, orderId);
-        } catch (EmptyResultDataAccessException e){
-            throw new ResourceNotFoundException("SortingOrder: id=" + orderId);
+        String hql = "FROM Order WHERE id=:id";
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Query query = session.createQuery(hql);
+        query.setParameter("id", orderId);
+        Order resultOrder = (Order) query.uniqueResult();
+        if (resultOrder == null){
+            throw new ResourceNotFoundException(" Order: id=" + orderId);
         }
+        return resultOrder;
     }
 
     @Override
-    public List<Order> findByUser(long userId, OrderSortingCriteria sortingCriteria, SortingOrder sortingOrder,
-                                  String offset, int limit) {
-        StringBuilder builder = new StringBuilder(SELECT_BY_USER_ID);
-        if(offset != null){
-            builder.append(QueryBuilder.addOffset(sortingCriteria.getColumn(), offset, sortingOrder, false));
+    public List<Order> findByUser(long userId, QueryCriteria criteria) {
+        Session session = HibernateUtil.getSessionFactory().openSession();//todo (session from Util or add bean SessionFactories
+        StringBuilder builder = new StringBuilder("FROM Order o WHERE o.userId = :userId");
+        builder.append(QueryBuilder.addSorting(criteria.getSortingCriteria(), criteria.getSortingOrder().toString()));
+        Query<Order> query = session.createQuery(builder.toString());
+        query.setParameter("userId", userId);
+        query.setMaxResults(criteria.getResultLimit());
+        query.setFirstResult(criteria.getFirstResult());
+        List<Order> resultList = query.list();
+        if(resultList.size() == 0){
+            throw new ResourceNotFoundException(" userId=" + userId);
         }
-        builder.append(QueryBuilder.addSorting(sortingCriteria.getColumn(), sortingOrder.toString()));
-        builder.append(QueryBuilder.addLimit(limit));
-        List<Order> orderList;
-        orderList = jdbcTemplate.query(builder.toString(), orderMapper, userId);
-        if(orderList.size() == 0){
-            throw new ResourceNotFoundException("orders for User: userId=" + userId);
-        }
-        return orderList;
+        return resultList;
     }
 
     private LocalDateTime convertToUtcLocalDateTime(ZonedDateTime zonedDateTime){

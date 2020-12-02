@@ -1,6 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.OrderDao;
+import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.Order;
@@ -8,6 +9,7 @@ import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.mapper.OrderDtoMapper;
 import com.epam.esm.service.sorting.OrderSortingCriteria;
+import com.epam.esm.service.sorting.PaginationUtil;
 import com.epam.esm.service.sorting.SortingOrder;
 import org.springframework.stereotype.Service;
 
@@ -39,13 +41,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getByUserId(long userId, String offset, Integer limit) {
-        if(limit == null){
-            limit = 5;
-        }
-        OrderSortingCriteria defaultSorting = OrderSortingCriteria.DATE;
-        SortingOrder defaultOrder = SortingOrder.DESC;
-        List<Order> orderList = orderDao.findByUser(userId, defaultSorting, defaultOrder, offset, limit);
+    public List<OrderDto> getByUserId(long userId, int page) {
+//        if(limit == null){
+//            limit = 5;
+//        }
+//        OrderSortingCriteria defaultSorting = OrderSortingCriteria.DATE;
+//        SortingOrder defaultOrder = SortingOrder.DESC;
+        QueryCriteria criteria = new QueryCriteria();
+        criteria.setSortingCriteria(OrderSortingCriteria.DATE.getFieldName());
+        criteria.setSortingOrder(QueryCriteria.Order.DESC);
+        criteria.setFirstResult(PaginationUtil.startValue(page));
+        criteria.setResultLimit(PaginationUtil.ON_PAGE);
+        List<Order> orderList = orderDao.findByUser(userId, criteria);
         return orderDtoMapper.toDto(orderList);
     }
 

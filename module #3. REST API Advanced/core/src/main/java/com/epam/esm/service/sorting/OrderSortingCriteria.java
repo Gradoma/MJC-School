@@ -1,19 +1,18 @@
 package com.epam.esm.service.sorting;
 
 import com.epam.esm.dao.column.OrdersTableConst;
-import com.epam.esm.dao.column.TagTableConst;
 
 public enum OrderSortingCriteria {
-    ID(OrdersTableConst.ID),
-    DATE(OrdersTableConst.PURCHASE_TIME);
+    ID("o.id"),
+    DATE("o.purchaseDate");
 
-    private final String column;
+    private final String fieldName;
 
-    OrderSortingCriteria(String column){
-        this.column = column;
+    OrderSortingCriteria(String fieldName){
+        this.fieldName = fieldName;
     }
 
-    public String getColumn() {
-        return column;
+    public String getFieldName() {
+        return fieldName;
     }
 }
