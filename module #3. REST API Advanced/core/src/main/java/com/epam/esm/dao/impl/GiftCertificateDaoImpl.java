@@ -7,9 +7,12 @@ import com.epam.esm.dao.util.HibernateUtil;
 import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,6 +20,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -45,9 +49,12 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
     private final GiftCertificateMapper giftMapper;
+    private final SessionFactory sessionFactory;
 
     public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, GiftCertificateMapper giftMapper,
-                                  NamedParameterJdbcTemplate namedParameterJdbcTemplate){
+                                  NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+                                  SessionFactory sessionFactory){
+        this.sessionFactory = sessionFactory;
         this.giftMapper = giftMapper;
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
@@ -56,18 +63,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
                 .usingGeneratedKeyColumns(ID);
     }
     @Override
-    public long add(GiftCertificate certificate) {          // HOW MAKE TRANSACTION???
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put(NAME, certificate.getName());
-        parameters.put(DESCRIPTION, certificate.getDescription());
-        parameters.put(PRICE, certificate.getPrice());
-        parameters.put(CREATE_DATE, convertToUtcLocalDateTime(certificate.getCreateDate()));
-        parameters.put(LAST_UPDATE_DATE, convertToUtcLocalDateTime(certificate.getLastUpdateDate()));
-        parameters.put(DURATION, certificate.getDuration().toDays());
-        long certificateId = simpleJdbcInsert.executeAndReturnKey(parameters).longValue();
-
-        certificate.getTagSet().forEach(tag -> addTagToCertId(tag.getId(), certificateId));
-        return certificateId;
+    public long add(GiftCertificate certificate) {      //todo (different type of cascade-why wasn't work with all)
+        Session session = sessionFactory.getCurrentSession();
+        session.save(certificate);
+        return certificate.getId();
     }
 
     @Override

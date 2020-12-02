@@ -10,6 +10,7 @@ import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.sorting.SortingOrder;
 import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.NativeQuery;
@@ -55,10 +56,12 @@ public class TagDaoImpl implements TagDao {
             "LIMIT 1";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
+    private final SessionFactory sessionFactory;
 
     private final TagMapper tagMapper;
 
-    public TagDaoImpl(JdbcTemplate jdbcTemplate, TagMapper tagMapper){
+    public TagDaoImpl(JdbcTemplate jdbcTemplate, TagMapper tagMapper, SessionFactory sessionFactory){
+        this.sessionFactory = sessionFactory;
         this.tagMapper = tagMapper;
         this.jdbcTemplate = jdbcTemplate;
         simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
@@ -68,13 +71,11 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public long add(Tag tag) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.getCurrentSession();
         try{
             session.save(tag);
         } catch (ConstraintViolationException e){
             throw new DuplicateException("Tag:name=" + tag.getName());
-        } finally {
-            session.close();
         }
         return tag.getId();
     }
@@ -154,7 +155,7 @@ public class TagDaoImpl implements TagDao {
     @Override
     public boolean contains(Tag tag) {
         String sql = "SELECT COUNT(*) AS c FROM tag WHERE id = :id AND name = :name";
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.getCurrentSession();
         Integer rows = (Integer) session.createSQLQuery(sql)
                 .setParameter("id", tag.getId())
                 .setParameter("name", tag.getName())

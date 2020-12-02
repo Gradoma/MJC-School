@@ -31,7 +31,7 @@ public class GiftCertificate {
     @Column(name = GiftCertificateTableConst.NAME, length = 40)
     private String name;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = TagToCertificateTableConst.TABLE_TAG_CERT,
             joinColumns = @JoinColumn(name = TagToCertificateTableConst.CERTIFICATE_ID),
     inverseJoinColumns = @JoinColumn(name = TagToCertificateTableConst.TAG_ID))

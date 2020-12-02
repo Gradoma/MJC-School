@@ -10,7 +10,9 @@ import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
+import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.ZoneId;
@@ -34,6 +36,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public long add(GiftCertificateDto certificateDto){
         GiftCertificate certificate = giftMapper.toEntity(certificateDto);
         if(certificate.getCreateDate() == null){
