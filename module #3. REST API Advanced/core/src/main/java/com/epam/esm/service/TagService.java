@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TagService {
     long save(TagDto tagDto);
-    List<TagDto> getAll(String offset, Integer limit);
+    List<TagDto> getAll(Integer page);
     TagDto getById(long id);
     TagDto getByName(String name);
     TagDto getMostPopular();

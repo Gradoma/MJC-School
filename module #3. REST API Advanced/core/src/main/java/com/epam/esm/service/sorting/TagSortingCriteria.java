@@ -4,13 +4,13 @@ public enum TagSortingCriteria {
     ID("t.id"),
     NAME("t.name");
 
-    private final String column;
+    private final String fieldName;
 
-    TagSortingCriteria(String column){
-        this.column = column;
+    TagSortingCriteria(String fieldName){
+        this.fieldName = fieldName;
     }
 
-    public String getColumn() {
-        return column;
+    public String getFieldName() {
+        return fieldName;
     }
 }

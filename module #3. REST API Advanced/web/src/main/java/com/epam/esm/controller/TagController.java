@@ -26,9 +26,8 @@ public class TagController {
     }
 
     @GetMapping
-    public List<TagDto> getAll(@RequestParam(value = "offset", required = false) String offset,
-                               @RequestParam(value = "limit", required = false) Integer limit){
-        return tagService.getAll(offset, limit);
+    public List<TagDto> getAll(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page){
+        return tagService.getAll(page);
     }
 
     @GetMapping("/{id}")

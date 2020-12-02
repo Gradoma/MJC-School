@@ -1,10 +1,12 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.TagDtoMapper;
+import com.epam.esm.service.sorting.PaginationUtil;
 import com.epam.esm.service.sorting.SortingOrder;
 import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.springframework.stereotype.Service;
@@ -32,13 +34,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagDto> getAll(String offset, Integer limit) {
-        if(limit == null){
-            limit = 5;
-        }
-        TagSortingCriteria defaultSorting = TagSortingCriteria.ID;
-        SortingOrder defaultSortingOrder = SortingOrder.ASC;
-        List<Tag> tagList = tagDao.findAll(defaultSorting, defaultSortingOrder, offset, limit);
+    public List<TagDto> getAll(Integer page) {
+        int startValue = PaginationUtil.startValue(page);
+        QueryCriteria criteria = new QueryCriteria();
+        criteria.setSortingOrder(QueryCriteria.Order.ASC);
+        criteria.setSortingCriteria(TagSortingCriteria.ID.getFieldName());
+        criteria.setFirstResult(startValue);
+        criteria.setResultLimit(PaginationUtil.ON_PAGE);
+        List<Tag> tagList = tagDao.findAll(criteria);
         return dtoMapper.toDto(tagList);
     }
 

@@ -2,6 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.builder.QueryBuilder;
+import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.dao.util.HibernateUtil;
 import com.epam.esm.entity.Tag;
@@ -13,21 +14,14 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.type.IntegerType;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.epam.esm.dao.column.TagTableConst.*;
 
@@ -81,14 +75,19 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public List<Tag> findAll(TagSortingCriteria sortingCriteria, SortingOrder sortingOrder, String offset,
-                             int limit) {
+    public List<Tag> findAll(QueryCriteria criteria) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         StringBuilder builder = new StringBuilder("FROM Tag t");
-        builder.append(QueryBuilder.addSorting(sortingCriteria.getColumn(), sortingOrder.toString()));
+        builder.append(QueryBuilder.addSorting(criteria.getSortingCriteria(), criteria.getSortingOrder().toString()));
         Query<Tag> query = session.createQuery(builder.toString());
-        // add pagination
-        return query.list();
+        query.setMaxResults(criteria.getResultLimit());
+        query.setFirstResult(criteria.getFirstResult());
+        List<Tag> resultList = query.list();
+        if(resultList.size() > 0){
+            return resultList;
+        } else {
+            throw new ResourceNotFoundException();
+        }
     }
 
     @Override
