@@ -3,7 +3,6 @@ package com.epam.esm.dao.builder;
 import com.epam.esm.dao.column.GiftCertificateTableConst;
 import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.service.sorting.SortingOrder;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -36,46 +35,7 @@ public class QueryBuilder {
     private static final String WHERE_ID = "' WHERE id = ";
     private static final String LIMIT = " LIMIT ";
 
-    public static String makeQuery(CertificateCriteria criteria){
-        int counter = 0;
-        StringBuilder builder = new StringBuilder(DEFAULT_QUERY);
-        if(criteria.getOffset() != null){
-            builder.append(addOffset(criteria.getCriteria().getColumn(), criteria.getOffset(),
-                    criteria.getSortingOrder(), true));
-            counter += 1;
-        }
-        if(criteria.getTags() != null){
-            if(counter == 0){
-                builder.append(WHERE);
-            } else {
-                builder.append(AND);
-            }
-            builder.append(SELECT_ID_BY_TAGS);
-            counter += 1;
-        }
-        if(criteria.getName() != null){
-            if(counter == 0){
-                builder.append(WHERE);
-            } else {
-                builder.append(AND);
-            }
-            builder.append(BY_NAME);
-            counter += 1;
-        }
-        if(criteria.getDescription() != null){
-            if(counter == 0){
-                builder.append(WHERE);
-            } else {
-                builder.append(AND);
-            }
-            builder.append(BY_DESCRIPTION);
-        }
-        builder.append(addSorting(criteria.getCriteria().getColumn(), criteria.getSortingOrder().toString()));
-        builder.append(addLimit(criteria.getLimit()));
-        return builder.toString();
-    }
-
-    public static String makeQueryAndTagCondition(CertificateCriteria criteria){
+    public static String makeQuerySelectCertificateWithConditions(CertificateCriteria criteria){
         int counter = 0;
         StringBuilder builder = new StringBuilder(DEFAULT_QUERY);
         if(criteria.getName() != null){
@@ -101,13 +61,11 @@ public class QueryBuilder {
             builder.append(GIFT_CERT_ID_IN);
             addSelectForEveryTag(builder, criteria.getTags().size());
         }
-        builder.append(addSorting(criteria.getCriteria().getColumn(), criteria.getSortingOrder().toString()));
-        builder.append(addLimit(criteria.getLimit()));
-        builder.append(SEMI);
+        builder.append(addSorting(criteria.getSortingCriteria(), criteria.getSortingOrder().toString()));
         return builder.toString();
     }
 
-    public static String makePatchQuery(GiftCertificate certificate){
+    public static String makeCertificatePatchQuery(GiftCertificate certificate){
         String equal = "='";
         StringBuilder builder = new StringBuilder(UPDATE);
         builder.append(equal);
@@ -142,30 +100,6 @@ public class QueryBuilder {
         builder.append(SPACE);
         builder.append(order);
         return builder.toString();
-    }
-
-    public static String addOffset(String columnName, String offset, SortingOrder sortingOrder, boolean firstCondition){
-        StringBuilder builder = new StringBuilder();
-        String sign;
-        if(sortingOrder == SortingOrder.ASC){
-            sign = ">'";
-        } else {
-            sign = "<'";
-        }
-        if (firstCondition) {
-            builder.append(WHERE);
-        } else {
-            builder.append(AND);
-            builder.append(SPACE);
-        }
-        builder.append(columnName);
-        builder.append(sign);
-        builder.append(offset);
-        return builder.append("'").toString();
-    }
-
-    public static String addLimit(int limit){
-        return LIMIT + limit + SEMI;
     }
 
     private static StringBuilder addSelectForEveryTag(StringBuilder builder, int tagCount){

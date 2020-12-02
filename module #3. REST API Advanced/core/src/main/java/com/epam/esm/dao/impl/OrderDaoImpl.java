@@ -6,15 +6,9 @@ import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dao.mapper.OrderMapper;
 import com.epam.esm.dao.util.HibernateUtil;
 import com.epam.esm.entity.Order;
-import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
-import com.epam.esm.service.sorting.OrderSortingCriteria;
-import com.epam.esm.service.sorting.SortingOrder;
 import org.hibernate.Session;
-import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -30,16 +24,12 @@ import static com.epam.esm.dao.column.OrdersTableConst.*;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
-    private static final String SELECT_BY_ID = "SELECT id, user_id, certificate_id, cost, purchase_time " +
-            "FROM orders WHERE id=?";
-    private static final String SELECT_BY_USER_ID = "SELECT id, user_id, certificate_id, cost, purchase_time " +
-            "FROM orders WHERE user_id=?";
 
     private final JdbcTemplate jdbcTemplate;
     public final OrderMapper orderMapper;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
-    public OrderDaoImpl(JdbcTemplate jdbcTemplate, OrderMapper orderMapper){
+    public OrderDaoImpl(JdbcTemplate jdbcTemplate, OrderMapper orderMapper){    //todo maybe bring sessionfactory ?
         this.jdbcTemplate = jdbcTemplate;
         this.orderMapper = orderMapper;
         simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())

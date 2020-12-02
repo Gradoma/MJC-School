@@ -2,8 +2,6 @@ package com.epam.esm.dao;
 
 import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.service.sorting.SortingOrder;
-import com.epam.esm.service.sorting.TagSortingCriteria;
 
 import java.util.List;
 

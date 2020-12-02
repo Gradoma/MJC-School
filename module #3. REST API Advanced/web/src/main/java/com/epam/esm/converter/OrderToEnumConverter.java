@@ -1,11 +1,11 @@
 package com.epam.esm.converter;
 
-import com.epam.esm.service.sorting.SortingOrder;
+import com.epam.esm.dao.criteria.QueryCriteria;
 import org.springframework.core.convert.converter.Converter;
 
-public class OrderToEnumConverter implements Converter<String, SortingOrder> {
+public class OrderToEnumConverter implements Converter<String, QueryCriteria.Order> {
     @Override
-    public SortingOrder convert(String s) {
-        return SortingOrder.valueOf(s.toUpperCase());
+    public QueryCriteria.Order convert(String s) {
+        return QueryCriteria.Order.valueOf(s.toUpperCase());
     }
 }

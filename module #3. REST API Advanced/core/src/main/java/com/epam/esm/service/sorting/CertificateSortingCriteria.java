@@ -6,13 +6,13 @@ public enum CertificateSortingCriteria {
     DATE(GiftCertificateTableConst.LAST_UPDATE_DATE),
     NAME(GiftCertificateTableConst.NAME);
 
-    private final String column;
+    private final String fieldName;
 
-    CertificateSortingCriteria(String column){
-        this.column = column;
+    CertificateSortingCriteria(String fieldName){
+        this.fieldName = fieldName;
     }
 
-    public String getColumn() {
-        return column;
+    public String getFieldName() {
+        return fieldName;
     }
 }

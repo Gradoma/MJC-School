@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QueryCriteria {
     public enum Order{ASC, DESC}
-    private String sortingCriteria;
-    private Order sortingOrder;
-    private int firstResult;
-    private int resultLimit;
+    protected String sortingCriteria;
+    protected Order sortingOrder;
+    protected int firstResult;
+    protected int resultLimit;
 }

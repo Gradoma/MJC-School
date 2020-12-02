@@ -1,6 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
+import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.TagDto;
@@ -10,7 +11,8 @@ import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
-import org.hibernate.SessionFactory;
+import com.epam.esm.service.sorting.CertificateSortingCriteria;
+import com.epam.esm.service.sorting.PaginationUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,9 +67,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public List<GiftCertificateDto> getByCriteria(CertificateCriteria criteria) {
-        if(criteria.getLimit() == null){
-            criteria.setLimit(5);
+        if(criteria.getSortingCriteria() == null){
+            criteria.setSortingCriteria(CertificateSortingCriteria.DATE.getFieldName());
         }
+        if(criteria.getSortingOrder() == null){
+            criteria.setSortingOrder(QueryCriteria.Order.DESC);
+        }
+        criteria.setFirstResult(PaginationUtil.startValue(criteria.getPage()));
+        criteria.setResultLimit(PaginationUtil.ON_PAGE);
         List<GiftCertificate> certificateList = certificateDao.findByCriteria(criteria);
         List<GiftCertificateDto> dtoList = giftMapper.toDto(certificateList);
         dtoList.forEach(certificateDto -> {

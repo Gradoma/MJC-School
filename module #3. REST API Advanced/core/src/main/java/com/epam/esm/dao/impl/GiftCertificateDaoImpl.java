@@ -2,33 +2,26 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.builder.QueryBuilder;
+import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import com.epam.esm.dao.util.HibernateUtil;
 import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 
@@ -83,33 +76,9 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> findByCriteria(CertificateCriteria criteria) {
-        List<GiftCertificate> resultList = new ArrayList<>();
-        String query = QueryBuilder.makeQuery(criteria);
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        if(criteria.getTags() != null){
-            parameters.addValue("tag_names", criteria.getTags());
-        }
-        if(criteria.getName() != null){
-            parameters.addValue("name", addPercentageWildcard(criteria.getName()));
-        }
-        if(criteria.getDescription() != null){
-            parameters.addValue("description", addPercentageWildcard(criteria.getDescription()));
-        }
-        resultList = namedParameterJdbcTemplate.query(query,
-                parameters, giftMapper);
-        if(resultList.size() == 0){
-            throw new ResourceNotFoundException("Gift certificate: name=" + criteria.getName() +
-                    ", description=" + criteria.getDescription() +
-                    ", tags=" + criteria.getTags());
-        }
-        return resultList;
-    }
-
-    @Override
-    public List<GiftCertificate> findByCriteriaAndCondition(CertificateCriteria criteria) {
-        List<GiftCertificate> resultList = new ArrayList<>();
-        String query = QueryBuilder.makeQueryAndTagCondition(criteria);
+    public List<GiftCertificate> findByCriteria(QueryCriteria queryCriteria) {
+        CertificateCriteria criteria = (CertificateCriteria) queryCriteria;
+        String sqlQuery = QueryBuilder.makeQuerySelectCertificateWithConditions(criteria);
         List<String> queryParams = new ArrayList<>();
         if(criteria.getName() != null){
             queryParams.add(addPercentageWildcard(criteria.getName()));
@@ -120,12 +89,16 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         if(criteria.getTags() != null){
             queryParams.addAll(criteria.getTags());
         }
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        NativeQuery<GiftCertificate> query = session.createNativeQuery(sqlQuery, GiftCertificate.class);
+        query.setFirstResult(criteria.getFirstResult());
+        query.setMaxResults(criteria.getResultLimit());
         if(queryParams.size() > 0){
-            String[] paramsArray = queryParams.stream().toArray(String[]::new);
-            resultList = jdbcTemplate.query(query, giftMapper, paramsArray);
-        } else {
-            resultList = jdbcTemplate.query(query, giftMapper);
+            for(int i = 0; i < queryParams.size(); i++){
+                query.setParameter(i + 1, queryParams.get(i));
+            }
         }
+        List<GiftCertificate> resultList = query.list();
         if(resultList.size() == 0){
             throw new ResourceNotFoundException("Gift certificate: name=" + criteria.getName() +
                     ", description=" + criteria.getDescription() +
@@ -143,7 +116,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 //        String updateHql = "UPDATE GiftCertificate SET name = :name, description = :description, price = :price, " +
 //                "lastUpdateDate = :lastUpdateDate, duration = :duration WHERE id = :id";
         Session session = sessionFactory.getCurrentSession();
-        session.update(certificate);      //todo (delete all records from 3rd table)
+        session.update(certificate);      //todo (it deletes all records from 3rd table and add nothing)
         return true;
 //        Query updateQuery = session.createQuery(updateHql);
 //        updateQuery.setParameter("id", certificate.getId());
@@ -193,7 +166,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public boolean patch(GiftCertificate certificate) {
-        String sqlQuery = QueryBuilder.makePatchQuery(certificate);
+        String sqlQuery = QueryBuilder.makeCertificatePatchQuery(certificate);
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         Query query = session.createSQLQuery(sqlQuery);

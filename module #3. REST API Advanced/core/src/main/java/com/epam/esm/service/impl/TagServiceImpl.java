@@ -7,10 +7,8 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.TagDtoMapper;
 import com.epam.esm.service.sorting.PaginationUtil;
-import com.epam.esm.service.sorting.SortingOrder;
 import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;

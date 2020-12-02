@@ -8,8 +8,6 @@ import com.epam.esm.dao.util.HibernateUtil;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
-import com.epam.esm.service.sorting.SortingOrder;
-import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -116,7 +114,7 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public List<Tag> findByCertificateId(long certificateId) {          // TODO TEST!
+    public List<Tag> findByCertificateId(long certificateId) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         List<Tag> tagList = session.getNamedNativeQuery("findByCertificateId")
                 .setParameter("id", certificateId)

@@ -10,7 +10,6 @@ import com.epam.esm.service.OrderService;
 import com.epam.esm.service.mapper.OrderDtoMapper;
 import com.epam.esm.service.sorting.OrderSortingCriteria;
 import com.epam.esm.service.sorting.PaginationUtil;
-import com.epam.esm.service.sorting.SortingOrder;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -42,11 +41,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getByUserId(long userId, int page) {
-//        if(limit == null){
-//            limit = 5;
-//        }
-//        OrderSortingCriteria defaultSorting = OrderSortingCriteria.DATE;
-//        SortingOrder defaultOrder = SortingOrder.DESC;
         QueryCriteria criteria = new QueryCriteria();
         criteria.setSortingCriteria(OrderSortingCriteria.DATE.getFieldName());
         criteria.setSortingOrder(QueryCriteria.Order.DESC);
