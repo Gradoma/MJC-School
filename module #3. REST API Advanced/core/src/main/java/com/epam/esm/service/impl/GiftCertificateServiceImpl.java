@@ -78,13 +78,20 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public boolean update(GiftCertificateDto certificateDto, long certificateId) {
         GiftCertificateDto originalCertDto = getById(certificateId);
-        List<Long> deletedTagsId = collectDeletedTagsId(originalCertDto.getTags(), certificateDto.getTags());
-        List<Long> addedTagsId = collectAddedTagsId(originalCertDto.getTags(), certificateDto.getTags());
-        GiftCertificate updatedCertificate = prepareUpdatedCertificate(certificateDto, originalCertDto);
+//        List<Long> deletedTagsId = collectDeletedTagsId(originalCertDto.getTags(), certificateDto.getTags());
+//        List<Long> addedTagsId = collectAddedTagsId(originalCertDto.getTags(), certificateDto.getTags());
+//        GiftCertificate updatedCertificate = prepareUpdatedCertificate(certificateDto, originalCertDto);
+//        updatedCertificate.setId(certificateId);
+//        return certificateDao.update(updatedCertificate, addedTagsId, deletedTagsId);
+
+        GiftCertificate updatedCertificate = giftMapper.toEntity(certificateDto);
         updatedCertificate.setId(certificateId);
-        return certificateDao.update(updatedCertificate, addedTagsId, deletedTagsId);
+        updatedCertificate.setCreateDate(ZonedDateTime.parse(originalCertDto.getCreateDate()));
+        updatedCertificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
+        return certificateDao.update(updatedCertificate, null, null);
     }
 
     @Override

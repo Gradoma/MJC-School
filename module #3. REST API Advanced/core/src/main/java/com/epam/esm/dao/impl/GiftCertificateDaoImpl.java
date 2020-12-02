@@ -140,38 +140,55 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId) {
-        String updateHql = "UPDATE GiftCertificate SET name = :name, description = :description, price = :price, " +
-                "lastUpdateDate = :lastUpdateDate, duration = :duration WHERE id = :id";
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        Query insertTagQuery = session.createSQLQuery(TAG_CERT_INSERT);
-        insertTagQuery.setParameter(2, certificate.getId());
-        addedTagsId.forEach(tagIdToAdd -> {
-            insertTagQuery.setParameter(1, tagIdToAdd);
-            insertTagQuery.executeUpdate();
-        });
-        Query deleteTagQuery = session.createSQLQuery(TAG_CERT_DELETE_BY_TAG_AND_CERT_ID);
-        deleteTagQuery.setParameter(2, certificate.getId());
-        deletedTagsId.forEach(tagIdToDelete -> {
-            deleteTagQuery.setParameter(1, tagIdToDelete);
-            deleteTagQuery.executeUpdate();
-        });
+//        String updateHql = "UPDATE GiftCertificate SET name = :name, description = :description, price = :price, " +
+//                "lastUpdateDate = :lastUpdateDate, duration = :duration WHERE id = :id";
+        Session session = sessionFactory.getCurrentSession();
+        session.update(certificate);      //todo (delete all records from 3rd table)
+        return true;
+//        Query updateQuery = session.createQuery(updateHql);
+//        updateQuery.setParameter("id", certificate.getId());
+//        updateQuery.setParameter("name", certificate.getName());
+//        updateQuery.setParameter("description", certificate.getDescription());
+//        updateQuery.setParameter("price", certificate.getPrice());
+//        updateQuery.setParameter("lastUpdateDate", certificate.getLastUpdateDate());
+//        updateQuery.setParameter("duration", certificate.getDuration());
+//        int rows = updateQuery.executeUpdate();
+//        if(rows > 0){
+//            return true;
+//        } else {
+//            throw new RuntimeException("no changes in database");
+//        }
 
-        Query updateQuery = session.createQuery(updateHql);
-        updateQuery.setParameter("id", certificate.getId());
-        updateQuery.setParameter("name", certificate.getName());
-        updateQuery.setParameter("description", certificate.getDescription());
-        updateQuery.setParameter("price", certificate.getPrice());
-        updateQuery.setParameter("lastUpdateDate", certificate.getLastUpdateDate());
-        updateQuery.setParameter("duration", certificate.getDuration());
-        int rows = updateQuery.executeUpdate();
-        if (rows > 0 ){
-            transaction.commit();
-            return true;
-        } else {
-            transaction.rollback();
-            return false;
-        }
+//        Session session = HibernateUtil.getSessionFactory().openSession();
+//        Transaction transaction = session.beginTransaction();
+//        Query insertTagQuery = session.createSQLQuery(TAG_CERT_INSERT);
+//        insertTagQuery.setParameter(2, certificate.getId());
+//        addedTagsId.forEach(tagIdToAdd -> {
+//            insertTagQuery.setParameter(1, tagIdToAdd);
+//            insertTagQuery.executeUpdate();
+//        });
+//        Query deleteTagQuery = session.createSQLQuery(TAG_CERT_DELETE_BY_TAG_AND_CERT_ID);
+//        deleteTagQuery.setParameter(2, certificate.getId());
+//        deletedTagsId.forEach(tagIdToDelete -> {
+//            deleteTagQuery.setParameter(1, tagIdToDelete);
+//            deleteTagQuery.executeUpdate();
+//        });
+//
+//        Query updateQuery = session.createQuery(updateHql);
+//        updateQuery.setParameter("id", certificate.getId());
+//        updateQuery.setParameter("name", certificate.getName());
+//        updateQuery.setParameter("description", certificate.getDescription());
+//        updateQuery.setParameter("price", certificate.getPrice());
+//        updateQuery.setParameter("lastUpdateDate", certificate.getLastUpdateDate());
+//        updateQuery.setParameter("duration", certificate.getDuration());
+//        int rows = updateQuery.executeUpdate();
+//        if (rows > 0 ){
+//            transaction.commit();
+//            return true;
+//        } else {
+//            transaction.rollback();
+//            return false;
+//        }
     }
 
     @Override
