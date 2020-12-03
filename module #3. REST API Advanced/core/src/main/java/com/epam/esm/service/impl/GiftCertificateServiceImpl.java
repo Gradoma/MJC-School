@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -88,13 +87,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public boolean update(GiftCertificateDto certificateDto, long certificateId) {
         GiftCertificateDto originalCertDto = getById(certificateId);
-//        List<Long> deletedTagsId = collectDeletedTagsId(originalCertDto.getTags(), certificateDto.getTags());
-//        List<Long> addedTagsId = collectAddedTagsId(originalCertDto.getTags(), certificateDto.getTags());
-//        GiftCertificate updatedCertificate = prepareUpdatedCertificate(certificateDto, originalCertDto);
-//        updatedCertificate.setId(certificateId);
-//        return certificateDao.update(updatedCertificate, addedTagsId, deletedTagsId);
-
         GiftCertificate updatedCertificate = giftMapper.toEntity(certificateDto);
+        certificateDto.getTags().forEach(tagDto -> {
+            saveTagIfNew(tagDto);
+            Tag tag = tagMapper.toEntity(tagDto);
+            updatedCertificate.addTag(tag);
+        });
         updatedCertificate.setId(certificateId);
         updatedCertificate.setCreateDate(ZonedDateTime.parse(originalCertDto.getCreateDate()));
         updatedCertificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
@@ -131,45 +129,5 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             long generatedId = tagService.save(tagDto);
             tagDto.setId(generatedId);
         }
-    }
-
-    private List<Long> collectDeletedTagsId(List<TagDto> originalTagDtoList, List<TagDto> updatedTagDtoList){
-        List<Long> deletedTagsId = new ArrayList<>();
-        originalTagDtoList.forEach(tagDto -> {
-            if(!updatedTagDtoList.contains(tagDto)){
-                deletedTagsId.add(tagDto.getId());
-            }
-        });
-        return deletedTagsId;
-    }
-
-    private List<Long> collectAddedTagsId(List<TagDto> originalTagDtoList, List<TagDto> updatedTagDtoList) {
-        List<Long> addedTagsId = new ArrayList<>();
-        updatedTagDtoList.forEach(tagDto -> {
-            saveTagIfNew(tagDto);
-            if (!originalTagDtoList.contains(tagDto)) {
-                addedTagsId.add(tagDto.getId());
-            }
-        });
-        return addedTagsId;
-    }
-
-    private GiftCertificate prepareUpdatedCertificate(GiftCertificateDto updatedDto,
-                                                      GiftCertificateDto originalDto){
-        if(!updatedDto.getName().equals(originalDto.getName())){
-            originalDto.setName(updatedDto.getName());
-        }
-        if(!updatedDto.getDescription().equals(originalDto.getDescription())){
-            originalDto.setDescription(updatedDto.getDescription());
-        }
-        if(!updatedDto.getPrice().equals(originalDto.getPrice())){
-            originalDto.setPrice(updatedDto.getPrice());
-        }
-        if(!updatedDto.getDuration().equals(originalDto.getDuration())){
-            originalDto.setDuration(updatedDto.getDuration());
-        }
-        GiftCertificate updatedCertificate = giftMapper.toEntity(originalDto);
-        updatedCertificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
-        return updatedCertificate;
     }
 }
