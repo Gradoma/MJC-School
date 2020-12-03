@@ -8,6 +8,7 @@ import com.epam.esm.dao.util.HibernateUtil;
 import com.epam.esm.entity.Order;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -24,31 +25,23 @@ import static com.epam.esm.dao.column.OrdersTableConst.*;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
+    private final SessionFactory sessionFactory;
 
-    private final JdbcTemplate jdbcTemplate;
-    public final OrderMapper orderMapper;
-    private final SimpleJdbcInsert simpleJdbcInsert;
-
-    public OrderDaoImpl(JdbcTemplate jdbcTemplate, OrderMapper orderMapper){    //todo maybe bring sessionfactory ?
-        this.jdbcTemplate = jdbcTemplate;
-        this.orderMapper = orderMapper;
-        simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
-                .withTableName(TABLE_ORDERS)
-                .usingGeneratedKeyColumns(ID);
+    public OrderDaoImpl(SessionFactory sessionFactory){
+        this.sessionFactory = sessionFactory;
     }
 
     @Override
     public long add(Order order) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            session.save(order);
-            return order.getId();
-        }
+        Session session = sessionFactory.openSession();
+        session.save(order);
+        return order.getId();
     }
 
     @Override
     public Order findById(long orderId) {
         String hql = "FROM Order WHERE id=:id";
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.openSession();
         Query query = session.createQuery(hql);
         query.setParameter("id", orderId);
         Order resultOrder = (Order) query.uniqueResult();
@@ -60,7 +53,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public List<Order> findByUser(long userId, QueryCriteria criteria) {
-        Session session = HibernateUtil.getSessionFactory().openSession();//todo (session from Util or add bean SessionFactories
+        Session session = sessionFactory.openSession();
         StringBuilder builder = new StringBuilder("FROM Order o WHERE o.userId = :userId");
         builder.append(QueryBuilder.addSorting(criteria.getSortingCriteria(), criteria.getSortingOrder().toString()));
         Query<Order> query = session.createQuery(builder.toString());

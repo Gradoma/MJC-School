@@ -27,9 +27,6 @@ import static com.epam.esm.dao.column.GiftCertificateTableConst.*;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
-    private static final String SELECT_BY_ID = "SELECT giftcertificate.id, giftcertificate.name, description, price, " +
-            "create_date, last_update_date, duration_days FROM giftcertificate " +
-            "WHERE giftcertificate.id = :id";
     private static final String UPDATE = "UPDATE giftcertificate SET name = ?, description = ?, price = ?, " +
             "last_update_date = ?, duration_days = ? WHERE id = ?";
     private static final String DELETE_BY_ID = "DELETE FROM giftcertificate WHERE id = :id";
@@ -39,24 +36,14 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String PERCENTAGE = "%";
 
     private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final SimpleJdbcInsert simpleJdbcInsert;
-    private final GiftCertificateMapper giftMapper;
     private final SessionFactory sessionFactory;
 
-    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, GiftCertificateMapper giftMapper,
-                                  NamedParameterJdbcTemplate namedParameterJdbcTemplate,
-                                  SessionFactory sessionFactory){
+    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
-        this.giftMapper = giftMapper;
         this.jdbcTemplate = jdbcTemplate;
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
-                .withTableName(TABLE_CERTIFICATE)
-                .usingGeneratedKeyColumns(ID);
     }
     @Override
-    public long add(GiftCertificate certificate) {      //todo (different type of cascade-why wasn't work with all)
+    public long add(GiftCertificate certificate) {
         Session session = sessionFactory.getCurrentSession();
         session.save(certificate);
         return certificate.getId();
@@ -65,7 +52,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public GiftCertificate findById(long id) {      //TODO(incorrect timezone - need UTC as in db)
         String hql = "FROM GiftCertificate WHERE id=:id";
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.openSession();
         Query query = session.createQuery(hql);
         query.setParameter("id", id);
         GiftCertificate certificate = (GiftCertificate) query.uniqueResult();
@@ -89,7 +76,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         if(criteria.getTags() != null){
             queryParams.addAll(criteria.getTags());
         }
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.openSession();
         NativeQuery<GiftCertificate> query = session.createNativeQuery(sqlQuery, GiftCertificate.class);
         query.setFirstResult(criteria.getFirstResult());
         query.setMaxResults(criteria.getResultLimit());
@@ -167,42 +154,34 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Override
     public boolean patch(GiftCertificate certificate) {
         String sqlQuery = QueryBuilder.makeCertificatePatchQuery(certificate);
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery(sqlQuery);
         int rows = query.executeUpdate();
-        if (rows > 0 ){
-            transaction.commit();
+        if(rows == 1){
             return true;
         } else {
-            transaction.rollback();
-            throw new ResourceNotFoundException("Gift certificate: id=" + certificate.getId());
+            throw new RuntimeException();
         }
     }
 
     @Override
     public boolean delete(long id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery(DELETE_BY_ID);
         query.setParameter("id", id);
         int rows = query.executeUpdate();
-        if (rows > 0 ){
-            transaction.commit();
+        if(rows == 1){
             return true;
         } else {
-            transaction.rollback();
-            throw new ResourceNotFoundException("Gift certificate: id=" + id);
+            throw new RuntimeException();
         }
     }
 
     private void addTagToCertId(long tagId, long certificateId){
-        // how to use hibernate - no entity for 3rd table
         jdbcTemplate.update(TAG_CERT_INSERT, tagId, certificateId);
     }
 
     private boolean deleteTagToCert(long certificateId, long tagId) {
-        // how to use hibernate - no entity for 3rd table
         int rows = jdbcTemplate.update(TAG_CERT_DELETE_BY_TAG_AND_CERT_ID, tagId, certificateId);
         return rows == 1;
     }

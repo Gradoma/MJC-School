@@ -102,6 +102,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public boolean patch(GiftCertificateDto certificateDto, long id) {
         GiftCertificate certificateWithPatchField = new GiftCertificate();
         if(certificateDto.getName() != null){
@@ -120,6 +121,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    @Transactional
     public boolean delete(long id) {
         return certificateDao.delete(id);
     }

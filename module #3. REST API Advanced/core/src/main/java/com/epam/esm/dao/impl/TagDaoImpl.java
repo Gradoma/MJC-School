@@ -25,15 +25,6 @@ import static com.epam.esm.dao.column.TagTableConst.*;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private static final String COUNT_BY_NAME = "SELECT COUNT(*) FROM tag WHERE id=? AND name=?";
-    private static final String SELECT_ALL = "SELECT id, name FROM tag";
-    private static final String SELECT_BY_ID = "SELECT id, name FROM tag WHERE id=?";
-    private static final String SELECT_BY_NAME = "SELECT id, name FROM tag WHERE name=?";
-    private static final String DELETE_BY_ID = "DELETE FROM tag WHERE id=?";
-    private static final String SELECT_BY_CERTIFICATE_ID = "SELECT tag.id, tag.Name FROM tag " +
-            "JOIN tag_certificate ON tag_certificate.tag_id = tag.id " +
-            "JOIN giftcertificate ON giftcertificate.id = tag_certificate.certificate_id " +
-            "WHERE giftcertificate.id=?";
     private static final String SELECT_MOST_POPULAR_TAG = "SELECT tag.id, tag.name " +
             "FROM tag " +
             "JOIN tag_certificate ON tag_certificate.tag_id = tag.id " +
@@ -46,19 +37,10 @@ public class TagDaoImpl implements TagDao {
             "GROUP BY tag.name " +
             "ORDER BY COUNT(tag.name) DESC " +
             "LIMIT 1";
-    private final JdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert simpleJdbcInsert;
     private final SessionFactory sessionFactory;
 
-    private final TagMapper tagMapper;
-
-    public TagDaoImpl(JdbcTemplate jdbcTemplate, TagMapper tagMapper, SessionFactory sessionFactory){
+    public TagDaoImpl(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
-        this.tagMapper = tagMapper;
-        this.jdbcTemplate = jdbcTemplate;
-        simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
-                .withTableName(TABLE_TAG)
-                .usingGeneratedKeyColumns(ID);
     }
 
     @Override
@@ -74,7 +56,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public List<Tag> findAll(QueryCriteria criteria) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.openSession();
         StringBuilder builder = new StringBuilder("FROM Tag t");
         builder.append(QueryBuilder.addSorting(criteria.getSortingCriteria(), criteria.getSortingOrder().toString()));
         Query<Tag> query = session.createQuery(builder.toString());
@@ -90,7 +72,7 @@ public class TagDaoImpl implements TagDao {
     @Override
     public Tag findByName(String name){
         String hql = "FROM Tag WHERE name=:name";
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.openSession();
         Query query = session.createQuery(hql);
         query.setParameter("name", name);
         Tag resultTag = (Tag) query.uniqueResult();
@@ -103,7 +85,7 @@ public class TagDaoImpl implements TagDao {
     @Override
     public Tag findById(long id) {
         String hql = "FROM Tag WHERE id=:id";
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.openSession();
         Query query = session.createQuery(hql);
         query.setParameter("id", id);
         Tag resultTag = (Tag) query.uniqueResult();
@@ -115,7 +97,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public List<Tag> findByCertificateId(long certificateId) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.openSession();
         List<Tag> tagList = session.getNamedNativeQuery("findByCertificateId")
                 .setParameter("id", certificateId)
                 .list();
@@ -127,24 +109,21 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Tag findMostPopular() {          // todo
-        return jdbcTemplate.queryForObject(SELECT_MOST_POPULAR_TAG, tagMapper);
+//        return jdbcTemplate.queryForObject(SELECT_MOST_POPULAR_TAG, tagMapper);
+        return null;
     }
 
-    @Transactional
     @Override
     public boolean deleteById(long id) {
         String hql = "DELETE Tag WHERE id = :id";
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery(hql);
         query.setParameter("id", id);
         int rows = query.executeUpdate();
-        if (rows > 0 ){
-            transaction.commit();
+        if(rows == 1){
             return true;
         } else {
-            transaction.rollback();
-            throw new ResourceNotFoundException("Tag: id=" + id);
+            throw new RuntimeException();
         }
     }
 
