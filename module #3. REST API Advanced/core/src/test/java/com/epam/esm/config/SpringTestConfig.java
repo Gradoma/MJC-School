@@ -22,9 +22,9 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 import javax.sql.DataSource;
 
 @Configuration
-@Import({TagDaoImpl.class, GiftCertificateDaoImpl.class, TagMapper.class, GiftCertificateMapper.class,
-        TagServiceImpl.class, GiftCertificateServiceImpl.class, LocalValidatorFactoryBean.class, TagDtoMapper.class,
-        GiftCertificateDtoMapper.class, MethodValidationPostProcessor.class, LocalValidatorFactoryBean.class})
+//@Import({TagDaoImpl.class, GiftCertificateDaoImpl.class, TagMapper.class, GiftCertificateMapper.class,
+//        TagServiceImpl.class, GiftCertificateServiceImpl.class, LocalValidatorFactoryBean.class, TagDtoMapper.class,
+//        GiftCertificateDtoMapper.class, MethodValidationPostProcessor.class, LocalValidatorFactoryBean.class})
 public class SpringTestConfig {
 
     @Bean
