@@ -1,11 +1,7 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
-import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.OrderService;
-import com.epam.esm.service.TagService;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +32,7 @@ public class OrderController {
         return ResponseEntity.ok().body(orderDto);
     }
 
-    @GetMapping("/by")
+    @GetMapping()
     public ResponseEntity<List<OrderDto>> getByUserId(@RequestParam(value = "user") long userId,
                                                       @RequestParam(value = "page", required = false,
                                                               defaultValue = "1") int page){

@@ -1,107 +1,94 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.config.SpringTestConfig;
+import com.epam.esm.config.TestApp;
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.service.TagService;
+import com.epam.esm.service.sorting.PaginationUtil;
+import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.Validator;
 
 import javax.validation.ConstraintViolationException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith({SpringExtension.class, MockitoExtension.class})
-@ContextConfiguration(classes = {SpringTestConfig.class})
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = TestApp.class)
 class TagServiceImplTest {
-    private static final String POSITIVE_NAME = "positive";
-    private static final String NEGATIVE_NAME = "negative";
-    private static final String TO_LONG_NAME = "lokpdamjlklkjoklnmlknlknlknlknmknlknnkjnnknkjbkjnlkmlkkjhyutfyt";
     @Autowired
-    @InjectMocks
     private TagService tagService;
 
-    @Mock
+    @MockBean
     private TagDao tagDao;
-    @Autowired
-    Validator validator;
 
     @Test
-    void saveNegative_InvalidId() {
-        TagDto tagDto = new TagDto();
-        tagDto.setId(31L);
-        tagDto.setName("slkdnfl");
-        assertThrows(ConstraintViolationException.class, () -> tagService.save(tagDto));
-    }
-
-    @Test
-    void saveNegative_InvalidNameNull() {
-        TagDto tagDto = new TagDto();
-        tagDto.setName(null);
-        assertThrows(ConstraintViolationException.class, () -> tagService.save(tagDto));
-    }
-
-    @Test
-    void saveNegative_InvalidNameTooLong() {
-        TagDto tagDto = new TagDto();
-        tagDto.setName(TO_LONG_NAME);
-        assertThrows(ConstraintViolationException.class, () -> tagService.save(tagDto));
-    }
-
-    @Test
-    void saveNegative_daoThrow() {
-//        Tag tag = new Tag();
-//        tag.setName("exception name");
-//        Mockito.when(tagDao.add(tag)).thenThrow(DuplicateException.class);
-//        TagDto tagDto = new TagDto();
-//        tagDto.setName("exception name");
-//        assertThrows(ConstraintViolationException.class, () -> tagService.save(tagDto));
-    }
-
-    @Test
-    @Disabled
     void getAll() {
+        int page = 1;
+        QueryCriteria criteria = new QueryCriteria();
+        criteria.setSortingOrder(QueryCriteria.Order.ASC);
+        criteria.setSortingCriteria(TagSortingCriteria.ID.getFieldName());
+        criteria.setFirstResult(0);
+        criteria.setResultLimit(5);
 
+        List<TagDto> resultList = tagService.getAll(page);
+
+        Mockito.verify(tagDao, Mockito.times(1))
+                .findAll(ArgumentMatchers.eq(criteria));
     }
 
     @Test
-    @Disabled
-    void getById() {
+    void save(){
+        TagDto tagDto = new TagDto();
+        tagDto.setName("name");
+
+        Tag tag = new Tag();
+        tag.setId(0);
+        tag.setName("name");
+
+        tagService.save(tagDto);
+
+        Mockito.verify(tagDao, Mockito.times(1))
+                .add(ArgumentMatchers.eq(tag));
     }
 
     @Test
-    @Disabled
-    void getByName() {
-        //cant test - exception
-//        Tag tag = new Tag();
-//        tag.setId(5);
-//        tag.setName(POSITIVE_NAME);
-//        Mockito.when(tagDao.findByName(POSITIVE_NAME)).thenReturn(Optional.of(tag));
-//
-//        TagDto expectedDto = new TagDto();
-//        expectedDto.setId("5");
-//        expectedDto.setName(POSITIVE_NAME);
-//        assertEquals(expectedDto, tagService.getByName(POSITIVE_NAME));
-    }
+    void saveDuplicate(){
+        TagDto tagDto = new TagDto();
+        tagDto.setName("duplicate");
 
-    @Test
-    @Disabled
-    void delete() {
+        Tag tag = new Tag();
+        tag.setId(0);
+        tag.setName("duplicate");
+
+        Mockito.doThrow(new DuplicateException()).when(tagDao).add(tag);
+
+        assertThrows(DuplicateException.class, () -> {
+            tagService.save(tagDto);
+        });
+
+        Mockito.verify(tagDao, Mockito.times(1))
+                .add(ArgumentMatchers.eq(tag));
     }
 }
