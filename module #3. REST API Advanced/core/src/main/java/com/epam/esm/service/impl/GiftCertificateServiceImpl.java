@@ -96,7 +96,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         updatedCertificate.setId(certificateId);
         updatedCertificate.setCreateDate(ZonedDateTime.parse(originalCertDto.getCreateDate()));
         updatedCertificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
-        return certificateDao.update(updatedCertificate, null, null);
+        return certificateDao.update(updatedCertificate);
     }
 
     @Override

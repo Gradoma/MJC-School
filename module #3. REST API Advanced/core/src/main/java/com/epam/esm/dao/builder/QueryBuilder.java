@@ -93,7 +93,7 @@ public class QueryBuilder {
         return builder.toString();
     }
 
-    public static String addSorting(String byField, String order){     //ORDER BY t.id DESC
+    public static String addSorting(String byField, String order){
         StringBuilder builder = new StringBuilder();
         builder.append(ORDER_BY);
         builder.append(byField);

@@ -99,7 +99,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId) {
+    public boolean update(GiftCertificate certificate) {
         Session session = sessionFactory.getCurrentSession();
         session.update(certificate);
         return true;

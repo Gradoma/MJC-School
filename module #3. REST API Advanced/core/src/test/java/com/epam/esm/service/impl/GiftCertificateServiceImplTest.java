@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.SpringTestConfig;
 import com.epam.esm.config.TestApp;
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.TagDao;
@@ -8,23 +7,15 @@ import com.epam.esm.dto.CertificateCriteria;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
-import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
-import com.epam.esm.service.mapper.TagDtoMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import javax.validation.ConstraintViolationException;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -201,5 +192,47 @@ class GiftCertificateServiceImplTest {
                 .getByGiftCertificateId(ArgumentMatchers.eq(id));
     }
 
-    //todo add for update
+    @Test
+    void update(){
+        long certificateId = 3;
+        GiftCertificate originalCert = new GiftCertificate();
+        originalCert.setId(certificateId);
+        originalCert.setCreateDate(ZonedDateTime.now());
+        originalCert.setLastUpdateDate(ZonedDateTime.now().minusDays(2));
+        originalCert.setDuration(Duration.ofDays(3));
+
+        Mockito.doReturn(originalCert).when(certificateDao).findById(ArgumentMatchers.eq(certificateId));
+
+        GiftCertificateDto updatedCertificate = new GiftCertificateDto();
+        updatedCertificate.setName("name");
+        updatedCertificate.setPrice(23.55);
+        updatedCertificate.setDescription("Description");
+        updatedCertificate.setDuration(23L);
+
+        List<TagDto> tagDtoList = new ArrayList<>();
+        TagDto tag1 = new TagDto();
+        tag1.setName("exist tag 1");
+        tagDtoList.add(tag1);
+        TagDto tag2 = new TagDto();
+        tag2.setName("exist tag 2");
+        tagDtoList.add(tag2);
+        updatedCertificate.setTags(tagDtoList);
+
+        ArgumentCaptor<GiftCertificate> captor = ArgumentCaptor.forClass(GiftCertificate.class);
+
+        giftCertificateService.update(updatedCertificate, certificateId);
+
+        // dates, tags were set
+        Mockito.verify(certificateDao, Mockito.times(1))
+                .update(captor.capture());
+        GiftCertificate certificate = captor.getValue();
+        assertEquals(certificateId, certificate.getId());
+        assertNotNull(certificate.getCreateDate());
+        assertNotNull(certificate.getLastUpdateDate());
+        assertNotNull(certificate.getTagSet());
+
+        //tags checking was called
+        Mockito.verify(tagService, Mockito.times(2))
+                .doesExist(ArgumentMatchers.any());
+    }
 }

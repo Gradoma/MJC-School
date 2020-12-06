@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.SpringTestConfig;
 import com.epam.esm.config.TestApp;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.criteria.QueryCriteria;
@@ -8,29 +7,17 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.service.TagService;
-import com.epam.esm.service.sorting.PaginationUtil;
 import com.epam.esm.service.sorting.TagSortingCriteria;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.validation.Validator;
-
-import javax.validation.ConstraintViolationException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -90,5 +77,40 @@ class TagServiceImplTest {
 
         Mockito.verify(tagDao, Mockito.times(1))
                 .add(ArgumentMatchers.eq(tag));
+    }
+
+    @Test
+    void getByGiftCertificateId(){
+        long certificateId = 15;
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = new Tag();
+        tag1.setId(1);
+        tag1.setName("tag1");
+        Tag tag2 = new Tag();
+        tag2.setId(2);
+        tag2.setName("tag2");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        Mockito.doReturn(tagList).when(tagDao).findByCertificateId(ArgumentMatchers.eq(certificateId));
+
+        tagService.getByGiftCertificateId(certificateId);
+
+        Mockito.verify(tagDao, Mockito.times(1))
+                .findByCertificateId(ArgumentMatchers.eq(certificateId));
+    }
+
+    @Test
+    void getById(){
+        long tagId = 15;
+
+        Tag tag = new Tag();
+        Mockito.doReturn(tag).when(tagDao).findById(tagId);
+
+        tagService.getById(tagId);
+
+        Mockito.verify(tagDao, Mockito.times(1))
+                .findById(ArgumentMatchers.eq(tagId));
     }
 }

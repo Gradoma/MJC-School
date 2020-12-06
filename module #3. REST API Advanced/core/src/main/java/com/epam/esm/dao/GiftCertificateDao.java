@@ -10,7 +10,7 @@ public interface GiftCertificateDao {
     long add(GiftCertificate certificate);
     List<GiftCertificate> findByCriteria(QueryCriteria queryCriteria);
     GiftCertificate findById(long id);
-    boolean update(GiftCertificate certificate, List<Long> addedTagsId, List<Long> deletedTagsId);
+    boolean update(GiftCertificate certificate);
     boolean patch(GiftCertificate certificate);
     boolean delete(long id);
 }
