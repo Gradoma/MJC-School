@@ -35,12 +35,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             "tag_id = ? AND certificate_id = ?";
     private static final String PERCENTAGE = "%";
 
-    private final JdbcTemplate jdbcTemplate;
     private final SessionFactory sessionFactory;
 
-    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, SessionFactory sessionFactory){
+    public GiftCertificateDaoImpl(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
-        this.jdbcTemplate = jdbcTemplate;
     }
     @Override
     public long add(GiftCertificate certificate) {
@@ -131,14 +129,14 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         }
     }
 
-    private void addTagToCertId(long tagId, long certificateId){
-        jdbcTemplate.update(TAG_CERT_INSERT, tagId, certificateId);
-    }
-
-    private boolean deleteTagToCert(long certificateId, long tagId) {
-        int rows = jdbcTemplate.update(TAG_CERT_DELETE_BY_TAG_AND_CERT_ID, tagId, certificateId);
-        return rows == 1;
-    }
+//    private void addTagToCertId(long tagId, long certificateId){
+//        jdbcTemplate.update(TAG_CERT_INSERT, tagId, certificateId);
+//    }
+//
+//    private boolean deleteTagToCert(long certificateId, long tagId) {
+//        int rows = jdbcTemplate.update(TAG_CERT_DELETE_BY_TAG_AND_CERT_ID, tagId, certificateId);
+//        return rows == 1;
+//    }
 
     private LocalDateTime convertToUtcLocalDateTime(ZonedDateTime zonedDateTime){
         return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();

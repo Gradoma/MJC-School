@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.TestApp;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dto.TagDto;
@@ -9,20 +8,17 @@ import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TestApp.class)
+@SpringBootTest()
 class TagServiceImplTest {
     @Autowired
     private TagService tagService;

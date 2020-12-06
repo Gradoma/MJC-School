@@ -1,30 +1,23 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.TestApp;
-import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.entity.User;
-import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.service.OrderService;
 import com.epam.esm.service.UserService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TestApp.class)
+@SpringBootTest()
 class UserServiceImplTest {
     @Autowired
     private UserService userService;
@@ -35,6 +28,11 @@ class UserServiceImplTest {
     @Test
     void getById() {
         long id = 5;
+
+        User user = new User();
+        user.setId(id);
+        user.setName("name");
+        Mockito.doReturn(user).when(userDao).findById(ArgumentMatchers.eq(id));
         userService.getById(5);
 
         Mockito.verify(userDao, Mockito.times(1)).findById(ArgumentMatchers.eq(id));

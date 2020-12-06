@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.TestApp;
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateCriteria;
@@ -10,12 +9,10 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -24,15 +21,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TestApp.class)
+@SpringBootTest()
 class GiftCertificateServiceImplTest {
+
     @Autowired
     private GiftCertificateService giftCertificateService;
-//    @Autowired
-//    private GiftCertificateDtoMapper giftMapper;
-//    @Autowired
-//    private TagDtoMapper tagDtoMapper;
 
     @MockBean
     private TagDao tagDao;
