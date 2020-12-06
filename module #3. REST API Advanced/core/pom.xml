@@ -17,27 +17,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-
-            <!-- exclude junit 4 -->
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
-
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.7.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -54,12 +33,6 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.22</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--            <artifactId>spring-test</artifactId>-->
-<!--            <version>5.2.10.RELEASE</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -71,12 +44,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.16</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>3.6.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
@@ -97,12 +64,6 @@
             <groupId>org.glassfish.web</groupId>
             <artifactId>javax.el</artifactId>
             <version>2.2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>2.23.4</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.hateoas</groupId>
