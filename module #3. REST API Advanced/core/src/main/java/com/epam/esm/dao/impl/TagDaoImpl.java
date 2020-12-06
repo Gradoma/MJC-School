@@ -5,6 +5,7 @@ import com.epam.esm.dao.builder.QueryBuilder;
 import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.dao.util.HibernateUtil;
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
@@ -12,6 +13,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.type.IntegerType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,18 +27,15 @@ import static com.epam.esm.dao.column.TagTableConst.*;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private static final String SELECT_MOST_POPULAR_TAG = "SELECT tag.id, tag.name " +
-            "FROM tag " +
-            "JOIN tag_certificate ON tag_certificate.tag_id = tag.id " +
-            "JOIN giftcertificate ON giftcertificate.id = tag_certificate.certificate_id " +
-            "WHERE giftcertificate.id IN " +
+    private static final String SELECT_MOST_POPULAR_TAG = "select id, name from tag where tag.id = " +
+            "(select tag_certificate.tag_id from tag_certificate where tag_certificate.certificate_id IN " +
             "(SELECT certificate_id FROM orders " +
             "WHERE user_id= " +
-            "    (SELECT user_id FROM orders WHERE cost = (SELECT MAX(cost) FROM orders)) " +
-            "    ) " +
-            "GROUP BY tag.name " +
-            "ORDER BY COUNT(tag.name) DESC " +
-            "LIMIT 1";
+            "(SELECT user_id FROM orders WHERE cost = " +
+            "(SELECT MAX(cost) FROM orders))) " +
+            "GROUP BY tag_id " +
+            "ORDER BY COUNT(tag_id) DESC " +
+            "LIMIT 1);";
     private final SessionFactory sessionFactory;
 
     public TagDaoImpl(SessionFactory sessionFactory){
@@ -109,8 +108,13 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Tag findMostPopular() {          // todo
-//        return jdbcTemplate.queryForObject(SELECT_MOST_POPULAR_TAG, tagMapper);
-        return null;
+        Session session = sessionFactory.openSession();
+        NativeQuery<Tag> query = session.createNativeQuery(SELECT_MOST_POPULAR_TAG, Tag.class);
+        Tag tag = query.uniqueResult();
+        if (tag == null){
+            throw new ResourceNotFoundException("Tag not found");
+        }
+        return tag;
     }
 
     @Override
