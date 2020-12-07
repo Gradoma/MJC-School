@@ -27,7 +27,7 @@ public class GiftCertificateDto{
     @NotNull(groups = {New.class})
     @Digits(groups = {New.class}, integer = 5, fraction = 2)
     private Double price;
-    private String createDate;      //todo custom annotation validation
+    private String createDate;
     private String lastUpdateDate;
     @NotNull(groups = {New.class, DurationPatch.class})
     @Min(groups = {New.class, DurationPatch.class}, value = 1)

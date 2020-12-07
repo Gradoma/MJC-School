@@ -51,7 +51,7 @@ public class TagController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TagDto> create(@RequestBody @Valid TagDto tagDto){        //todo (rename to createTag?)
+    public ResponseEntity<TagDto> create(@RequestBody @Valid TagDto tagDto){
         long generatedId = tagService.save(tagDto);
         URI resourceUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(URL + "/" + generatedId).build().toUri();

@@ -19,5 +19,5 @@ public class OrderDto extends RepresentationModel<OrderDto> {
     @Digits(integer = 20, fraction = 0)
     private Long certificateId;
     private Double cost;
-    private String purchase_date;   //todo custom annotation validation
+    private String purchase_date;
 }

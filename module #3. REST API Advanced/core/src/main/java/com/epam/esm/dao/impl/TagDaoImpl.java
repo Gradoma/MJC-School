@@ -91,7 +91,7 @@ public class TagDaoImpl implements TagDao {
     @Override
     public List<Tag> findByCertificateId(long certificateId) {
         Session session = sessionFactory.openSession();
-        List<Tag> tagList = session.getNamedNativeQuery("findByCertificateId")      //todo fix
+        List<Tag> tagList = session.getNamedNativeQuery("findByCertificateId")
                 .setParameter("id", certificateId)
                 .list();
         if(tagList.size() == 0){
