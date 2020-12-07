@@ -3,12 +3,10 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.dto.UserDto;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.UserService;
 import com.epam.esm.service.mapper.UserDtoMapper;
 import com.epam.esm.service.sorting.PaginationUtil;
-import com.epam.esm.service.sorting.TagSortingCriteria;
 import com.epam.esm.service.sorting.UserSortingCriteria;
 import org.springframework.stereotype.Service;
 

@@ -76,20 +76,21 @@ public class TagDaoImpl implements TagDao {
     @Override
     public Tag findById(long id) {
         String hql = "FROM Tag WHERE id=:id";
-        Session session = sessionFactory.openSession();
-        Query query = session.createQuery(hql);
-        query.setParameter("id", id);
-        Tag resultTag = (Tag) query.uniqueResult();
-        if (resultTag == null){
-            throw new ResourceNotFoundException("Tag: id=" + id);
+        try (Session session = sessionFactory.openSession()) {
+            Query query = session.createQuery(hql);
+            query.setParameter("id", id);
+            Tag resultTag = (Tag) query.uniqueResult();
+            if (resultTag == null) {
+                throw new ResourceNotFoundException("Tag: id=" + id);
+            }
+            return resultTag;
         }
-        return resultTag;
     }
 
     @Override
     public List<Tag> findByCertificateId(long certificateId) {
         Session session = sessionFactory.openSession();
-        List<Tag> tagList = session.getNamedNativeQuery("findByCertificateId")
+        List<Tag> tagList = session.getNamedNativeQuery("findByCertificateId")      //todo fix
                 .setParameter("id", certificateId)
                 .list();
         if(tagList.size() == 0){

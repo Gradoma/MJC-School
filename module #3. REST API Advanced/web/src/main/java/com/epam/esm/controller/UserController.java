@@ -1,7 +1,5 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.dto.CertificateCriteria;
-import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.UserService;
 import org.springframework.http.MediaType;
@@ -29,10 +27,9 @@ public class UserController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<UserDto>> getByCriteria(@RequestParam(value = "page", required = false,
+    public ResponseEntity<List<UserDto>> getAll(@RequestParam(value = "page", required = false,
             defaultValue = "1") Integer page){
         List<UserDto> userDtoList = userService.getAll(page);
-//        userDtoList.forEach(userDto -> addLinks(certificateDto));
         return ResponseEntity.ok().body(userDtoList);
     }
 }

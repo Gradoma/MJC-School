@@ -12,10 +12,6 @@ public class QueryBuilder {
     private static final String DEFAULT_QUERY = "SELECT giftcertificate.id, giftcertificate.name, " +
             "description, price, create_date, last_update_date, duration_days " +
             "FROM giftcertificate";
-    private static final String SELECT_ID_BY_TAGS = " giftcertificate.id IN (SELECT certificate_id FROM tag_certificate " +
-            "INNER JOIN tag ON tag_certificate.tag_id = tag.id WHERE tag.name IN (:tag_names)) ";
-    private static final String BY_NAME = " LOWER(giftcertificate.name) LIKE LOWER(:name)";
-    private static final String BY_DESCRIPTION = " LOWER(description) LIKE LOWER(:description)";
     private static final String AND = " AND";
     private static final String WHERE = " WHERE ";
     private static final String ORDER_BY = " ORDER BY ";
@@ -33,7 +29,6 @@ public class QueryBuilder {
     private static final String AND_CERT_ID_IN = " AND certificate_id IN ";
     private static final String UPDATE = "UPDATE giftcertificate SET last_update_date ";
     private static final String WHERE_ID = "' WHERE id = ";
-    private static final String LIMIT = " LIMIT ";
 
     public static String makeQuerySelectCertificateWithConditions(CertificateCriteria criteria){
         int counter = 0;

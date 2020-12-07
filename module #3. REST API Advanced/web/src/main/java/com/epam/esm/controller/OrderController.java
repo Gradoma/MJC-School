@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 @Validated
@@ -54,7 +55,11 @@ public class OrderController {
         Link certificateLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
                 .getById(certificateId))
                 .withRel("certificate");
+        long userId = orderDto.getUserId();
+        Link userLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
+                .getById(userId))
+                .withRel("user");
         orderDto.add(certificateLink);
-        // todo add user link
+        orderDto.add(userLink);
     }
 }

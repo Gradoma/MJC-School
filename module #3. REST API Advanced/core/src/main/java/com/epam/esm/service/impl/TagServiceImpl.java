@@ -25,6 +25,7 @@ public class TagServiceImpl implements TagService {
         this.dtoMapper = dtoMapper;
     }
 
+    @Transactional
     @Override
     public long save(TagDto tagDto) {
         tagDto.setId(0L);

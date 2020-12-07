@@ -1,7 +1,6 @@
 package com.epam.esm.entity;
 
 import com.epam.esm.dao.column.OrdersTableConst;
-import com.epam.esm.dao.column.TagTableConst;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
