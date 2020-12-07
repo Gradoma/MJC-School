@@ -40,13 +40,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public long add(GiftCertificateDto certificateDto){
         GiftCertificate certificate = giftMapper.toEntity(certificateDto);
-        if(certificate.getCreateDate() == null){
-            certificate.setCreateDate(ZonedDateTime.now());
-            certificate.setLastUpdateDate(certificate.getCreateDate());
-        }
-        if(certificate.getLastUpdateDate() == null){
-            certificate.setLastUpdateDate(ZonedDateTime.now());
-        }
         certificateDto.getTags().forEach(tagDto -> {
             saveTagIfNew(tagDto);
             Tag tag = tagMapper.toEntity(tagDto);
@@ -95,7 +88,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         });
         updatedCertificate.setId(certificateId);
         updatedCertificate.setCreateDate(ZonedDateTime.parse(originalCertDto.getCreateDate()));
-        updatedCertificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneId.systemDefault()));
         return certificateDao.update(updatedCertificate);
     }
 

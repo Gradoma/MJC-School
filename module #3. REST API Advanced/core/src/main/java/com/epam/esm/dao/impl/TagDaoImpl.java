@@ -3,32 +3,24 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.builder.QueryBuilder;
 import com.epam.esm.dao.criteria.QueryCriteria;
-import com.epam.esm.dao.mapper.TagMapper;
-import com.epam.esm.dao.util.HibernateUtil;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.type.IntegerType;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.epam.esm.dao.column.TagTableConst.*;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private static final String SELECT_MOST_POPULAR_TAG = "select id, name from tag where tag.id = " +
-            "(select tag_certificate.tag_id from tag_certificate where tag_certificate.certificate_id IN " +
+    private static final String SELECT_MOST_POPULAR_TAG = "SELECT id, name FROM tag WHERE tag.id = " +
+            "(SELECT tag_certificate.tag_id FROM tag_certificate WHERE tag_certificate.certificate_id IN " +
             "(SELECT certificate_id FROM orders " +
             "WHERE user_id= " +
             "(SELECT user_id FROM orders WHERE cost = " +
@@ -107,7 +99,7 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public Tag findMostPopular() {          // todo
+    public Tag findMostPopular() {
         Session session = sessionFactory.openSession();
         NativeQuery<Tag> query = session.createNativeQuery(SELECT_MOST_POPULAR_TAG, Tag.class);
         Tag tag = query.uniqueResult();

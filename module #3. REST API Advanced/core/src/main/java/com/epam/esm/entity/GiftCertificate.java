@@ -1,15 +1,13 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.dao.audit.AuditListener;
 import com.epam.esm.dao.column.GiftCertificateTableConst;
 import com.epam.esm.dao.column.TagToCertificateTableConst;
 import com.epam.esm.dao.util.DurationConverter;
 import com.epam.esm.entity.util.CertificateTagsUtil;
 import lombok.*;
-import org.hibernate.annotations.Type;
-import org.hibernate.type.DurationType;
 
 import javax.persistence.*;
-import java.sql.Types;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -18,6 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
+@EntityListeners(AuditListener.class)
 @Entity
 @Table(name = GiftCertificateTableConst.TABLE_CERTIFICATE)
 public class GiftCertificate {

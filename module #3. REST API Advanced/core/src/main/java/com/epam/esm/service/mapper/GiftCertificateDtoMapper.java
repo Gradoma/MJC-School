@@ -18,12 +18,6 @@ public class GiftCertificateDtoMapper {
         giftCertificate.setPrice(certificateDto.getPrice());
         long days = certificateDto.getDuration();
         giftCertificate.setDuration(Duration.ofDays(days));
-        if(certificateDto.getCreateDate() != null){
-            giftCertificate.setCreateDate(ZonedDateTime.parse(certificateDto.getCreateDate()));
-        }
-        if(certificateDto.getLastUpdateDate() != null) {
-            giftCertificate.setLastUpdateDate(ZonedDateTime.parse(certificateDto.getLastUpdateDate()));
-        }
         return giftCertificate;
     }
 
