@@ -3,6 +3,7 @@ package com.epam.esm.handler;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.InvalidSortingException;
 import com.epam.esm.exception.ResourceNotFoundException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.ConstraintViolationException;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
@@ -51,12 +51,12 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ConversionFailedException.class)          //todo fix
+    @ExceptionHandler(ConversionFailedException.class)
     public final ResponseEntity<ErrorResponse> handleConversionFailedException(ConversionFailedException ex){
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)       //todo fix
+    @ExceptionHandler(org.hibernate.exception.ConstraintViolationException.class)
     public final ResponseEntity<ErrorResponse> handleConstraintViolationException (ConstraintViolationException ex) {
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }

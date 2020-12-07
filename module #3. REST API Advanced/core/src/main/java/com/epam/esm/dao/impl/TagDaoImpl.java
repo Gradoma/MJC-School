@@ -24,7 +24,8 @@ public class TagDaoImpl implements TagDao {
             "(SELECT certificate_id FROM orders " +
             "WHERE user_id= " +
             "(SELECT user_id FROM orders WHERE cost = " +
-            "(SELECT MAX(cost) FROM orders))) " +
+            "(SELECT MAX(cost) FROM orders)" +
+            "LIMIT 1)) " +
             "GROUP BY tag_id " +
             "ORDER BY COUNT(tag_id) DESC " +
             "LIMIT 1);";
