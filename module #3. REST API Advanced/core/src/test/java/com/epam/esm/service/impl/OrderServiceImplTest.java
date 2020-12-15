@@ -70,8 +70,8 @@ class OrderServiceImplTest {
         QueryCriteria criteria = captor.getValue();
         assertNotNull(criteria.getSortingCriteria());
         assertNotNull(criteria.getSortingOrder());
-        assertEquals(5, criteria.getFirstResult());
-        assertEquals(5, criteria.getResultLimit());
+        assertEquals(10, criteria.getFirstResult());
+        assertEquals(10, criteria.getResultLimit());
     }
 
     @Test

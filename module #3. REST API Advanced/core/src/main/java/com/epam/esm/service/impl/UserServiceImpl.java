@@ -6,7 +6,7 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.UserService;
 import com.epam.esm.service.mapper.UserDtoMapper;
-import com.epam.esm.service.sorting.PaginationUtil;
+import com.epam.esm.service.pagination.PaginationUtil;
 import com.epam.esm.service.sorting.UserSortingCriteria;
 import org.springframework.stereotype.Service;
 

@@ -15,7 +15,6 @@ public class AuditListener {
             GiftCertificate certificate = (GiftCertificate) object;
             certificate.setCreateDate(ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC));
             certificate.setLastUpdateDate(certificate.getCreateDate());
-            System.out.println("create dates: " + certificate.getCreateDate() + ", " + certificate.getLastUpdateDate());
         }
     }
 
@@ -24,7 +23,6 @@ public class AuditListener {
         if(object instanceof GiftCertificate){
             GiftCertificate certificate = (GiftCertificate) object;
             certificate.setLastUpdateDate(ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC));
-            System.out.println("date: " + certificate.getLastUpdateDate());
         }
     }
 }

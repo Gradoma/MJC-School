@@ -9,7 +9,7 @@ import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.mapper.OrderDtoMapper;
 import com.epam.esm.service.sorting.OrderSortingCriteria;
-import com.epam.esm.service.sorting.PaginationUtil;
+import com.epam.esm.service.pagination.PaginationUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;

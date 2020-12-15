@@ -33,7 +33,7 @@ class TagServiceImplTest {
         criteria.setSortingOrder(QueryCriteria.Order.ASC);
         criteria.setSortingCriteria(TagSortingCriteria.ID.getFieldName());
         criteria.setFirstResult(0);
-        criteria.setResultLimit(5);
+        criteria.setResultLimit(10);
 
         List<TagDto> resultList = tagService.getAll(page);
 

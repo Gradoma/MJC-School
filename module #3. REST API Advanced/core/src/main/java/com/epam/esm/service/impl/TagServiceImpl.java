@@ -6,7 +6,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.TagDtoMapper;
-import com.epam.esm.service.sorting.PaginationUtil;
+import com.epam.esm.service.pagination.PaginationUtil;
 import com.epam.esm.service.sorting.TagSortingCriteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

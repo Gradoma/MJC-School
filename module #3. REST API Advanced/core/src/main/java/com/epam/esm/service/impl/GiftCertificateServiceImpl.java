@@ -12,7 +12,9 @@ import com.epam.esm.service.TagService;
 import com.epam.esm.service.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.service.mapper.TagDtoMapper;
 import com.epam.esm.service.sorting.CertificateSortingCriteria;
-import com.epam.esm.service.sorting.PaginationUtil;
+import com.epam.esm.service.pagination.PaginationUtil;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,4 +1,4 @@
-package com.epam.esm.service.sorting;
+package com.epam.esm.service.pagination;
 
 public class PaginationUtil {
     public static final int ON_PAGE = 10;
