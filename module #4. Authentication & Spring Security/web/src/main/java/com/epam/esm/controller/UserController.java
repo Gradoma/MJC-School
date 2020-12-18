@@ -1,12 +1,16 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 @Validated
@@ -31,5 +35,13 @@ public class UserController {
             defaultValue = "1") Integer page){
         List<UserDto> userDtoList = userService.getAll(page);
         return ResponseEntity.ok().body(userDtoList);
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TagDto> create(@RequestBody @Valid UserDto userDto){
+        long generatedId = userService.create(userDto);
+        URI resourceUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(URL + "/" + generatedId).build().toUri();
+        return ResponseEntity.created(resourceUri).build();
     }
 }

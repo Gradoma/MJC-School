@@ -4,9 +4,11 @@ import com.epam.esm.dao.UserDao;
 import com.epam.esm.dao.builder.QueryBuilder;
 import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.entity.User;
+import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +20,17 @@ public class UserDaoImpl implements UserDao {
 
     public UserDaoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    public long add(User user) {
+        Session session = sessionFactory.getCurrentSession();
+        try{
+            session.save(user);
+        } catch (ConstraintViolationException e){
+            throw new DuplicateException("User:name=" + user.getName());
+        }
+        return user.getId();
     }
 
     @Override

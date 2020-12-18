@@ -11,11 +11,14 @@ import javax.validation.constraints.Size;
 @Data
 @NoArgsConstructor
 public class UserDto {
-    @NotNull
-    @Digits(integer = 20, fraction = 0)
-    @Positive
+//    @NotNull  //todo delete
+//    @Digits(integer = 20, fraction = 0)
+//    @Positive
     private Long id;
     @NotNull
     @Size(max = 45)
     private String name;
+    @NotNull
+    @Size(max = 255)
+    private String password;
 }
