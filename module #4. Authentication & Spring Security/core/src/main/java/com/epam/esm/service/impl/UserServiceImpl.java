@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public long create(UserDto userDto) {
         User user = userDtoMapper.toEntity(userDto);
-        user.setRole(new Role(RoleName.USER.name()));
+        user.setRole(new Role(RoleName.USER));
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         return userDao.add(user);
     }
@@ -41,6 +41,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getById(long id) {
         return userDtoMapper.toDto(userDao.findById(id));
+    }
+
+    @Override
+    public User getByName(String name) {
+        return userDao.findByName(name);
     }
 
     @Override

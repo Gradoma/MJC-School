@@ -8,5 +8,6 @@ import java.util.List;
 public interface UserDao {
     long add(User user);
     User findById(long id);
+    User findByName(String name);
     List<User> findAll(QueryCriteria criteria);
 }

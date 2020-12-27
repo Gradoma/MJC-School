@@ -11,8 +11,19 @@ import javax.persistence.*;
 @Entity
 @Table(name = RoleTableConst.TABLE_ROLE)
 public class Role {
-    public Role(String roleName){
-        this.roleName = roleName;
+    private static final long USER_ID = 2;
+    private static final long ADMIN_ID = 3;
+
+    public Role(RoleName roleName){
+        this.roleName = roleName.name();
+        switch (roleName){
+            case USER:
+                this.id = USER_ID;
+                break;
+            case ADMIN:
+                this.id = ADMIN_ID;
+                break;
+        }
     }
 
     @Id

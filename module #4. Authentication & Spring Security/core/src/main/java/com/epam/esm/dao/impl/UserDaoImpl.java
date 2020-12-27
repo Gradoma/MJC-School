@@ -6,6 +6,7 @@ import com.epam.esm.dao.criteria.QueryCriteria;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.DuplicateException;
 import com.epam.esm.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+@Slf4j
 public class UserDaoImpl implements UserDao {
     private final SessionFactory sessionFactory;
 
@@ -43,6 +45,20 @@ public class UserDaoImpl implements UserDao {
         if (user == null){
             throw new ResourceNotFoundException("User: id=" + id);
         }
+        return user;
+    }
+
+    @Override
+    public User findByName(String name) {
+        String hql = "FROM User WHERE name=:name";
+        Session session = sessionFactory.openSession();
+        Query query = session.createQuery(hql);
+        query.setParameter("name", name);
+        User user = (User) query.uniqueResult();
+        if (user == null){
+            throw new ResourceNotFoundException("User: name=" + name);
+        }
+        log.info("user = " + user);
         return user;
     }
 
